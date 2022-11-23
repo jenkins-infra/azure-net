@@ -28,20 +28,20 @@
 ## Resource groups
 resource "azurerm_resource_group" "prod_public" {
   name     = "prod-jenkins-public"
-  location = local.location
+  location = var.location
   tags     = local.default_tags
 }
 
 resource "azurerm_resource_group" "prod_private" {
   name     = "prod-jenkins-private"
-  location = local.location
+  location = var.location
   tags     = local.default_tags
 }
 
 ## Virtual networks
 resource "azurerm_virtual_network" "prod_public" {
   name                = "prod-jenkins-public-vnet"
-  location            = local.location
+  location            = var.location
   resource_group_name = azurerm_resource_group.prod_public.name
   address_space       = ""
   tags                = local.default_tags
@@ -49,7 +49,7 @@ resource "azurerm_virtual_network" "prod_public" {
 
 resource "azurerm_virtual_network" "prod_private" {
   name                = "prod-jenkins-private-vnet"
-  location            = local.location
+  location            = var.location
   resource_group_name = azurerm_resource_group.prod_private.name
   address_space       = ""
   tags                = local.default_tags
@@ -58,7 +58,7 @@ resource "azurerm_virtual_network" "prod_private" {
 ## Network Security Groups
 resource "azurerm_network_security_group" "prod_public_apptier" {
   name                = "prod-jenkins-public-vnet-apptier"
-  location            = local.location
+  location            = var.location
   resource_group_name = azurerm_resource_group.prod_public.name
 
   # Inbound rules
