@@ -109,6 +109,16 @@ resource "azurerm_network_security_group" "prod_public_apptier" {
     destination_port_range = "22"
     source_address_prefix  = "52.167.253.43/32,52.202.51.185/32,52.177.88.13/32"
   }
+  # You shall not pass!
+  security_rule {
+    name                   = "deny-all-inbound"
+    priority               = 65500
+    direction              = "Inbound"
+    access                 = "Deny"
+    protocol               = "*"
+    source_port_range      = "*"
+    destination_port_range = "*"
+  }
 
   tags = local.default_tags
 }
