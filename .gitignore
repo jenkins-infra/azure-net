@@ -1,0 +1,13 @@
+# Compiled files
+*.tfstate
+*.tfstate.backup
+*.html
+.ruby-*
+*.sw*
+.*.json
+.tf-prepare/
+.tf-remote-state-enabled
+.terraform
+backend-config
+terraform-plan-output.txt
+tfplan
