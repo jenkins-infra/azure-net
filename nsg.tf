@@ -1,5 +1,4 @@
 ## Network Security Groups
-#tfsec:ignore:azure-network-no-public-ingress #tfsec:ignore:azure-network-no-public-egress
 resource "azurerm_network_security_group" "prod_public_apptier" {
   name                = "prod-jenkins-public-vnet-apptier"
   location            = var.location
@@ -80,6 +79,7 @@ resource "azurerm_network_security_group" "prod_public_apptier" {
     source_address_prefix        = "*"
     destination_address_prefixes = azurerm_virtual_network.prod_private.address_space
   }
+  #tfsec:ignore:azure-network-no-public-egress
   security_rule {
     name                       = "allow-https-outbound"
     priority                   = 2101
