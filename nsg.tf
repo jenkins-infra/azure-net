@@ -40,7 +40,9 @@ resource "azurerm_network_security_group" "prod_public_apptier" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "873"
-    source_address_prefixes    = var.whitelist_ips
+    # 52.202.51.185: pkg.origin.jenkins.io
+    # TODO: replace by the object reference data when all DNS entries will be imported
+    source_address_prefixes = ["52.202.51.185/32"]
     destination_address_prefix = "*"
   }
   security_rule {
