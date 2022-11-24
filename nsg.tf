@@ -6,43 +6,49 @@ resource "azurerm_network_security_group" "prod_public_apptier" {
 
   # Inbound rules
   security_rule {
-    name                   = "allow-http-inbound"
-    priority               = 100
-    direction              = "Inbound"
-    access                 = "Allow"
-    protocol               = "Tcp"
-    source_port_range      = "*"
-    destination_port_range = "80"
-  }
-  security_rule {
-    name                   = "allow-https-inbound"
-    priority               = 101
-    direction              = "Inbound"
-    access                 = "Allow"
-    protocol               = "Tcp"
-    source_port_range      = "*"
-    destination_port_range = "443"
-  }
-  security_rule {
-    name                   = "allow-ldap-inbound"
-    priority               = 102
-    direction              = "Inbound"
-    access                 = "Allow"
-    protocol               = "Tcp"
-    source_port_range      = "*"
-    destination_port_range = "636"
-  }
-  security_rule {
-    name                       = "allow-rsyncd-inbound"
-    priority                   = 103
+    name                       = "allow-http-inbound"
+    priority                   = 100
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
-    destination_port_range     = "873"
+    destination_port_range     = "80"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+  security_rule {
+    name                       = "allow-https-inbound"
+    priority                   = 101
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+  security_rule {
+    name                       = "allow-ldap-inbound"
+    priority                   = 102
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "636"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+  security_rule {
+    name                   = "allow-rsyncd-inbound"
+    priority               = 103
+    direction              = "Inbound"
+    access                 = "Allow"
+    protocol               = "Tcp"
+    source_port_range      = "*"
+    destination_port_range = "873"
     # 52.202.51.185: pkg.origin.jenkins.io
     # TODO: replace by the object reference data when all DNS entries will be imported
-    source_address_prefixes = ["52.202.51.185/32"]
+    source_address_prefixes    = ["52.202.51.185/32"]
     destination_address_prefix = "*"
   }
   security_rule {
@@ -64,8 +70,8 @@ resource "azurerm_network_security_group" "prod_public_apptier" {
     direction                    = "Outbound"
     access                       = "Allow"
     protocol                     = "Tcp"
-    source_port_range            = "8140"
-    destination_port_range       = "*"
+    source_port_range            = "*"
+    destination_port_range       = "8140"
     source_address_prefix        = "*"
     destination_address_prefixes = azurerm_virtual_network.prod_private.address_space
   }
@@ -76,8 +82,8 @@ resource "azurerm_network_security_group" "prod_public_apptier" {
     direction                  = "Outbound"
     access                     = "Allow"
     protocol                   = "Tcp"
-    source_port_range          = "443"
-    destination_port_range     = "*"
+    source_port_range          = "*"
+    destination_port_range     = "443"
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
