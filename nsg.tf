@@ -46,17 +46,6 @@ resource "azurerm_network_security_group" "prod_public_apptier" {
     destination_address_prefix = "*"
   }
   security_rule {
-    name                       = "allow-public-ssh-inbound"
-    priority                   = 4000
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "22"
-    source_address_prefixes    = azurerm_virtual_network.prod_public.address_space
-    destination_address_prefix = "*"
-  }
-  security_rule {
     name                       = "allow-private-ssh-inbound"
     priority                   = 4001
     direction                  = "Inbound"
