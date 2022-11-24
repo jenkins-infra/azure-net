@@ -43,7 +43,7 @@ resource "azurerm_virtual_network" "prod_public" {
   name                = "prod-jenkins-public-vnet"
   location            = var.location
   resource_group_name = azurerm_resource_group.prod_public.name
-  address_space       = "10.244.0.0/14"
+  address_space       = ["10.244.0.0/14"]
   tags                = local.default_tags
 }
 
@@ -51,7 +51,7 @@ resource "azurerm_virtual_network" "prod_private" {
   name                = "prod-jenkins-private-vnet"
   location            = var.location
   resource_group_name = azurerm_resource_group.prod_private.name
-  address_space       = "10.248.0.0/14"
+  address_space       = ["10.248.0.0/14"]
   tags                = local.default_tags
 }
 
