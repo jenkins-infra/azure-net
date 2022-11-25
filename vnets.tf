@@ -8,10 +8,10 @@
 #     ┌─────────►   Public VPN Gateway  ◄─────────►  Public Production VNet  │
 #     │         │                       │         │                          │
 #     │         └───────────────────────┘         │                          │
-#     │                                           └────────────▲─────────────┘
-#     │                                                        │
-#                                                              │
-# The Internet                                           VNet peering
+#     │                                           └─▲──────────▲─────────────┘
+#     │                                             │          │
+#                                                   │          │
+# The Internet ─────────────────────────────────────┘    VNet peering
 #                                                              │
 #     │                                                        │
 #     │                                           ┌────────────▼─────────────┐
@@ -21,7 +21,6 @@
 #               │                       │         │                          │
 #               └───────────────────────┘         │                          │
 #                                                 └──────────────────────────┘
-#
 #
 # See also https://github.com/jenkins-infra/azure/blob/legacy-tf/plans/vnets.tf
 
@@ -47,6 +46,8 @@ resource "azurerm_virtual_network" "prod_public" {
   tags                = local.default_tags
 }
 
+### Private VNet Address Plan:
+# - azure-net/vpn: 10.244.0.0/28 (x16 from 10.244.0.1 to 10.244.0.14)
 resource "azurerm_virtual_network" "prod_private" {
   name                = "${azurerm_resource_group.prod_private.name}-vnet"
   location            = azurerm_resource_group.prod_private.location
@@ -63,6 +64,6 @@ resource "azurerm_virtual_network_peering" "prod_private_public" {
   remote_virtual_network_id    = azurerm_virtual_network.prod_public.id
   allow_virtual_network_access = true
   allow_forwarded_traffic      = true
-  allow_gateway_transit = false
-  use_remote_gateways = false
+  allow_gateway_transit        = false
+  use_remote_gateways          = false
 }
