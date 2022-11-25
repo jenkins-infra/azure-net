@@ -40,7 +40,7 @@ resource "azurerm_resource_group" "prod_private" {
 
 ## Virtual networks
 resource "azurerm_virtual_network" "prod_public" {
-  name                = "prod-jenkins-public-vnet"
+  name                = "${azurerm_resource_group.prod_public.name}-vnet"
   location            = azurerm_resource_group.prod_public.location
   resource_group_name = azurerm_resource_group.prod_public.name
   address_space       = ["10.244.0.0/14"]
@@ -48,7 +48,7 @@ resource "azurerm_virtual_network" "prod_public" {
 }
 
 resource "azurerm_virtual_network" "prod_private" {
-  name                = "prod-jenkins-private-vnet"
+  name                = "${azurerm_resource_group.prod_private.name}-vnet"
   location            = azurerm_resource_group.prod_private.location
   resource_group_name = azurerm_resource_group.prod_private.name
   address_space       = ["10.248.0.0/14"]
@@ -57,7 +57,7 @@ resource "azurerm_virtual_network" "prod_private" {
 
 ## Peering
 resource "azurerm_virtual_network_peering" "prod_private_public" {
-  name                         = "prod-public-private-peering"
+  name                         = "${azurerm_resource_group.prod_public.name}-peering"
   resource_group_name          = azurerm_resource_group.prod_private.name
   virtual_network_name         = azurerm_virtual_network.prod_private.name
   remote_virtual_network_id    = azurerm_virtual_network.prod_public.id
