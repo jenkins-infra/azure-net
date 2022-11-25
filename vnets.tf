@@ -56,17 +56,6 @@ resource "azurerm_virtual_network" "prod_private" {
 }
 
 ## Peering
-resource "azurerm_virtual_network_peering" "prod_public_private" {
-  name                         = "prod-public-private-peering"
-  resource_group_name          = azurerm_resource_group.prod_public.name
-  virtual_network_name         = azurerm_virtual_network.prod_public.name
-  remote_virtual_network_id    = azurerm_virtual_network.prod_private.id
-  allow_virtual_network_access = true
-  allow_forwarded_traffic      = true
-  allow_gateway_transit = false
-  use_remote_gateways = false
-}
-
 resource "azurerm_virtual_network_peering" "prod_private_public" {
   name                         = "prod-public-private-peering"
   resource_group_name          = azurerm_resource_group.prod_private.name
