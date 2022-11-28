@@ -100,7 +100,7 @@ resource "azurerm_linux_virtual_machine" "vpn" {
     public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGFrPRIlP8qplANgNa3IO5c1gh0ZqNNj17RZeYcm+Jcb jenkins-infra-team@googlegroups.com"
   }
 
-  user_data = base64encode(templatefile("./vpn-cloudinit.tftpl", { hostname = join(".", local.vpn_subdomain, data.azurerm_dns_zone.jenkinsio.name) }))
+  user_data = base64encode(templatefile("./vpn-cloudinit.tftpl", { hostname = join(".", [local.vpn_subdomain, data.azurerm_dns_zone.jenkinsio.name]) }))
 
   os_disk {
     caching              = "ReadWrite"
