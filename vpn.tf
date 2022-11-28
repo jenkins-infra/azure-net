@@ -87,8 +87,8 @@ resource "azurerm_linux_virtual_machine" "vpn" {
   ]
 
   admin_ssh_key {
-    username   = "adminuser"
-    public_key = file("~/.ssh/id_rsa.pub")
+    username   = "jenkins-infra-team"
+    public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGFrPRIlP8qplANgNa3IO5c1gh0ZqNNj17RZeYcm+Jcb jenkins-infra-team@googlegroups.com"
   }
 
   os_disk {
