@@ -21,6 +21,15 @@ resource "azurerm_public_ip" "public" {
   tags                = local.default_tags
 }
 
+resource "azurerm_dns_a_record" "vpn" {
+  name                = local.vpn_subdomain
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 300
+  records             = [azurerm_public_ip.public.ip_address]
+  tags                = local.default_tags
+}
+
 resource "azurerm_network_interface" "main" {
   name                = "${azurerm_virtual_network.prod_private.name}-vpn-nic-main"
   location            = azurerm_resource_group.vpn.location
@@ -90,6 +99,8 @@ resource "azurerm_linux_virtual_machine" "vpn" {
     username   = "jenkins-infra-team"
     public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGFrPRIlP8qplANgNa3IO5c1gh0ZqNNj17RZeYcm+Jcb jenkins-infra-team@googlegroups.com"
   }
+
+  user_data = base64encode(templatefile("./vpn-cloudinit.tftpl", { hostname = join(".", local.vpn_subdomain, data.azurerm_dns_zone.jenkinsio.name) }))
 
   os_disk {
     caching              = "ReadWrite"
