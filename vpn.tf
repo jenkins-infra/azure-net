@@ -9,7 +9,7 @@ resource "azurerm_subnet" "vpn" {
   name                 = "${azurerm_virtual_network.prod_private.name}-vpn"
   resource_group_name  = azurerm_resource_group.vpn.name
   virtual_network_name = azurerm_virtual_network.prod_private.name
-  address_prefixes     = ["10.244.0.0/28"]
+  address_prefixes     = ["10.248.0.0/28"]
 }
 
 resource "azurerm_public_ip" "public" {
@@ -60,10 +60,17 @@ resource "azurerm_network_interface" "internal" {
 }
 
 # From https://github.com/hashicorp/terraform-provider-azurerm/blob/main/examples/virtual-machines/linux/public-ip/main.tf
-resource "azurerm_network_security_group" "webserver" {
-  name                = "${azurerm_resource_group.vpn.name}-tls-webserver"
+
+
+
+// For main interface (not internal!)
+resource "azurerm_network_security_group" "" {
+  name                = "${azurerm_resource_group.vpn.name}-tls-webserver" //TODO: correct name
   location            = azurerm_resource_group.vpn.location
   resource_group_name = azurerm_resource_group.vpn.name
+  // TODO:
+  // Allow only SSH from specific IPs
+  // Allow openvpn from all IPs
   security_rule {
     access                     = "Allow"
     direction                  = "Inbound"
@@ -75,12 +82,18 @@ resource "azurerm_network_security_group" "webserver" {
     destination_port_range     = "443"
     destination_address_prefix = azurerm_network_interface.main.private_ip_address
   }
+
+  // Outbound
+  // http/https (for apt-get upgrade for ex)
+  // + check from current jenkins-infra puppet config
   tags = local.default_tags
 }
 
-# Association should be linked to azurerm_network_interface.main instead of internal???
+// TODO: nsg for the internal NIC, check if existing one?
+// deny all, authorize 5432 for database only for ex, API k8s of privatek8s, ssh rebond
+
 resource "azurerm_network_interface_security_group_association" "main" {
-  network_interface_id      = azurerm_network_interface.internal.id
+  network_interface_id      = azurerm_network_interface.main
   network_security_group_id = azurerm_network_security_group.webserver.id
 }
 
@@ -89,18 +102,19 @@ resource "azurerm_linux_virtual_machine" "vpn" {
   resource_group_name = azurerm_resource_group.vpn.name
   location            = azurerm_resource_group.vpn.location
   size                = "Standard_B1s"
-  admin_username      = "adminuser"
+  admin_username      = local.vpn_username
   network_interface_ids = [
     azurerm_network_interface.main.id,
     azurerm_network_interface.internal.id,
   ]
 
   admin_ssh_key {
-    username   = "jenkins-infra-team"
-    public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGFrPRIlP8qplANgNa3IO5c1gh0ZqNNj17RZeYcm+Jcb jenkins-infra-team@googlegroups.com"
+    username   = local.vpn_username
+    public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC3mnu4alSfeWuKBDQjVZn0sSogh5Cf31SlV3CbbHhjmJ9ZKIe4KKGRNhgtrVosDwQ4QeW8bE2QwzExII6UOZQ8uEeLJHpjHR6DJNFCmUM24dvZD5eSTdLi89JcY1EGAIsVue+a7vdPDadPWQLb8eiYBuGfA4ydmFTIJEoCsNDZk6bOYyFxQPnYgKIuw9qxQhMvq55sMch+Fh+eMO4Sc0I5V0MMDl/UaC3hbpT9gegqwMw6hPC0OMhpEe3b/G/cW0buQf7pXSW4RN7ukyoeTTYXmjVKMB5K5qLAznSepe+p4qkGNdfQd1BcKNd72L8jEfc/Nbs8ZP34PHwsjFSTDC1WJWrwhzxCLinJ+WisB4JyWoY8S7ziOi4Rb7sevneYFjjVcY1kxvsM+dnzQxleRlPibV/1kzNtH/pqLFIX8eM+m6lTDgc6phhtQnWlPsLyrKbILAI6wP1MHvwz9SaKqKFXx+4Dnrz3my3L9U8v/oBCbHjhjjFSW3jT1ZAsXe553PmF7xYoFnSxrbXwjuVSfHrS2KEldfB116Acw5IMSTre+q7woP7XvocLZEi9AOE/+nQjL0R7XOCXI8ODOfk9BSQ1EOqyf1ONDIVf3ugAKoEQ22lBt8pLdFZjY2Mc5UbMzOT/MUYgLI/zKGg8+XGRXlYelEivMf3PBrit9FVucHhyfQ== jenkins-infra-team@googlegroups.com"
   }
 
-  user_data = base64encode(templatefile("./vpn-cloudinit.tftpl", { hostname = join(".", [local.vpn_subdomain, data.azurerm_dns_zone.jenkinsio.name]) }))
+  # TODO: put cloudinit template in .shared-tools? Same for every provider (ex: Oracle)
+  user_data = base64encode(templatefile("./cloudinit.tftpl", { hostname = join(".", [local.vpn_shorthostname, data.azurerm_dns_zone.jenkinsio.name]) }))
 
   os_disk {
     caching              = "ReadWrite"
@@ -111,7 +125,8 @@ resource "azurerm_linux_virtual_machine" "vpn" {
     publisher = "Canonical"
     offer     = "UbuntuServer"
     sku       = "20.04-LTS"
-    version   = "latest"
+    // TODO: use fixed version + updatecli manifest if it recreates the VM
+    version = "latest"
   }
 
   # identity {

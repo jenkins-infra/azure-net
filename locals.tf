@@ -4,5 +4,6 @@ locals {
     repository = "jenkins-infra/azure-net"
   }
 
-  vpn_subdomain = "vpn-test"
+  vpn_shorthostname = "vpn-test"
+  vpn_username      = "jenkins-infra-team"
 }

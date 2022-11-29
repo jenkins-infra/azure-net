@@ -47,7 +47,8 @@ resource "azurerm_virtual_network" "prod_public" {
 }
 
 ### Private VNet Address Plan:
-# - azure-net/vpn: 10.244.0.0/28 (x16 from 10.244.0.1 to 10.244.0.14)
+# - azure-net/vpn: 10.248.0.0/28 (x16 from 10.248.0.1 to 10.248.0.14)
+# - azure/privatek8s: 10.249.0.0/16 (x16 from 10.249.0.1 to 10.249.255.254)
 resource "azurerm_virtual_network" "prod_private" {
   name                = "${azurerm_resource_group.prod_private.name}-vnet"
   location            = azurerm_resource_group.prod_private.location
