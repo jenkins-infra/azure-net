@@ -107,6 +107,7 @@ resource "azurerm_network_security_group" "main" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
+  #tfsec:ignore:azure-network-no-public-egress
   security_rule {
     name                       = "allow-puppet-outbound"
     priority                   = 2002
