@@ -79,7 +79,7 @@ resource "azurerm_network_security_group" "main" {
     source_port_range          = "*"
     destination_port_range     = "22"
     source_address_prefix      = join(",", values(local.vpn.allowed_ips))
-    destination_address_prefix = azurerm_network_interface.main.private_ip_address
+    destination_address_prefix = azurerm_network_interface.main.private_ip_address # "*"?
   }
 
   ## Outbound rules
@@ -117,7 +117,7 @@ resource "azurerm_network_security_group" "main" {
     source_port_range          = "*"
     destination_port_range     = "8140"
     source_address_prefix      = "*"
-    destination_address_prefix = "*"
+    destination_address_prefix = local.vpn.puppet_ips
   }
 
   tags = local.default_tags
