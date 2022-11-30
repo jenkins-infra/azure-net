@@ -1,14 +1,14 @@
 resource "azurerm_resource_group" "vpn" {
-  name     = "prod-vpn"
+  name     = "vpn"
   location = var.location
   tags     = local.default_tags
 }
 
 # Dedicated subnet in the private vnet
 resource "azurerm_subnet" "vpn" {
-  name                 = "${azurerm_virtual_network.prod_private.name}-vpn"
+  name                 = "${azurerm_virtual_network.private.name}-vpn"
   resource_group_name  = azurerm_resource_group.vpn.name
-  virtual_network_name = azurerm_virtual_network.prod_private.name
+  virtual_network_name = azurerm_virtual_network.private.name
   address_prefixes     = ["10.248.0.0/28"]
 }
 
@@ -31,7 +31,7 @@ resource "azurerm_dns_a_record" "vpn" {
 }
 
 resource "azurerm_network_interface" "main" {
-  name                = "${azurerm_virtual_network.prod_private.name}-vpn-nic-main"
+  name                = "${azurerm_virtual_network.private.name}-vpn-nic-main"
   location            = azurerm_resource_group.vpn.location
   resource_group_name = azurerm_resource_group.vpn.name
 
@@ -46,7 +46,7 @@ resource "azurerm_network_interface" "main" {
 }
 
 resource "azurerm_network_interface" "internal" {
-  name                = "${azurerm_virtual_network.prod_private.name}-vpn-nic-internal"
+  name                = "${azurerm_virtual_network.private.name}-vpn-nic-internal"
   location            = azurerm_resource_group.vpn.location
   resource_group_name = azurerm_resource_group.vpn.name
 
@@ -133,7 +133,7 @@ resource "azurerm_network_interface_security_group_association" "main" {
 }
 
 resource "azurerm_linux_virtual_machine" "vpn" {
-  name                = "${azurerm_virtual_network.prod_private.name}-vpn"
+  name                = "${azurerm_virtual_network.private.name}-vpn"
   resource_group_name = azurerm_resource_group.vpn.name
   location            = azurerm_resource_group.vpn.location
   size                = "Standard_B1s"
@@ -148,7 +148,7 @@ resource "azurerm_linux_virtual_machine" "vpn" {
     public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC3mnu4alSfeWuKBDQjVZn0sSogh5Cf31SlV3CbbHhjmJ9ZKIe4KKGRNhgtrVosDwQ4QeW8bE2QwzExII6UOZQ8uEeLJHpjHR6DJNFCmUM24dvZD5eSTdLi89JcY1EGAIsVue+a7vdPDadPWQLb8eiYBuGfA4ydmFTIJEoCsNDZk6bOYyFxQPnYgKIuw9qxQhMvq55sMch+Fh+eMO4Sc0I5V0MMDl/UaC3hbpT9gegqwMw6hPC0OMhpEe3b/G/cW0buQf7pXSW4RN7ukyoeTTYXmjVKMB5K5qLAznSepe+p4qkGNdfQd1BcKNd72L8jEfc/Nbs8ZP34PHwsjFSTDC1WJWrwhzxCLinJ+WisB4JyWoY8S7ziOi4Rb7sevneYFjjVcY1kxvsM+dnzQxleRlPibV/1kzNtH/pqLFIX8eM+m6lTDgc6phhtQnWlPsLyrKbILAI6wP1MHvwz9SaKqKFXx+4Dnrz3my3L9U8v/oBCbHjhjjFSW3jT1ZAsXe553PmF7xYoFnSxrbXwjuVSfHrS2KEldfB116Acw5IMSTre+q7woP7XvocLZEi9AOE/+nQjL0R7XOCXI8ODOfk9BSQ1EOqyf1ONDIVf3ugAKoEQ22lBt8pLdFZjY2Mc5UbMzOT/MUYgLI/zKGg8+XGRXlYelEivMf3PBrit9FVucHhyfQ== jenkins-infra-team@googlegroups.com"
   }
 
-  user_data = base64encode(templatefile("./shared-tools/terraform/cloudinit.tftpl", { hostname = join(".", [local.vpn.shorthostname, data.azurerm_dns_zone.jenkinsio.name]) }))
+  user_data = base64encode(templatefile("./.shared-tools/terraform/cloudinit.tftpl", { hostname = join(".", [local.vpn.shorthostname, data.azurerm_dns_zone.jenkinsio.name]) }))
 
   os_disk {
     caching              = "ReadWrite"
