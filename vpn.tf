@@ -7,7 +7,7 @@ resource "azurerm_resource_group" "vpn" {
 # Dedicated subnet in the private vnet
 resource "azurerm_subnet" "vpn" {
   name                 = "${azurerm_virtual_network.private.name}-vpn"
-  resource_group_name  = azurerm_resource_group.vpn.name
+  resource_group_name  = azurerm_resource_group.private.name
   virtual_network_name = azurerm_virtual_network.private.name
   address_prefixes     = ["10.248.0.0/28"]
 }
