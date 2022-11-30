@@ -59,16 +59,11 @@ resource "azurerm_network_interface" "internal" {
   tags = local.default_tags
 }
 
-# From https://github.com/hashicorp/terraform-provider-azurerm/blob/main/examples/virtual-machines/linux/public-ip/main.tf
-
-// For main interface (not internal!)
 resource "azurerm_network_security_group" "main" {
   name                = "${azurerm_resource_group.vpn.name}-nsg-main"
   location            = azurerm_resource_group.vpn.location
   resource_group_name = azurerm_resource_group.vpn.name
-  // TODO:
-  // Allow only SSH from specific IPs
-  // Allow openvpn from all IPs
+  // TODO: allow openvpn from all IPs
   ## Inbound rules
   security_rule {
     name                       = "allowed-ssh-ips-inbound"
@@ -126,7 +121,6 @@ resource "azurerm_network_security_group" "main" {
 // TODO: nsg for the internal NIC, check if existing one?
 // deny all, authorize 5432 for database only for ex, API k8s of privatek8s, ssh rebond
 
-
 resource "azurerm_network_interface_security_group_association" "main" {
   network_interface_id      = azurerm_network_interface.main.id
   network_security_group_id = azurerm_network_security_group.main.id
@@ -164,10 +158,6 @@ resource "azurerm_linux_virtual_machine" "vpn" {
     # az vm image list --all --publisher="Canonical" --sku="22_04-lts-gen2" --offer="0001-com-ubuntu-server-jammy"
     version = "22.04.202211160"
   }
-
-  # identity {
-  #   type = "SystemAssigned"
-  # }
 
   tags = local.default_tags
 }
