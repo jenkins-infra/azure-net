@@ -2,46 +2,46 @@
 # Networks in Azure according to IEP-002:
 #   <https://github.com/jenkins-infra/iep/tree/master/iep-002>
 #
-#                                                 ┌──────────────────────────┐
-#               ┌───────────────────────┐         │                          │
-#               │                       │         │                          │
-#     ┌─────────►   Public VPN Gateway  ◄─────────►  Public Production VNet  │
-#     │         │                       │         │                          │
-#     │         └───────────────────────┘         │                          │
-#     │                                           └─▲──────────▲─────────────┘
+#                                                 ┌────────────────┐
+#               ┌───────────────────────┐         │                │
+#               │                       │         │                │
+#     ┌─────────►   Public VPN Gateway  ◄─────────►  Public VNet   │
+#     │         │                       │         │                │
+#     │         └───────────────────────┘         │                │
+#     │                                           └─▲──────────▲───┘
 #     │                                             │          │
 #                                                   │          │
 # The Internet ─────────────────────────────────────┘    VNet peering
 #                                                              │
 #     │                                                        │
-#     │                                           ┌────────────▼─────────────┐
-#     │         ┌───────────────────────┐         │                          │
-#     │         │                       │         │                          │
-#     └─────────►  Private VPN Gateway  ◄─────────►  Private Production VNet │
-#               │                       │         │                          │
-#               └───────────────────────┘         │                          │
-#                                                 └──────────────────────────┘
+#     │                                           ┌────────────▼───┐
+#     │         ┌───────────────────────┐         │                │
+#     │         │                       │         │                │
+#     └─────────►  Private VPN Gateway  ◄─────────►  Private VNet  │
+#               │                       │         │                │
+#               └───────────────────────┘         │                │
+#                                                 └────────────────┘
 #
 # See also https://github.com/jenkins-infra/azure/blob/legacy-tf/plans/vnets.tf
 
 ## Resource groups
-resource "azurerm_resource_group" "prod_public" {
-  name     = "prod-jenkins-public"
+resource "azurerm_resource_group" "public" {
+  name     = "public"
   location = var.location
   tags     = local.default_tags
 }
 
-resource "azurerm_resource_group" "prod_private" {
-  name     = "prod-jenkins-private"
+resource "azurerm_resource_group" "private" {
+  name     = "private"
   location = var.location
   tags     = local.default_tags
 }
 
 ## Virtual networks
-resource "azurerm_virtual_network" "prod_public" {
-  name                = "${azurerm_resource_group.prod_public.name}-vnet"
-  location            = azurerm_resource_group.prod_public.location
-  resource_group_name = azurerm_resource_group.prod_public.name
+resource "azurerm_virtual_network" "public" {
+  name                = "${azurerm_resource_group.public.name}-vnet"
+  location            = azurerm_resource_group.public.location
+  resource_group_name = azurerm_resource_group.public.name
   address_space       = ["10.244.0.0/14"]
   tags                = local.default_tags
 }
@@ -49,20 +49,20 @@ resource "azurerm_virtual_network" "prod_public" {
 ### Private VNet Address Plan:
 # - azure-net/vpn: 10.248.0.0/28 (x16 from 10.248.0.1 to 10.248.0.14)
 # - azure/privatek8s: 10.249.0.0/16 (x16 from 10.249.0.1 to 10.249.255.254)
-resource "azurerm_virtual_network" "prod_private" {
-  name                = "${azurerm_resource_group.prod_private.name}-vnet"
-  location            = azurerm_resource_group.prod_private.location
-  resource_group_name = azurerm_resource_group.prod_private.name
+resource "azurerm_virtual_network" "private" {
+  name                = "${azurerm_resource_group.private.name}-vnet"
+  location            = azurerm_resource_group.private.location
+  resource_group_name = azurerm_resource_group.private.name
   address_space       = ["10.248.0.0/14"]
   tags                = local.default_tags
 }
 
 ## Peering
-resource "azurerm_virtual_network_peering" "prod_private_public" {
-  name                         = "${azurerm_resource_group.prod_public.name}-peering"
-  resource_group_name          = azurerm_resource_group.prod_private.name
-  virtual_network_name         = azurerm_virtual_network.prod_private.name
-  remote_virtual_network_id    = azurerm_virtual_network.prod_public.id
+resource "azurerm_virtual_network_peering" "private_public" {
+  name                         = "${azurerm_resource_group.public.name}-peering"
+  resource_group_name          = azurerm_resource_group.private.name
+  virtual_network_name         = azurerm_virtual_network.private.name
+  remote_virtual_network_id    = azurerm_virtual_network.public.id
   allow_virtual_network_access = true
   allow_forwarded_traffic      = true
   allow_gateway_transit        = false
@@ -70,10 +70,10 @@ resource "azurerm_virtual_network_peering" "prod_private_public" {
 }
 
 ## Network Security Groups
-resource "azurerm_network_security_group" "prod_public_apptier" {
-  name                = "${azurerm_resource_group.prod_public.name}-nsg-apptier"
-  location            = azurerm_resource_group.prod_public.location
-  resource_group_name = azurerm_resource_group.prod_public.name
+resource "azurerm_network_security_group" "public_apptier" {
+  name                = "${azurerm_resource_group.public.name}-nsg-apptier"
+  location            = azurerm_resource_group.public.location
+  resource_group_name = azurerm_resource_group.public.name
 
   ## Inbound rules
 
@@ -134,7 +134,7 @@ resource "azurerm_network_security_group" "prod_public_apptier" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "22"
-    source_address_prefixes    = azurerm_virtual_network.prod_private.address_space
+    source_address_prefixes    = azurerm_virtual_network.private.address_space
     destination_address_prefix = "*"
   }
 
@@ -148,7 +148,7 @@ resource "azurerm_network_security_group" "prod_public_apptier" {
     source_port_range            = "*"
     destination_port_range       = "8140"
     source_address_prefix        = "*"
-    destination_address_prefixes = azurerm_virtual_network.prod_private.address_space
+    destination_address_prefixes = azurerm_virtual_network.private.address_space
   }
   #tfsec:ignore:azure-network-no-public-egress
   security_rule {
