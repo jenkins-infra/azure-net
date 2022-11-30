@@ -22,7 +22,7 @@ resource "azurerm_public_ip" "public" {
 }
 
 resource "azurerm_dns_a_record" "vpn" {
-  name                = local.vpn_subdomain
+  name                = local.vpn.shorthostname
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 300
@@ -61,40 +61,74 @@ resource "azurerm_network_interface" "internal" {
 
 # From https://github.com/hashicorp/terraform-provider-azurerm/blob/main/examples/virtual-machines/linux/public-ip/main.tf
 
-
-
 // For main interface (not internal!)
-resource "azurerm_network_security_group" "" {
-  name                = "${azurerm_resource_group.vpn.name}-tls-webserver" //TODO: correct name
+resource "azurerm_network_security_group" "main" {
+  name                = "${azurerm_resource_group.vpn.name}-nsg-main"
   location            = azurerm_resource_group.vpn.location
   resource_group_name = azurerm_resource_group.vpn.name
   // TODO:
   // Allow only SSH from specific IPs
   // Allow openvpn from all IPs
+  ## Inbound rules
   security_rule {
-    access                     = "Allow"
-    direction                  = "Inbound"
-    name                       = "tls"
+    name                       = "allowed-ssh-ips-inbound"
     priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
-    source_address_prefix      = "*"
-    destination_port_range     = "443"
+    destination_port_range     = "22"
+    source_address_prefix      = join(",", values(local.vpn.allowed_ips))
     destination_address_prefix = azurerm_network_interface.main.private_ip_address
   }
 
-  // Outbound
-  // http/https (for apt-get upgrade for ex)
-  // + check from current jenkins-infra puppet config
+  ## Outbound rules
+  #tfsec:ignore:azure-network-no-public-egress
+  security_rule {
+    name                       = "allow-http-outbound"
+    priority                   = 2000
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "80"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+  #tfsec:ignore:azure-network-no-public-egress
+  security_rule {
+    name                       = "allow-https-outbound"
+    priority                   = 2001
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+  security_rule {
+    name                         = "allow-puppet-outbound"
+    priority                     = 2002
+    direction                    = "Outbound"
+    access                       = "Allow"
+    protocol                     = "Tcp"
+    source_port_range            = "*"
+    destination_port_range       = "8140"
+    source_address_prefix        = "*"
+    destination_address_prefix = "*"
+  }
+
   tags = local.default_tags
 }
 
 // TODO: nsg for the internal NIC, check if existing one?
 // deny all, authorize 5432 for database only for ex, API k8s of privatek8s, ssh rebond
 
+
 resource "azurerm_network_interface_security_group_association" "main" {
-  network_interface_id      = azurerm_network_interface.main
-  network_security_group_id = azurerm_network_security_group.webserver.id
+  network_interface_id      = azurerm_network_interface.main.id
+  network_security_group_id = azurerm_network_security_group.main.id
 }
 
 resource "azurerm_linux_virtual_machine" "vpn" {
@@ -102,19 +136,19 @@ resource "azurerm_linux_virtual_machine" "vpn" {
   resource_group_name = azurerm_resource_group.vpn.name
   location            = azurerm_resource_group.vpn.location
   size                = "Standard_B1s"
-  admin_username      = local.vpn_username
+  admin_username      = local.vpn.username
   network_interface_ids = [
     azurerm_network_interface.main.id,
     azurerm_network_interface.internal.id,
   ]
 
   admin_ssh_key {
-    username   = local.vpn_username
+    username   = local.vpn.username
     public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC3mnu4alSfeWuKBDQjVZn0sSogh5Cf31SlV3CbbHhjmJ9ZKIe4KKGRNhgtrVosDwQ4QeW8bE2QwzExII6UOZQ8uEeLJHpjHR6DJNFCmUM24dvZD5eSTdLi89JcY1EGAIsVue+a7vdPDadPWQLb8eiYBuGfA4ydmFTIJEoCsNDZk6bOYyFxQPnYgKIuw9qxQhMvq55sMch+Fh+eMO4Sc0I5V0MMDl/UaC3hbpT9gegqwMw6hPC0OMhpEe3b/G/cW0buQf7pXSW4RN7ukyoeTTYXmjVKMB5K5qLAznSepe+p4qkGNdfQd1BcKNd72L8jEfc/Nbs8ZP34PHwsjFSTDC1WJWrwhzxCLinJ+WisB4JyWoY8S7ziOi4Rb7sevneYFjjVcY1kxvsM+dnzQxleRlPibV/1kzNtH/pqLFIX8eM+m6lTDgc6phhtQnWlPsLyrKbILAI6wP1MHvwz9SaKqKFXx+4Dnrz3my3L9U8v/oBCbHjhjjFSW3jT1ZAsXe553PmF7xYoFnSxrbXwjuVSfHrS2KEldfB116Acw5IMSTre+q7woP7XvocLZEi9AOE/+nQjL0R7XOCXI8ODOfk9BSQ1EOqyf1ONDIVf3ugAKoEQ22lBt8pLdFZjY2Mc5UbMzOT/MUYgLI/zKGg8+XGRXlYelEivMf3PBrit9FVucHhyfQ== jenkins-infra-team@googlegroups.com"
   }
 
   # TODO: put cloudinit template in .shared-tools? Same for every provider (ex: Oracle)
-  user_data = base64encode(templatefile("./cloudinit.tftpl", { hostname = join(".", [local.vpn_shorthostname, data.azurerm_dns_zone.jenkinsio.name]) }))
+  user_data = base64encode(templatefile("./cloudinit.tftpl", { hostname = join(".", [local.vpn.shorthostname, data.azurerm_dns_zone.jenkinsio.name]) }))
 
   os_disk {
     caching              = "ReadWrite"
@@ -124,7 +158,7 @@ resource "azurerm_linux_virtual_machine" "vpn" {
   source_image_reference {
     publisher = "Canonical"
     offer     = "UbuntuServer"
-    sku       = "20.04-LTS"
+    sku       = "22.04-LTS"
     // TODO: use fixed version + updatecli manifest if it recreates the VM
     version = "latest"
   }

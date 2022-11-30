@@ -4,6 +4,16 @@ locals {
     repository = "jenkins-infra/azure-net"
   }
 
-  vpn_shorthostname = "vpn-test"
-  vpn_username      = "jenkins-infra-team"
+  vpn = {
+    shorthostname = "vpn-test"
+    username      = "jenkins-infra-team"
+    allowed_ips = {
+      dduportal     = "109.88.253.68/32"
+      dduportal_gsm = "109.88.134.151/32"
+      lemeurherve   = "176.185.227.180/32"
+      smerle33      = "82.64.5.129/32"
+      olblak        = "109.128.249.199/32"
+      olblak_bis    = "86.130.79.46/32"
+    }
+  }
 }
