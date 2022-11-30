@@ -14,6 +14,9 @@ locals {
       olblak      = "109.128.249.199/32"
       olblak_bis  = "86.130.79.46/32"
     }
-    puppet_ips = ["140.211.9.94"]
+    puppet_ips = {
+      # dig puppet.jenkins.io
+      radish_jenkins_io = "140.211.9.94"
+    }
   }
 }
