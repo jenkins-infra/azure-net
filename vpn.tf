@@ -78,7 +78,7 @@ resource "azurerm_network_security_group" "main" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "22"
-    source_address_prefix      = join(",", values(local.vpn.allowed_ips))
+    source_address_prefixes    = values(local.vpn.allowed_ips)
     destination_address_prefix = azurerm_network_interface.main.private_ip_address # "*"?
   }
 
@@ -109,15 +109,15 @@ resource "azurerm_network_security_group" "main" {
   }
   #tfsec:ignore:azure-network-no-public-egress
   security_rule {
-    name                       = "allow-puppet-outbound"
-    priority                   = 2002
-    direction                  = "Outbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "8140"
-    source_address_prefix      = "*"
-    destination_address_prefix = join(".", values(local.vpn.puppet_ips))
+    name                         = "allow-puppet-outbound"
+    priority                     = 2002
+    direction                    = "Outbound"
+    access                       = "Allow"
+    protocol                     = "Tcp"
+    source_port_range            = "*"
+    destination_port_range       = "8140"
+    source_address_prefix        = "*"
+    destination_address_prefixes = values(local.vpn.puppet_ips)
   }
 
   tags = local.default_tags
@@ -158,10 +158,10 @@ resource "azurerm_linux_virtual_machine" "vpn" {
 
   source_image_reference {
     publisher = "Canonical"
-    offer     = "UbuntuServer"
+    offer     = "0001-com-ubuntu-server-jammy"
     sku       = "22_04-lts-gen2"
     // TODO: use fixed version + updatecli manifest if it recreates the VM
-    # az vm image list --all --publisher="Canonical" --sku="22_04-lts-gen2"
+    # az vm image list --all --publisher="Canonical" --sku="22_04-lts-gen2" --offer="0001-com-ubuntu-server-jammy"
     version = "22.04.202211160"
   }
 
