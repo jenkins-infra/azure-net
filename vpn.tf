@@ -73,7 +73,7 @@ resource "azurerm_network_security_group" "main" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "22"
-    source_address_prefixes    = values(local.vpn.allowed_ips)
+    source_address_prefixes    = values(local.vpn.ssh_allowed_inbound_ips)
     destination_address_prefix = azurerm_network_interface.main.private_ip_address # "*"?
   }
 
@@ -112,7 +112,7 @@ resource "azurerm_network_security_group" "main" {
     source_port_range            = "*"
     destination_port_range       = "8140"
     source_address_prefix        = "*"
-    destination_address_prefixes = values(local.vpn.puppet_ips)
+    destination_address_prefixes = values(local.vpn.puppet_outbound_ips)
   }
 
   tags = local.default_tags
