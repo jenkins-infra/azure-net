@@ -144,6 +144,8 @@ resource "azurerm_linux_virtual_machine" "vpn" {
   }
 
   user_data = base64encode(templatefile("./.shared-tools/terraform/cloudinit.tftpl", { hostname = join(".", [local.vpn.shorthostname, data.azurerm_dns_zone.jenkinsio.name]) }))
+  # Force VM recreation when the VPN URL change
+  computer_name = replace(join(".", [local.vpn.shorthostname, data.azurerm_dns_zone.jenkinsio.name]), ".", "-")
 
   os_disk {
     caching              = "ReadWrite"
