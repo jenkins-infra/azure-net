@@ -63,7 +63,7 @@ resource "azurerm_network_security_group" "main" {
   name                = "${azurerm_resource_group.vpn.name}-nsg-main"
   location            = azurerm_resource_group.vpn.location
   resource_group_name = azurerm_resource_group.vpn.name
-  // TODO: allow openvpn from all IPs
+
   ## Inbound rules
   security_rule {
     name                       = "allowed-ssh-ips-inbound"
@@ -77,42 +77,17 @@ resource "azurerm_network_security_group" "main" {
     destination_address_prefix = azurerm_network_interface.main.private_ip_address # "*"?
   }
 
-  ## Outbound rules
-  #tfsec:ignore:azure-network-no-public-egress
+  #tfsec:ignore:azure-network-no-public-ingress
   security_rule {
-    name                       = "allow-http-outbound"
-    priority                   = 2000
-    direction                  = "Outbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "80"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-  #tfsec:ignore:azure-network-no-public-egress
-  security_rule {
-    name                       = "allow-https-outbound"
-    priority                   = 2001
-    direction                  = "Outbound"
+    name                       = "allow-https-inbound"
+    priority                   = 101
+    direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "443"
     source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-  #tfsec:ignore:azure-network-no-public-egress
-  security_rule {
-    name                         = "allow-puppet-outbound"
-    priority                     = 2002
-    direction                    = "Outbound"
-    access                       = "Allow"
-    protocol                     = "Tcp"
-    source_port_range            = "*"
-    destination_port_range       = "8140"
-    source_address_prefix        = "*"
-    destination_address_prefixes = values(local.vpn.puppet_outbound_ips)
+    destination_address_prefix = azurerm_network_interface.main.private_ip_address # "*"?
   }
 
   tags = local.default_tags
