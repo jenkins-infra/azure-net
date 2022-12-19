@@ -8,7 +8,7 @@ locals {
     shorthostname = "private.vpn"
     username      = "jenkins-infra-team"
     ssh_allowed_inbound_ips = {
-      dduportal   = "109.88.253.68/32"
+      dduportal   = "86.194.33.212/32"
       lemeurherve = "176.185.227.180/32"
       smerle33    = "82.64.5.129/32"
     }
