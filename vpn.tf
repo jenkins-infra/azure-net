@@ -63,7 +63,7 @@ resource "azurerm_network_security_rule" "allow_ssh_from_admins_to_vpn" {
   for_each = local.vpn.ssh_allowed_inbound_ips
 
   name                        = "allow-ssh-from-${each.key}-to-vpn"
-  priority                    = 100
+  priority                    = 100 + index(keys(local.vpn.ssh_allowed_inbound_ips), each.key)
   direction                   = "Inbound"
   access                      = "Allow"
   protocol                    = "Tcp"
@@ -77,7 +77,7 @@ resource "azurerm_network_security_rule" "allow_ssh_from_admins_to_vpn" {
 
 resource "azurerm_network_security_rule" "allow_openvpn_from_internet_to_vpn" {
   name                        = "allow-openvpn-from-internet-to-vpn"
-  priority                    = 100
+  priority                    = 200
   direction                   = "Inbound"
   access                      = "Allow"
   protocol                    = "Tcp"
@@ -93,7 +93,7 @@ resource "azurerm_network_security_rule" "allow_puppet_from_vpn_to_puppetmasters
   for_each = local.vpn.puppet_outbound_ips
 
   name                        = "allow-puppet-from-vpn-to-${each.key}"
-  priority                    = 2100
+  priority                    = 2100 + index(keys(local.vpn.puppet_outbound_ips), each.key)
   direction                   = "Outbound"
   access                      = "Allow"
   protocol                    = "Tcp"
@@ -107,7 +107,7 @@ resource "azurerm_network_security_rule" "allow_puppet_from_vpn_to_puppetmasters
 
 resource "azurerm_network_security_rule" "allow_https_from_vpn_to_Internet" {
   name                        = "allow-https-from-vpn-to-Internet"
-  priority                    = 2100
+  priority                    = 2200
   direction                   = "Outbound"
   access                      = "Allow"
   protocol                    = "Tcp"
