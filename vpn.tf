@@ -52,7 +52,7 @@ resource "azurerm_network_interface" "internal" {
 
   ip_configuration {
     name                          = "internal"
-    subnet_id                     = azurerm_subnet.vpn.id
+    subnet_id                     = azurerm_subnet.dmz.id
     private_ip_address_allocation = "Dynamic"
   }
 
