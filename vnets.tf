@@ -47,9 +47,9 @@ resource "azurerm_virtual_network" "public" {
 }
 
 ### Private VNet Address Plan:
-# - azure-net/dmz for external access (such as VPN external NIC): 10.248.0.0/28 (from 10.248.0.1 to 10.248.0.14). Defined below.
-# - Subnet "vpn-internal" for vpn VM internal NIC 10.248.0.64/28 (from 10.248.0.65 to 10.248.0.78) - defined in vpn.tf.
-# - Subnet "privatek8s" for the AKS cluster 10.249.0.0/16 (from 10.249.0.1 to 10.249.255.254) - Defined in jenkins-infra/azure/privatek8s.tf
+# - azure-net:vnets.tf/dmz = 10.248.0.0/28 (from 10.248.0.1 to 10.248.0.14), for external access (such as VPN external NIC)
+# - azure-net:vpn.tf/vpn-internal = 10.248.0.64/28 (from 10.248.0.65 to 10.248.0.78),  for vpn VM internal NIC
+# - azure:privatek8s.tf/privatek8s-tier = 10.249.0.0/16 (from 10.249.0.1 to 10.249.255.254), for the AKS cluster 
 resource "azurerm_virtual_network" "private" {
   name                = "${azurerm_resource_group.private.name}-vnet"
   location            = azurerm_resource_group.private.location

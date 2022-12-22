@@ -7,6 +7,7 @@ resource "azurerm_network_security_group" "private_dmz" {
   resource_group_name = azurerm_resource_group.private.name
 
   # No security rule: using 'azurerm_network_security_rule' to allow composition across files
+
   tags = local.default_tags
 }
 
@@ -55,6 +56,7 @@ resource "azurerm_network_security_group" "public_apptier" {
   resource_group_name = azurerm_resource_group.public.name
 
   # No security rule: using 'azurerm_network_security_rule' to allow composition across files
+
   tags = local.default_tags
 
   ## Inbound rules
