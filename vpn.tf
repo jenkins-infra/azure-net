@@ -71,7 +71,7 @@ resource "azurerm_network_security_rule" "allow_ssh_from_admins_to_vpn" {
   destination_port_range      = "22"
   source_address_prefix       = each.value
   destination_address_prefix  = azurerm_network_interface.main.private_ip_address
-  resource_group_name         = azurerm_resource_group.vpn.name
+  resource_group_name         = azurerm_resource_group.private.name
   network_security_group_name = azurerm_network_security_group.private_dmz.name
 }
 
@@ -85,7 +85,7 @@ resource "azurerm_network_security_rule" "allow_openvpn_from_internet_to_vpn" {
   destination_port_range      = "443"
   source_address_prefix       = "Internet"
   destination_address_prefix  = azurerm_network_interface.main.private_ip_address
-  resource_group_name         = azurerm_resource_group.vpn.name
+  resource_group_name         = azurerm_resource_group.private.name
   network_security_group_name = azurerm_network_security_group.private_dmz.name
 }
 
@@ -101,7 +101,7 @@ resource "azurerm_network_security_rule" "allow_puppet_from_vpn_to_puppetmasters
   destination_port_range      = "8140"
   source_address_prefix       = azurerm_network_interface.main.private_ip_address
   destination_address_prefix  = azurerm_network_interface.main.private_ip_address
-  resource_group_name         = azurerm_resource_group.vpn.name
+  resource_group_name         = azurerm_resource_group.private.name
   network_security_group_name = azurerm_network_security_group.private_dmz.name
 }
 
@@ -115,7 +115,7 @@ resource "azurerm_network_security_rule" "allow_https_from_vpn_to_Internet" {
   destination_port_range      = "443"
   source_address_prefix       = azurerm_network_interface.main.private_ip_address
   destination_address_prefix  = "Internet"
-  resource_group_name         = azurerm_resource_group.vpn.name
+  resource_group_name         = azurerm_resource_group.private.name
   network_security_group_name = azurerm_network_security_group.private_dmz.name
 }
 
