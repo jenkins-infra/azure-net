@@ -5,8 +5,8 @@ resource "azurerm_resource_group" "vpn" {
 }
 
 # Dedicated subnet in the private vnet
-resource "azurerm_subnet" "vpn" {
-  name                 = "${azurerm_virtual_network.private.name}-vpn"
+resource "azurerm_subnet" "dmz" {
+  name                 = "${azurerm_virtual_network.private.name}-dmz"
   resource_group_name  = azurerm_resource_group.private.name
   virtual_network_name = azurerm_virtual_network.private.name
   address_prefixes     = ["10.248.0.0/28"]
@@ -37,7 +37,7 @@ resource "azurerm_network_interface" "main" {
 
   ip_configuration {
     name                          = "main"
-    subnet_id                     = azurerm_subnet.vpn.id
+    subnet_id                     = azurerm_subnet.dmz.id
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.public.id
   }
@@ -121,10 +121,10 @@ resource "azurerm_linux_virtual_machine" "vpn" {
   user_data = base64encode(templatefile("./.shared-tools/terraform/cloudinit.tftpl", { hostname = join(".", [local.vpn.shorthostname, data.azurerm_dns_zone.jenkinsio.name]) }))
   # Force VM recreation when the VPN URL change
   computer_name = replace(join(".", [local.vpn.shorthostname, data.azurerm_dns_zone.jenkinsio.name]), ".", "-")
-  
+
   # Encrypt all disks (ephemeral, temp dirs and data volumes) - https://learn.microsoft.com/en-us/azure/virtual-machines/disks-enable-host-based-encryption-portal?tabs=azure-powershell
   encryption_at_host_enabled = true
-  
+
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
