@@ -5,7 +5,7 @@ resource "azurerm_resource_group" "vpn" {
 }
 
 # Dedicated subnet in the private vnet
-resource "azurerm_subnet" "vpn-internal" {
+resource "azurerm_subnet" "vpn_internal" {
   name                 = "${azurerm_virtual_network.private.name}-vpn-internal"
   resource_group_name  = azurerm_resource_group.private.name
   virtual_network_name = azurerm_virtual_network.private.name
@@ -52,7 +52,7 @@ resource "azurerm_network_interface" "internal" {
 
   ip_configuration {
     name                          = "internal"
-    subnet_id                     = azurerm_subnet.vpn-internal.id
+    subnet_id                     = azurerm_subnet.vpn_internal.id
     private_ip_address_allocation = "Dynamic"
   }
 
