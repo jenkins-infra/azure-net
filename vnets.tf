@@ -37,6 +37,12 @@ resource "azurerm_resource_group" "private" {
   tags     = local.default_tags
 }
 
+resource "azurerm_resource_group" "vpn" {
+  name     = "vpn"
+  location = var.location
+  tags     = local.default_tags
+}
+
 ## Virtual networks
 resource "azurerm_virtual_network" "public" {
   name                = "${azurerm_resource_group.public.name}-vnet"
@@ -47,7 +53,6 @@ resource "azurerm_virtual_network" "public" {
 }
 
 ### Private VNet Address Plan:
-# - azure-net/vpn: 10.248.0.0/28 (x16 from 10.248.0.1 to 10.248.0.14)
 # - azure/privatek8s: 10.249.0.0/16 (x16 from 10.249.0.1 to 10.249.255.254)
 resource "azurerm_virtual_network" "private" {
   name                = "${azurerm_resource_group.private.name}-vnet"
@@ -57,12 +62,33 @@ resource "azurerm_virtual_network" "private" {
   tags                = local.default_tags
 }
 
+### VPN VNet Address Plan:
+# - azure-net/vpn: 10.9.0.0/28 (x16 from 10.9.0.1 to 10.9.0.14)
+resource "azurerm_virtual_network" "vpn" {
+  name                = "${azurerm_resource_group.vpn.name}-vnet"
+  location            = azurerm_resource_group.vpn.location
+  resource_group_name = azurerm_resource_group.vpn.name
+  address_space       = ["10.9.0.0/24"]
+  tags                = local.default_tags
+}
+
 ## Peering
 resource "azurerm_virtual_network_peering" "private_public" {
-  name                         = "${azurerm_resource_group.public.name}-peering"
+  name                         = "${azurerm_resource_group.private.name}-${azurerm_resource_group.public.name}-peering"
   resource_group_name          = azurerm_resource_group.private.name
   virtual_network_name         = azurerm_virtual_network.private.name
   remote_virtual_network_id    = azurerm_virtual_network.public.id
+  allow_virtual_network_access = true
+  allow_forwarded_traffic      = true
+  allow_gateway_transit        = false
+  use_remote_gateways          = false
+}
+
+resource "azurerm_virtual_network_peering" "vpn_private" {
+  name                         = "${azurerm_resource_group.vpn.name}-${azurerm_resource_group.private.name}-peering"
+  resource_group_name          = azurerm_resource_group.vpn.name
+  virtual_network_name         = azurerm_virtual_network.vpn.name
+  remote_virtual_network_id    = azurerm_virtual_network.private.id
   allow_virtual_network_access = true
   allow_forwarded_traffic      = true
   allow_gateway_transit        = false
