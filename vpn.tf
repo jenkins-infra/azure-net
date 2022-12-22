@@ -59,83 +59,64 @@ resource "azurerm_network_interface" "internal" {
   tags = local.default_tags
 }
 
-resource "azurerm_network_security_group" "main" {
-  name                = "${azurerm_resource_group.vpn.name}-nsg-main"
-  location            = azurerm_resource_group.vpn.location
-  resource_group_name = azurerm_resource_group.vpn.name
+resource "azurerm_network_security_rule" "allow_ssh_from_admins_to_vpn" {
+  for_each = local.vpn.ssh_allowed_inbound_ips
 
-  ## Inbound rules
-  security_rule {
-    name                       = "allowed-ssh-ips-inbound"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "22"
-    source_address_prefixes    = values(local.vpn.ssh_allowed_inbound_ips)
-    destination_address_prefix = azurerm_network_interface.main.private_ip_address # "*"?
-  }
-
-  #tfsec:ignore:azure-network-no-public-ingress
-  security_rule {
-    name                       = "allow-https-inbound"
-    priority                   = 101
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "443"
-    source_address_prefix      = "*"
-    destination_address_prefix = azurerm_network_interface.main.private_ip_address # "*"?
-  }
-
-  tags = local.default_tags
+  name                        = "allow-ssh-from-${each.key}-to-vpn"
+  priority                    = 100
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = "22"
+  source_address_prefix       = each.value
+  destination_address_prefix  = azurerm_network_interface.main.private_ip_address
+  resource_group_name         = azurerm_resource_group.vpn.name
+  network_security_group_name = azurerm_network_security_group.private_dmz.name
 }
 
-// deny all, authorize 5432 for database only for ex, API k8s of privatek8s, ssh rebond
-resource "azurerm_network_security_group" "internal" {
-  name                = "${azurerm_resource_group.vpn.name}-nsg-internal"
-  location            = azurerm_resource_group.vpn.location
-  resource_group_name = azurerm_resource_group.vpn.name
-
-  ## Inbound rules
-  security_rule {
-    name                       = "allowed-ssh-ips-inbound"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "22"
-    source_address_prefixes    = values(local.vpn.ssh_allowed_inbound_ips)
-    destination_address_prefix = azurerm_network_interface.internal.private_ip_address # "*"?
-  }
-
-  #tfsec:ignore:azure-network-no-public-ingress
-  security_rule {
-    name                       = "allow-https-inbound"
-    priority                   = 101
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "443"
-    source_address_prefix      = "*"
-    destination_address_prefix = azurerm_network_interface.internal.private_ip_address # "*"?
-  }
-
-  tags = local.default_tags
+resource "azurerm_network_security_rule" "allow_openvpn_from_internet_to_vpn" {
+  name                        = "allow-openvpn-from-internet-to-vpn"
+  priority                    = 100
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = "443"
+  source_address_prefix       = "Internet"
+  destination_address_prefix  = azurerm_network_interface.main.private_ip_address
+  resource_group_name         = azurerm_resource_group.vpn.name
+  network_security_group_name = azurerm_network_security_group.private_dmz.name
 }
 
-resource "azurerm_network_interface_security_group_association" "main" {
-  network_interface_id      = azurerm_network_interface.main.id
-  network_security_group_id = azurerm_network_security_group.main.id
+resource "azurerm_network_security_rule" "allow_puppet_from_vpn_to_puppetmasters" {
+  for_each = local.vpn.puppet_outbound_ips
+
+  name                        = "allow-puppet-from-vpn-to-${each.key}"
+  priority                    = 2100
+  direction                   = "Outbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = "8140"
+  source_address_prefix       = azurerm_network_interface.main.private_ip_address
+  destination_address_prefix  = azurerm_network_interface.main.private_ip_address
+  resource_group_name         = azurerm_resource_group.vpn.name
+  network_security_group_name = azurerm_network_security_group.private_dmz.name
 }
 
-resource "azurerm_network_interface_security_group_association" "internal" {
-  network_interface_id      = azurerm_network_interface.internal.id
-  network_security_group_id = azurerm_network_security_group.internal.id
+resource "azurerm_network_security_rule" "allow_https_from_vpn_to_Internet" {
+  name                        = "allow-https-from-vpn-to-Internet"
+  priority                    = 2100
+  direction                   = "Outbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = "443"
+  source_address_prefix       = azurerm_network_interface.main.private_ip_address
+  destination_address_prefix  = "Internet"
+  resource_group_name         = azurerm_resource_group.vpn.name
+  network_security_group_name = azurerm_network_security_group.private_dmz.name
 }
 
 resource "azurerm_linux_virtual_machine" "vpn" {
