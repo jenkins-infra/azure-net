@@ -11,6 +11,7 @@ locals {
       dduportal   = "86.194.33.212/32"
       lemeurherve = "176.185.227.180/32"
       smerle33    = "82.64.5.129/32"
+      mwaite      = "162.142.59.220"
     }
     puppet_outbound_ips = {
       # dig puppet.jenkins.io
