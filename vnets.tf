@@ -47,8 +47,9 @@ resource "azurerm_virtual_network" "public" {
 }
 
 ### Private VNet Address Plan:
-# - azure-net/vpn: 10.248.0.0/28 (x16 from 10.248.0.1 to 10.248.0.14)
-# - azure/privatek8s: 10.249.0.0/16 (x16 from 10.249.0.1 to 10.249.255.254)
+# - azure-net/dmz for external access (such as VPN external NIC): 10.248.0.0/28 (from 10.248.0.1 to 10.248.0.14)
+# - azure-net/vpn for vpn VM internal NIC 10.248.0.64/28 (from 10.248.0.65 to 10.248.0.78)
+# - azure/privatek8s: 10.249.0.0/16 (from 10.249.0.1 to 10.249.255.254)
 resource "azurerm_virtual_network" "private" {
   name                = "${azurerm_resource_group.private.name}-vnet"
   location            = azurerm_resource_group.private.location
