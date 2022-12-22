@@ -93,12 +93,49 @@ resource "azurerm_network_security_group" "main" {
   tags = local.default_tags
 }
 
-// TODO: nsg for the internal NIC, check if existing one?
 // deny all, authorize 5432 for database only for ex, API k8s of privatek8s, ssh rebond
+resource "azurerm_network_security_group" "internal" {
+  name                = "${azurerm_resource_group.vpn.name}-nsg-internal"
+  location            = azurerm_resource_group.vpn.location
+  resource_group_name = azurerm_resource_group.vpn.name
+
+  ## Inbound rules
+  security_rule {
+    name                       = "allowed-ssh-ips-inbound"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefixes    = values(local.vpn.ssh_allowed_inbound_ips)
+    destination_address_prefix = azurerm_network_interface.internal.private_ip_address # "*"?
+  }
+
+  #tfsec:ignore:azure-network-no-public-ingress
+  security_rule {
+    name                       = "allow-https-inbound"
+    priority                   = 101
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "*"
+    destination_address_prefix = azurerm_network_interface.internal.private_ip_address # "*"?
+  }
+
+  tags = local.default_tags
+}
 
 resource "azurerm_network_interface_security_group_association" "main" {
   network_interface_id      = azurerm_network_interface.main.id
   network_security_group_id = azurerm_network_security_group.main.id
+}
+
+resource "azurerm_network_interface_security_group_association" "internal" {
+  network_interface_id      = azurerm_network_interface.internal.id
+  network_security_group_id = azurerm_network_security_group.internal.id
 }
 
 resource "azurerm_linux_virtual_machine" "vpn" {
