@@ -37,7 +37,6 @@ resource "azurerm_network_interface" "main" {
 
   ip_configuration {
     name                          = "main"
-    # Defined in "vnets.tf" file
     subnet_id                     = azurerm_subnet.dmz.id
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.public.id
