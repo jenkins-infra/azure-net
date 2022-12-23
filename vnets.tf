@@ -54,6 +54,7 @@ resource "azurerm_virtual_network" "private" {
   address_space       = ["10.248.0.0/14"]
   tags                = local.default_tags
 }
+
 # Dedicated subnet for external access (such as VPN external NIC)
 resource "azurerm_subnet" "dmz" {
   name                 = "${azurerm_virtual_network.private.name}-dmz"
@@ -61,6 +62,7 @@ resource "azurerm_subnet" "dmz" {
   virtual_network_name = azurerm_virtual_network.private.name
   address_prefixes     = ["10.248.0.0/28"]
 }
+
 # Dedicated subnet for machine to machine private communications
 resource "azurerm_subnet" "data_tier" {
   name                 = "${azurerm_virtual_network.private.name}-data-tier"
@@ -68,8 +70,9 @@ resource "azurerm_subnet" "data_tier" {
   virtual_network_name = azurerm_virtual_network.private.name
   address_prefixes     = ["10.248.1.0/24"]
 }
-# Dedicated subnet for the AKS cluster 'privatek8s' resources
-## Important: the Enterprise Application "terraform-production" used by this repo pipeline needs to be able to manage this subnet
+
+# Dedicated subnet for the  "privatek8s" AKS cluster resources
+## Important: the "terraform-production" Enterprise Application used by this repo pipeline needs to be able to manage this subnet.
 ## See the corresponding role assignment for this cluster added here (private repo):
 ## https://github.com/jenkins-infra/terraform-states/blob/1f44cdb8c6837021b1007fef383207703b0f4d76/azure/main.tf#L49
 resource "azurerm_subnet" "privatek8s_tier" {
