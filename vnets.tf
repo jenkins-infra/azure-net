@@ -73,7 +73,7 @@ resource "azurerm_subnet" "data_tier" {
 
 # Dedicated subnet for the  "privatek8s" AKS cluster resources
 ## Important: the "terraform-production" Enterprise Application used by this repo pipeline needs to be able to manage this subnet.
-## See the corresponding role assignment for this cluster added here (private repo):
+## See the corresponding role assignment for this cluster added in the (private) terraform-state repo:
 ## https://github.com/jenkins-infra/terraform-states/blob/1f44cdb8c6837021b1007fef383207703b0f4d76/azure/main.tf#L49
 resource "azurerm_subnet" "privatek8s_tier" {
   name                 = "privatek8s-tier"
