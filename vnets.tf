@@ -64,7 +64,7 @@ resource "azurerm_subnet" "dmz" {
 }
 
 # Dedicated subnet for machine to machine private communications
-resource "azurerm_subnet" "data_tier" {
+resource "azurerm_subnet" "private_vnet_data_tier" {
   name                 = "${azurerm_virtual_network.private.name}-data-tier"
   resource_group_name  = azurerm_resource_group.private.name
   virtual_network_name = azurerm_virtual_network.private.name
