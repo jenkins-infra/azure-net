@@ -44,7 +44,7 @@ resource "azurerm_network_interface" "internal" {
 
   ip_configuration {
     name                          = "internal"
-    subnet_id                     = azurerm_subnet.data_tier.id
+    subnet_id                     = azurerm_subnet.private_vnet_data_tier.id
     private_ip_address_allocation = "Dynamic"
   }
 
