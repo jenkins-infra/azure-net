@@ -4,14 +4,6 @@ resource "azurerm_resource_group" "vpn" {
   tags     = local.default_tags
 }
 
-# Dedicated subnet in the private vnet
-resource "azurerm_subnet" "data_tier" {
-  name                 = "${azurerm_virtual_network.private.name}-data-tier"
-  resource_group_name  = azurerm_resource_group.private.name
-  virtual_network_name = azurerm_virtual_network.private.name
-  address_prefixes     = ["10.248.1.0/24"]
-}
-
 resource "azurerm_public_ip" "public" {
   name                = "${azurerm_resource_group.vpn.name}-public-ip"
   resource_group_name = azurerm_resource_group.vpn.name
@@ -52,7 +44,7 @@ resource "azurerm_network_interface" "internal" {
 
   ip_configuration {
     name                          = "internal"
-    subnet_id                     = azurerm_subnet.data_tier.id
+    subnet_id                     = azurerm_subnet.private_vnet_data_tier.id
     private_ip_address_allocation = "Dynamic"
   }
 
