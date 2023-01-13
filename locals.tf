@@ -18,4 +18,10 @@ locals {
       puppet_jenkins_io = "140.211.9.94"
     }
   }
+
+  lets_encrypt_dns_challenged_domains = {
+    "trusted.ci.jenkins.io" = "service_principal"
+    ## TODO: add support for workload identities:
+    # "cert.ci.jenkins.io" = "managed_identity"
+  }
 }
