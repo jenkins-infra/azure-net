@@ -34,7 +34,12 @@ resource "azuread_application" "letsencrypt_dns_challenges" {
   for_each = { for key, value in local.lets_encrypt_dns_challenged_domains : key => value if value == "service_principal" }
 
   display_name = replace(each.key, ".", "_")
+  owners       = [data.azuread_client_config.current.object_id]
   tags         = [for key, value in local.default_tags : "${key}:${value}"]
+
+  web {
+    homepage_url = "https://github.com/jenkins-infra/azure-net"
+  }
 }
 
 resource "azuread_service_principal" "child_zone_service_principals" {
