@@ -30,14 +30,22 @@ resource "azurerm_dns_ns_record" "child_zone_ns_records" {
   records = azurerm_dns_zone.child_zones[each.key].name_servers
 }
 
-data "azuread_application" "letsencrypt_dns_challenge" {
-  display_name = "letsencrypt-dns-challenge"
+resource "azuread_application" "letsencrypt_dns_challenges" {
+  for_each = { for key, value in local.lets_encrypt_dns_challenged_domains : key => value if value == "service_principal" }
+
+  display_name = replace(each.key, ".", "_")
+  owners       = [data.azuread_client_config.current.object_id]
+  tags         = [for key, value in local.default_tags : "${key}:${value}"]
+
+  web {
+    homepage_url = "https://github.com/jenkins-infra/azure-net"
+  }
 }
 
 resource "azuread_service_principal" "child_zone_service_principals" {
   for_each = { for key, value in local.lets_encrypt_dns_challenged_domains : key => value if value == "service_principal" }
 
-  application_id = data.azuread_application.letsencrypt_dns_challenge.application_id
+  application_id = azuread_application.letsencrypt_dns_challenges[each.key].application_id
 }
 
 resource "azuread_service_principal_password" "child_zone_service_principal_passwords" {
