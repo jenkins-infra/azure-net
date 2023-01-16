@@ -33,7 +33,7 @@ resource "azurerm_dns_ns_record" "child_zone_ns_records" {
 resource "azuread_application" "letsencrypt_dns_challenges" {
   for_each = { for key, value in local.lets_encrypt_dns_challenged_domains : key => value if value == "service_principal" }
 
-  display_name = replace(each.key, ".", "_")
+  display_name = "letsencrypt-${each.key}"
   owners       = [data.azuread_client_config.current.object_id]
   tags         = [for key, value in local.default_tags : "${key}:${value}"]
 
@@ -48,11 +48,12 @@ resource "azuread_service_principal" "child_zone_service_principals" {
   application_id = azuread_application.letsencrypt_dns_challenges[each.key].application_id
 }
 
-resource "azuread_service_principal_password" "child_zone_service_principal_passwords" {
+resource "azuread_application_password" "child_zone_app_passwords" {
   for_each = { for key, value in local.lets_encrypt_dns_challenged_domains : key => value if value == "service_principal" }
 
-  display_name         = "Service Principal secret for ${each.key} Let's Encrypt DNS-01 challenges"
-  service_principal_id = azuread_service_principal.child_zone_service_principals[each.key].object_id
+  display_name = "test-ddu-1"
+
+  application_object_id = azuread_application.letsencrypt_dns_challenges[each.key].id
 }
 
 resource "azurerm_role_assignment" "child_zone_service_principal_assignements" {
