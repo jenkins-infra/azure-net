@@ -80,6 +80,8 @@ resource "azurerm_subnet" "privatek8s_tier" {
   resource_group_name  = azurerm_resource_group.private.name
   virtual_network_name = azurerm_virtual_network.private.name
   address_prefixes     = ["10.249.0.0/16"]
+  # Enable KeyVault service endpoint so the cluster can access secrets to update other clusters
+  service_endpoints = ["Microsoft.KeyVault"]
 }
 
 ## Peering
