@@ -38,6 +38,7 @@ resource "azurerm_resource_group" "private" {
 }
 
 ## Virtual networks
+### Public VNet
 resource "azurerm_virtual_network" "public" {
   name                = "${azurerm_resource_group.public.name}-vnet"
   location            = azurerm_resource_group.public.location
@@ -53,6 +54,22 @@ resource "azurerm_virtual_network" "private" {
   resource_group_name = azurerm_resource_group.private.name
   address_space       = ["10.248.0.0/14"]
   tags                = local.default_tags
+}
+
+# Dedicated subnet for external access (such as VPN external NIC)
+resource "azurerm_subnet" "dmz_public" {
+  name                 = "${azurerm_virtual_network.public.name}-dmz"
+  resource_group_name  = azurerm_resource_group.public.name
+  virtual_network_name = azurerm_virtual_network.public.name
+  address_prefixes     = ["10.244.0.0/28"]
+}
+
+# Dedicated subnet for machine to machine private communications
+resource "azurerm_subnet" "public_vnet_data_tier" {
+  name                 = "${azurerm_virtual_network.public.name}-data-tier"
+  resource_group_name  = azurerm_resource_group.public.name
+  virtual_network_name = azurerm_virtual_network.public.name
+  address_prefixes     = ["10.244.1.0/24"]
 }
 
 # Dedicated subnet for external access (such as VPN external NIC)

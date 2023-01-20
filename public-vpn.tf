@@ -1,57 +1,57 @@
-resource "azurerm_resource_group" "vpn" {
-  name     = "vpn"
+resource "azurerm_resource_group" "vpn_public" {
+  name     = "vpn-public"
   location = var.location
   tags     = local.default_tags
 }
 
-resource "azurerm_public_ip" "public" {
-  name                = "${azurerm_resource_group.vpn.name}-public-ip"
-  resource_group_name = azurerm_resource_group.vpn.name
-  location            = azurerm_resource_group.vpn.location
+resource "azurerm_public_ip" "ip_public" {
+  name                = "${azurerm_resource_group.vpn_public.name}-public-ip"
+  resource_group_name = azurerm_resource_group.vpn_public.name
+  location            = azurerm_resource_group.vpn_public.location
   allocation_method   = "Static"
   sku                 = "Basic"
   tags                = local.default_tags
 }
 
-resource "azurerm_dns_a_record" "vpn" {
-  name                = local.vpn.shorthostname
+resource "azurerm_dns_a_record" "vpn_public" {
+  name                = local.vpn.public_shorthostname
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 300
-  records             = [azurerm_public_ip.public.ip_address]
+  records             = [azurerm_public_ip.ip_public.ip_address]
   tags                = local.default_tags
 }
 
-resource "azurerm_network_interface" "main" {
-  name                = "${azurerm_virtual_network.private.name}-vpn-nic-main"
-  location            = azurerm_resource_group.vpn.location
-  resource_group_name = azurerm_resource_group.vpn.name
+resource "azurerm_network_interface" "main_public" {
+  name                = "${azurerm_virtual_network.public.name}-vpn-nic-main"
+  location            = azurerm_resource_group.vpn_public.location
+  resource_group_name = azurerm_resource_group.vpn_public.name
 
   ip_configuration {
     name                          = "main"
-    subnet_id                     = azurerm_subnet.dmz.id
+    subnet_id                     = azurerm_subnet.dmz_public.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.public.id
+    public_ip_address_id          = azurerm_public_ip.ip_public.id
   }
 
   tags = local.default_tags
 }
 
 resource "azurerm_network_interface" "internal" {
-  name                = "${azurerm_virtual_network.private.name}-vpn-nic-internal"
-  location            = azurerm_resource_group.vpn.location
-  resource_group_name = azurerm_resource_group.vpn.name
+  name                = "${azurerm_virtual_network.public.name}-vpn-nic-internal"
+  location            = azurerm_resource_group.vpn_public.location
+  resource_group_name = azurerm_resource_group.vpn_public.name
 
   ip_configuration {
     name                          = "internal"
-    subnet_id                     = azurerm_subnet.private_vnet_data_tier.id
+    subnet_id                     = azurerm_subnet.public_vnet_data_tier.id
     private_ip_address_allocation = "Dynamic"
   }
 
   tags = local.default_tags
 }
 
-resource "azurerm_network_security_rule" "allow_ssh_from_admins_to_vpn" {
+resource "azurerm_network_security_rule" "allow_ssh_from_admins_to_vpn_public" {
   for_each = local.vpn.ssh_allowed_inbound_ips
 
   name                        = "allow-ssh-from-${each.key}-to-vpn"
@@ -62,12 +62,12 @@ resource "azurerm_network_security_rule" "allow_ssh_from_admins_to_vpn" {
   source_port_range           = "*"
   destination_port_range      = "22"
   source_address_prefix       = each.value
-  destination_address_prefix  = azurerm_network_interface.main.private_ip_address
-  resource_group_name         = azurerm_resource_group.private.name
+  destination_address_prefix  = azurerm_network_interface.main_public.private_ip_address
+  resource_group_name         = azurerm_resource_group.public.name
   network_security_group_name = azurerm_network_security_group.private_dmz.name
 }
 
-resource "azurerm_network_security_rule" "allow_openvpn_from_internet_to_vpn" {
+resource "azurerm_network_security_rule" "allow_openvpn_from_internet_to_vpn_public" {
   name                        = "allow-openvpn-from-internet-to-vpn"
   priority                    = 200
   direction                   = "Inbound"
@@ -76,12 +76,12 @@ resource "azurerm_network_security_rule" "allow_openvpn_from_internet_to_vpn" {
   source_port_range           = "*"
   destination_port_range      = "443"
   source_address_prefix       = "Internet"
-  destination_address_prefix  = azurerm_network_interface.main.private_ip_address
-  resource_group_name         = azurerm_resource_group.private.name
-  network_security_group_name = azurerm_network_security_group.private_dmz.name
+  destination_address_prefix  = azurerm_network_interface.main_public.private_ip_address
+  resource_group_name         = azurerm_resource_group.public.name
+  network_security_group_name = azurerm_network_security_group.private_dmz.name # ?
 }
 
-resource "azurerm_network_security_rule" "allow_puppet_from_vpn_to_puppetmasters" {
+resource "azurerm_network_security_rule" "allow_puppet_from_vpn_to_puppetmasters_public" {
   for_each = local.vpn.puppet_outbound_ips
 
   name                        = "allow-puppet-from-vpn-to-${each.key}"
@@ -91,13 +91,13 @@ resource "azurerm_network_security_rule" "allow_puppet_from_vpn_to_puppetmasters
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = "8140"
-  source_address_prefix       = azurerm_network_interface.main.private_ip_address
-  destination_address_prefix  = azurerm_network_interface.main.private_ip_address
-  resource_group_name         = azurerm_resource_group.private.name
-  network_security_group_name = azurerm_network_security_group.private_dmz.name
+  source_address_prefix       = azurerm_network_interface.main_public.private_ip_address
+  destination_address_prefix  = azurerm_network_interface.main_public.private_ip_address
+  resource_group_name         = azurerm_resource_group.public.name
+  network_security_group_name = azurerm_network_security_group.private_dmz.name # ?
 }
 
-resource "azurerm_network_security_rule" "allow_https_from_vpn_to_Internet" {
+resource "azurerm_network_security_rule" "allow_https_from_vpn_to_internet_public" {
   name                        = "allow-https-from-vpn-to-Internet"
   priority                    = 2200
   direction                   = "Outbound"
@@ -105,21 +105,21 @@ resource "azurerm_network_security_rule" "allow_https_from_vpn_to_Internet" {
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = "443"
-  source_address_prefix       = azurerm_network_interface.main.private_ip_address
+  source_address_prefix       = azurerm_network_interface.main_public.private_ip_address
   destination_address_prefix  = "Internet"
-  resource_group_name         = azurerm_resource_group.private.name
-  network_security_group_name = azurerm_network_security_group.private_dmz.name
+  resource_group_name         = azurerm_resource_group.public.name
+  network_security_group_name = azurerm_network_security_group.private_dmz.name # ?
 }
 
-resource "azurerm_linux_virtual_machine" "vpn" {
-  name                = "${azurerm_virtual_network.private.name}-vpn"
-  resource_group_name = azurerm_resource_group.vpn.name
-  location            = azurerm_resource_group.vpn.location
+resource "azurerm_linux_virtual_machine" "vpn_public" {
+  name                = "${azurerm_virtual_network.public.name}-vpn"
+  resource_group_name = azurerm_resource_group.vpn_public.name
+  location            = azurerm_resource_group.vpn_public.location
   size                = "Standard_B1s"
   admin_username      = local.vpn.username
   network_interface_ids = [
-    azurerm_network_interface.main.id,
-    azurerm_network_interface.internal.id,
+    azurerm_network_interface.main_public.id,
+    azurerm_network_interface.internal_public.id,
   ]
 
   admin_ssh_key {
@@ -128,9 +128,9 @@ resource "azurerm_linux_virtual_machine" "vpn" {
     public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC3mnu4alSfeWuKBDQjVZn0sSogh5Cf31SlV3CbbHhjmJ9ZKIe4KKGRNhgtrVosDwQ4QeW8bE2QwzExII6UOZQ8uEeLJHpjHR6DJNFCmUM24dvZD5eSTdLi89JcY1EGAIsVue+a7vdPDadPWQLb8eiYBuGfA4ydmFTIJEoCsNDZk6bOYyFxQPnYgKIuw9qxQhMvq55sMch+Fh+eMO4Sc0I5V0MMDl/UaC3hbpT9gegqwMw6hPC0OMhpEe3b/G/cW0buQf7pXSW4RN7ukyoeTTYXmjVKMB5K5qLAznSepe+p4qkGNdfQd1BcKNd72L8jEfc/Nbs8ZP34PHwsjFSTDC1WJWrwhzxCLinJ+WisB4JyWoY8S7ziOi4Rb7sevneYFjjVcY1kxvsM+dnzQxleRlPibV/1kzNtH/pqLFIX8eM+m6lTDgc6phhtQnWlPsLyrKbILAI6wP1MHvwz9SaKqKFXx+4Dnrz3my3L9U8v/oBCbHjhjjFSW3jT1ZAsXe553PmF7xYoFnSxrbXwjuVSfHrS2KEldfB116Acw5IMSTre+q7woP7XvocLZEi9AOE/+nQjL0R7XOCXI8ODOfk9BSQ1EOqyf1ONDIVf3ugAKoEQ22lBt8pLdFZjY2Mc5UbMzOT/MUYgLI/zKGg8+XGRXlYelEivMf3PBrit9FVucHhyfQ== jenkins-infra-team@googlegroups.com"
   }
 
-  user_data = base64encode(templatefile("./.shared-tools/terraform/cloudinit.tftpl", { hostname = join(".", [local.vpn.shorthostname, data.azurerm_dns_zone.jenkinsio.name]) }))
+  user_data = base64encode(templatefile("./.shared-tools/terraform/cloudinit.tftpl", { hostname = join(".", [local.vpn.public_shorthostname, data.azurerm_dns_zone.jenkinsio.name]) }))
   # Force VM recreation when the VPN URL change
-  computer_name = replace(join(".", [local.vpn.shorthostname, data.azurerm_dns_zone.jenkinsio.name]), ".", "-")
+  computer_name = replace(join(".", [local.vpn.public_shorthostname, data.azurerm_dns_zone.jenkinsio.name]), ".", "-")
 
   # Encrypt all disks (ephemeral, temp dirs and data volumes) - https://learn.microsoft.com/en-us/azure/virtual-machines/disks-enable-host-based-encryption-portal?tabs=azure-powershell
   encryption_at_host_enabled = true
@@ -152,6 +152,6 @@ resource "azurerm_linux_virtual_machine" "vpn" {
   tags = local.default_tags
 }
 
-output "vpn_public_ip_address" {
-  value = azurerm_public_ip.public.ip_address
+output "vpn_public_public_ip_address" {
+  value = azurerm_public_ip.ip_public.ip_address
 }
