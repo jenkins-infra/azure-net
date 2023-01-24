@@ -42,7 +42,7 @@ resource "azurerm_virtual_network" "public" {
   name                = "${azurerm_resource_group.public.name}-vnet"
   location            = azurerm_resource_group.public.location
   resource_group_name = azurerm_resource_group.public.name
-  address_space       = ["10.244.0.0/14"]
+  address_space       = ["10.244.0.0/14", "fd00:db8:deca::/48"]
   tags                = local.default_tags
 }
 
@@ -92,7 +92,7 @@ resource "azurerm_subnet" "publick8s_tier" {
   name                 = "publick8s-tier"
   resource_group_name  = azurerm_resource_group.public.name
   virtual_network_name = azurerm_virtual_network.public.name
-  address_prefixes     = ["10.245.0.0/16"]
+  address_prefixes     = ["10.245.0.0/24", "fd00:db8:deca:deed::/64"] # smaller size as we're using kubenet (required by dual-stack AKS cluster), which allocate one IP per node instead of one IP per pod (in case of Azure CNI)
 }
 
 ## Peering
