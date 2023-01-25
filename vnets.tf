@@ -95,6 +95,14 @@ resource "azurerm_subnet" "publick8s_tier" {
   address_prefixes     = ["10.245.0.0/24", "fd00:db8:deca:deed::/64"] # smaller size as we're using kubenet (required by dual-stack AKS cluster), which allocate one IP per node instead of one IP per pod (in case of Azure CNI)
 }
 
+# Dedicated subnet for machine to machine private communications
+resource "azurerm_subnet" "public_vnet_data_tier" {
+  name                 = "${azurerm_virtual_network.public.name}-data-tier"
+  resource_group_name  = azurerm_resource_group.public.name
+  virtual_network_name = azurerm_virtual_network.public.name
+  address_prefixes     = ["10.245.1.0/24"]
+}
+
 ## Peering
 resource "azurerm_virtual_network_peering" "private_public" {
   name                         = "${azurerm_resource_group.public.name}-peering"
