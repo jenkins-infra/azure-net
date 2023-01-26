@@ -63,3 +63,12 @@ resource "azurerm_role_assignment" "child_zone_service_principal_assignements" {
   role_definition_name = "DNS Zone Contributor" # Predefined standard role in Azure
   principal_id         = azuread_service_principal.child_zone_service_principals[each.key].id
 }
+
+# CNAME record for artifact-caching-proxy on Azure
+resource "azurerm_dns_cname_record" "target" {
+  name                = "repo.azure"
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 300
+  record              = "public.publick8s.jenkins.io"
+}
