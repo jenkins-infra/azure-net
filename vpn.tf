@@ -55,13 +55,13 @@ resource "azurerm_network_security_rule" "allow_ssh_from_admins_to_vpn" {
   for_each = local.vpn.ssh_allowed_inbound_ips
 
   name                        = "allow-ssh-from-${each.key}-to-vpn"
-  priority                    = 100 + index(keys(local.vpn.ssh_allowed_inbound_ips), each.key)
+  priority                    = each.value.priority
   direction                   = "Inbound"
   access                      = "Allow"
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = "22"
-  source_address_prefix       = each.value
+  source_address_prefixes     = each.value.ips
   destination_address_prefix  = azurerm_network_interface.main.private_ip_address
   resource_group_name         = azurerm_resource_group.private.name
   network_security_group_name = azurerm_network_security_group.private_dmz.name
