@@ -79,5 +79,5 @@ resource "azurerm_dns_cname_record" "github-comment-ops" {
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 300
-  record              = "public.privatek8s"
+  record              = "public.privatek8s.jenkins.io"
 }
