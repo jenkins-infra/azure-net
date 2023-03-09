@@ -72,3 +72,12 @@ resource "azurerm_dns_cname_record" "target" {
   ttl                 = 300
   record              = "public.publick8s.jenkins.io"
 }
+
+# CNAME record for github-comment-ops GitHub App
+resource "azurerm_dns_cname_record" "webhook-github-comment-ops" {
+  name                = "webhook-github-comment-ops"
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 300
+  record              = "public.privatek8s.jenkins.io"
+}
