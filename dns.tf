@@ -93,5 +93,5 @@ resource "azurerm_dns_txt_record" "jenkins-transfert-github-verification" {
     value = "b4df95a7b9"
   }
 
-  tags = [for key, value in local.default_tags : "${key}:${value}"]
+  tags = local.default_tags
 }
