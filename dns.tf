@@ -81,3 +81,17 @@ resource "azurerm_dns_cname_record" "webhook-github-comment-ops" {
   ttl                 = 300
   record              = "public.privatek8s.jenkins.io"
 }
+
+# TXT record to verify jenkins-transfert GitHub org (https://github.com/jenkins-infra/helpdesk/issues/3448)
+resource "azurerm_dns_txt_record" "jenkins-transfert-github-verification" {
+  name                = "_github-challenge-jenkinsci-transfer-org.www"
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 300
+
+  record {
+    value = "b4df95a7b9"
+  }
+
+  tags = [for key, value in local.default_tags : "${key}:${value}"]
+}
