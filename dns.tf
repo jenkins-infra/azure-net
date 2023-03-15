@@ -28,6 +28,8 @@ resource "azurerm_dns_ns_record" "child_zone_ns_records" {
   ttl                 = 60
 
   records = azurerm_dns_zone.child_zones[each.key].name_servers
+
+  tags = local.default_tags
 }
 
 resource "azuread_application" "letsencrypt_dns_challenges" {
@@ -71,6 +73,8 @@ resource "azurerm_dns_cname_record" "target" {
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 300
   record              = "public.publick8s.jenkins.io"
+
+  tags = local.default_tags
 }
 
 # CNAME record for github-comment-ops GitHub App
@@ -80,6 +84,8 @@ resource "azurerm_dns_cname_record" "webhook-github-comment-ops" {
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 300
   record              = "public.privatek8s.jenkins.io"
+
+  tags = local.default_tags
 }
 
 # TXT record to verify jenkinsci-transfer GitHub org (https://github.com/jenkins-infra/helpdesk/issues/3448)
