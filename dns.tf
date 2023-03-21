@@ -5,7 +5,8 @@ data "azurerm_resource_group" "proddns_jenkinsio" {
 
 # TODO: import as resource
 data "azurerm_dns_zone" "jenkinsio" {
-  name = "jenkins.io"
+  name                = "jenkins.io"
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
 }
 
 resource "azurerm_dns_zone" "child_zones" {
