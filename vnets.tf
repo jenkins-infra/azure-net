@@ -71,7 +71,7 @@ resource "azurerm_subnet" "private_vnet_data_tier" {
   address_prefixes     = ["10.248.1.0/24"]
 }
 
-# Dedicated subnet for the  "privatek8s" AKS cluster resources
+# Dedicated subnet for the "privatek8s" AKS cluster resources
 ## Important: the "terraform-production" Enterprise Application used by this repo pipeline needs to be able to manage this virtual network.
 ## See the corresponding role assignment for this vnet added in the (private) terraform-state repo:
 ## https://github.com/jenkins-infra/terraform-states/blob/17df75c38040c9b1087bade3654391bc5db45ffd/azure/main.tf#L59
@@ -82,6 +82,19 @@ resource "azurerm_subnet" "privatek8s_tier" {
   address_prefixes     = ["10.249.0.0/16"]
   # Enable KeyVault and Storage service endpoints so the cluster can access secrets to update other clusters, and manage postgresql
   service_endpoints = ["Microsoft.KeyVault", "Microsoft.Storage"]
+}
+
+# Dedicated subnet for the release nodes of the "privatek8s" AKS cluster resources
+## Important: the "terraform-production" Enterprise Application used by this repo pipeline needs to be able to manage this virtual network.
+## See the corresponding role assignment for this vnet added in the (private) terraform-state repo:
+## https://github.com/jenkins-infra/terraform-states/blob/17df75c38040c9b1087bade3654391bc5db45ffd/azure/main.tf#L59
+resource "azurerm_subnet" "privatek8s_release_tier" {
+  name                 = "privatek8s-release-tier"
+  resource_group_name  = azurerm_resource_group.private.name
+  virtual_network_name = azurerm_virtual_network.private.name
+  address_prefixes     = ["10.250.0.0/26"]
+  # Enable KeyVault and Storage service endpoints so the cluster can access secrets to update other clusters
+  service_endpoints = ["Microsoft.KeyVault"]
 }
 
 # Dedicated subnet for the  "publick8s" AKS cluster resources
