@@ -102,3 +102,14 @@ resource "azurerm_dns_txt_record" "jenkinsci-transfer-github-verification" {
 
   tags = local.default_tags
 }
+
+# CNAME record for release.ci.jenkins.io, accessible only via the private VPN
+resource "azurerm_dns_cname_record" "release-ci-jenkins-io" {
+  name                = "release.ci"
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 300
+  record              = "private.privatek8s.jenkins.io"
+
+  tags = local.default_tags
+}
