@@ -37,7 +37,7 @@ resource "azuread_application" "letsencrypt_dns_challenges" {
   for_each = { for key, value in local.lets_encrypt_dns_challenged_domains : key => value if value == "service_principal" }
 
   display_name = "letsencrypt-${each.key}"
-  owners       = [data.azuread_service_principal.terraform_production.id]
+  owners       = [data.azuread_service_principal.terraform-azure-net-production.id]
   tags         = [for key, value in local.default_tags : "${key}:${value}"]
 
   web {
