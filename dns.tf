@@ -40,6 +40,15 @@ resource "azuread_application" "letsencrypt_dns_challenges" {
   owners       = [data.azuread_service_principal.terraform-azure-net-production.id]
   tags         = [for key, value in local.default_tags : "${key}:${value}"]
 
+  required_resource_access {
+    resource_app_id = "00000003-0000-0000-c000-000000000000" # Microsoft Graph
+
+    resource_access {
+      id   = "e1fe6dd8-ba31-4d61-89e7-88639da4683d" # User.Read
+      type = "Scope"
+    }
+  }
+
   web {
     homepage_url = "https://github.com/jenkins-infra/azure-net"
   }
@@ -48,15 +57,18 @@ resource "azuread_application" "letsencrypt_dns_challenges" {
 resource "azuread_service_principal" "child_zone_service_principals" {
   for_each = { for key, value in local.lets_encrypt_dns_challenged_domains : key => value if value == "service_principal" }
 
+  app_role_assignment_required = false
+  owners                       = [data.azuread_service_principal.terraform-azure-net-production.id]
+
   application_id = azuread_application.letsencrypt_dns_challenges[each.key].application_id
 }
 
 resource "azuread_application_password" "child_zone_app_passwords" {
   for_each = { for key, value in local.lets_encrypt_dns_challenged_domains : key => value if value == "service_principal" }
 
-  display_name = "test-ddu-1"
-
+  display_name          = "${each.key}-tf-managed"
   application_object_id = azuread_application.letsencrypt_dns_challenges[each.key].id
+  end_date              = "2024-04-03T20:00:00Z"
 }
 
 resource "azurerm_role_assignment" "child_zone_service_principal_assignements" {
