@@ -151,8 +151,7 @@ resource "azurerm_subnet" "public_vnet_ci_jenkins_io_controller" {
   virtual_network_name = azurerm_virtual_network.public.name
   address_prefixes     = [
     "10.245.4.0/24", # 10.245.4.1 - 10.245.4.254
-    ## Removed IPv6 as a hotfix
-    # "fdb5:c0c9:9cfc:7658::/64", # smaller size as it only need to support public IPv6 for ci.jenkins.io controller
+    "fd00:db8:deca::/64",
   ]
 }
 
