@@ -124,7 +124,10 @@ resource "azurerm_subnet" "publick8s_tier" {
   name                 = "publick8s-tier"
   resource_group_name  = azurerm_resource_group.public.name
   virtual_network_name = azurerm_virtual_network.public.name
-  address_prefixes     = ["10.245.0.0/24", "fd00:db8:deca:deed::/64"] # smaller size as we're using kubenet (required by dual-stack AKS cluster), which allocate one IP per node instead of one IP per pod (in case of Azure CNI)
+  address_prefixes     = [
+    "10.245.0.0/24", # 10.245.0.1 - 10.245.0.254
+    "fd00:db8:deca:deed::/64", # smaller size as we're using kubenet (required by dual-stack AKS cluster), which allocate one IP per node instead of one IP per pod (in case of Azure CNI)
+  ]
 }
 
 # Dedicated subnet for machine to machine private communications
@@ -132,7 +135,24 @@ resource "azurerm_subnet" "public_vnet_data_tier" {
   name                 = "${azurerm_virtual_network.public.name}-data-tier"
   resource_group_name  = azurerm_resource_group.public.name
   virtual_network_name = azurerm_virtual_network.public.name
-  address_prefixes     = ["10.245.1.0/24"]
+  address_prefixes     = ["10.245.1.0/24"] # 10.245.1.1 - 10.245.1.254
+}
+
+# Dedicated subnets for ci.jenkins.io (controller and agents)
+resource "azurerm_subnet" "public_vnet_ci_jenkins_io_agents" {
+  name                 = "${azurerm_virtual_network.public.name}-ci_jenkins_io_agents"
+  resource_group_name  = azurerm_resource_group.public.name
+  virtual_network_name = azurerm_virtual_network.public.name
+  address_prefixes     = ["10.245.2.0/23"] # 10.245.2.1 - 10.245.3.254
+}
+resource "azurerm_subnet" "public_vnet_ci_jenkins_io_controller" {
+  name                 = "${azurerm_virtual_network.public.name}-ci_jenkins_io_controller"
+  resource_group_name  = azurerm_resource_group.public.name
+  virtual_network_name = azurerm_virtual_network.public.name
+  address_prefixes     = [
+    "10.245.4.0/24", # 10.245.4.1 - 10.245.4.254
+    "fdb5:c0c9:9cfc:7658::/64", # smaller size as it only need to support public IPv6 for ci.jenkins.io controller
+  ]
 }
 
 ## Peering
