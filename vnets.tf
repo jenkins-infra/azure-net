@@ -37,6 +37,11 @@ resource "azurerm_resource_group" "private" {
   tags     = local.default_tags
 }
 
+resource "azurerm_resource_group" "trusted" {
+  name     = "jenkinsinfra-trusted"
+  location = "East US"
+}
+
 ## Virtual networks
 resource "azurerm_virtual_network" "public" {
   name                = "${azurerm_resource_group.public.name}-vnet"
@@ -52,6 +57,14 @@ resource "azurerm_virtual_network" "private" {
   location            = azurerm_resource_group.private.location
   resource_group_name = azurerm_resource_group.private.name
   address_space       = ["10.248.0.0/14"]
+  tags                = local.default_tags
+}
+# NETWORKING FOR TRUSTED
+resource "azurerm_virtual_network" "trusted" {
+  name                = "trusted-controller-network"
+  address_space       = ["10.252.0.0/16"]
+  location            = azurerm_resource_group.trusted.location
+  resource_group_name = azurerm_resource_group.trusted.name
   tags                = local.default_tags
 }
 
@@ -72,7 +85,6 @@ resource "azurerm_subnet" "cert_ci_jenkins_io_agents" {
   virtual_network_name = azurerm_virtual_network.cert_ci_jenkins_io_agents.name
   address_prefixes     = ["10.0.0.0/24"]
 }
-
 
 # Dedicated subnet for external access (such as VPN external NIC)
 resource "azurerm_subnet" "dmz" {
@@ -171,35 +183,21 @@ resource "azurerm_virtual_network_peering" "private_public" {
 ###################   TRUSTED   ##################################################################################
 ##################################################################################################################
 
-# Resources groups for TRUSTED NETWORK
-resource "azurerm_resource_group" "trusted" {
-  name     = "jenkinsinfra-trusted"
-  location = "East US"
-}
-
-# NETWORKING FOR TRUSTED
-resource "azurerm_virtual_network" "trusted" {
-  name                = "trusted-controller-network"
-  address_space       = ["10.246.0.0/16"]
-  location            = azurerm_resource_group.trusted.location
-  resource_group_name = azurerm_resource_group.trusted.name
-  tags                = local.default_tags
-}
 resource "azurerm_subnet" "trusted_controller" {
   name                 = "trusted-controller-subnet"
   resource_group_name  = azurerm_resource_group.trusted.name
   virtual_network_name = azurerm_virtual_network.trusted.name
-  address_prefixes     = ["10.246.1.0/24"]
+  address_prefixes     = ["10.252.1.0/24"]
 }
 resource "azurerm_subnet" "trusted_vmagents" {
   name                 = "trusted-vmagents-subnet"
   resource_group_name  = azurerm_resource_group.trusted.name
   virtual_network_name = azurerm_virtual_network.trusted.name
-  address_prefixes     = ["10.246.2.0/24"]
+  address_prefixes     = ["10.252.2.0/24"]
 }
 resource "azurerm_subnet" "trusted_permanent_agents" {
   name                 = "trusted-permanent-agents-subnet"
   resource_group_name  = azurerm_resource_group.trusted.name
   virtual_network_name = azurerm_virtual_network.trusted.name
-  address_prefixes     = ["10.246.3.0/24"]
+  address_prefixes     = ["10.252.3.0/24"]
 }
