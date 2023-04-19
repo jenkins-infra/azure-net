@@ -178,10 +178,7 @@ resource "azurerm_virtual_network_peering" "private_public" {
   use_remote_gateways          = false
 }
 
-##################################################################################################################
-###################   TRUSTED   ##################################################################################
-##################################################################################################################
-
+# Dedicated subnets for trusted.ci.jenkins.io (controller and agents)
 resource "azurerm_subnet" "trusted_controller" {
   name                 = "trusted-controller-subnet"
   resource_group_name  = azurerm_resource_group.trusted.name
