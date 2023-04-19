@@ -59,7 +59,6 @@ resource "azurerm_virtual_network" "private" {
   address_space       = ["10.248.0.0/14"]
   tags                = local.default_tags
 }
-# NETWORKING FOR TRUSTED
 resource "azurerm_virtual_network" "trusted" {
   name                = "trusted-controller-network"
   address_space       = ["10.252.0.0/16"]
