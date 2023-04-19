@@ -17,10 +17,33 @@
 #     │                                           ┌────────────▼───┐
 #     │         ┌───────────────────────┐         │                │
 #     │         │                       │         │                │
-#     └─────────►  Private VPN Gateway  ◄─────────►  Private VNet  │
-#               │                       │         │                │
-#               └───────────────────────┘         │                │
-#                                                 └────────────────┘
+#     ├─────────►  Private VPN Gateway  ◄─────────►  Private VNet  │
+#     │         │                       │         │                │
+#     │         └───────────────────────┘         │                │
+#     │                                           └────────────────┘
+#     │
+#     │                                            ┌────────────────────────────┐
+#     │                                            │                            │
+#     │         ┌───────────────────────┐          │       Trusted VNet         │
+#     │         │                       │          │                            │
+#     │         │      ┌──────────┐     │          │     ┌─────────────────┐    │
+#     └─────────►      │Bounce VM │     ◄──────────┼────►│Controller Subnet│    │
+#               │      └──────────┘     │          │     └─────────────────┘    │
+#               │                       │          │                            │
+#               └───────────────────────┘          │  ┌───────────────────────┐ │
+#                                                  │  │Ephemeral Agents Subnet│ │
+#                                                  │  └───────────────────────┘ │
+#                                                  │                            │
+#                                                  │  ┌───────────────────────┐ │
+#                                                  │  │Permanent Agents Subnet│ │
+#                                                  │  └───────────────────────┘ │
+#                                                  │                            │
+#                                                  │                            │
+#                                                  └────────────────────────────┘
+#
+#
+#
+#
 #
 # See also https://github.com/jenkins-infra/azure/blob/legacy-tf/plans/vnets.tf
 
@@ -60,10 +83,10 @@ resource "azurerm_virtual_network" "private" {
   tags                = local.default_tags
 }
 resource "azurerm_virtual_network" "trusted" {
-  name                = "trusted-controller-network"
-  address_space       = ["10.252.0.0/16"]
+  name                = "${azurerm_resource_group.trusted.name}-vnet"
   location            = azurerm_resource_group.trusted.location
   resource_group_name = azurerm_resource_group.trusted.name
+  address_space       = ["10.252.0.0/21"] # 10.252.0.1 - 10.252.7.254
   tags                = local.default_tags
 }
 
@@ -180,20 +203,20 @@ resource "azurerm_virtual_network_peering" "private_public" {
 
 # Dedicated subnets for trusted.ci.jenkins.io (controller and agents)
 resource "azurerm_subnet" "trusted_controller" {
-  name                 = "trusted-controller-subnet"
+  name                 = "${azurerm_virtual_network.trusted.name}-controller"
   resource_group_name  = azurerm_resource_group.trusted.name
   virtual_network_name = azurerm_virtual_network.trusted.name
-  address_prefixes     = ["10.252.1.0/24"]
+  address_prefixes     = ["10.252.0.0/24"] # 10.252.0.1 - 10.252.0.254
 }
 resource "azurerm_subnet" "trusted_vmagents" {
-  name                 = "trusted-vmagents-subnet"
+  name                 = "${azurerm_virtual_network.trusted.name}-ephemeral-agents"
   resource_group_name  = azurerm_resource_group.trusted.name
   virtual_network_name = azurerm_virtual_network.trusted.name
-  address_prefixes     = ["10.252.2.0/24"]
+  address_prefixes     = ["10.252.1.0/24"] # 10.252.1.1 - 10.252.1.254
 }
 resource "azurerm_subnet" "trusted_permanent_agents" {
-  name                 = "trusted-permanent-agents-subnet"
+  name                 = "${azurerm_virtual_network.trusted.name}-permanent-agents"
   resource_group_name  = azurerm_resource_group.trusted.name
   virtual_network_name = azurerm_virtual_network.trusted.name
-  address_prefixes     = ["10.252.3.0/24"]
+  address_prefixes     = ["10.252.2.0/24"] # 10.252.2.1 - 10.252.2.254
 }
