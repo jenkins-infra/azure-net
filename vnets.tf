@@ -38,7 +38,7 @@ resource "azurerm_resource_group" "private" {
 }
 
 resource "azurerm_resource_group" "trusted" {
-  name     = "jenkinsinfra-trusted"
+  name     = "trusted"
   location = "East US"
 }
 
