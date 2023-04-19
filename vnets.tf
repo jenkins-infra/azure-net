@@ -124,8 +124,8 @@ resource "azurerm_subnet" "publick8s_tier" {
   name                 = "publick8s-tier"
   resource_group_name  = azurerm_resource_group.public.name
   virtual_network_name = azurerm_virtual_network.public.name
-  address_prefixes     = [
-    "10.245.0.0/24", # 10.245.0.1 - 10.245.0.254
+  address_prefixes = [
+    "10.245.0.0/24",           # 10.245.0.1 - 10.245.0.254
     "fd00:db8:deca:deed::/64", # smaller size as we're using kubenet (required by dual-stack AKS cluster), which allocate one IP per node instead of one IP per pod (in case of Azure CNI)
   ]
 }
@@ -149,7 +149,7 @@ resource "azurerm_subnet" "public_vnet_ci_jenkins_io_controller" {
   name                 = "${azurerm_virtual_network.public.name}-ci_jenkins_io_controller"
   resource_group_name  = azurerm_resource_group.public.name
   virtual_network_name = azurerm_virtual_network.public.name
-  address_prefixes     = [
+  address_prefixes = [
     "10.245.4.0/24", # 10.245.4.1 - 10.245.4.254
     "fd00:db8:deca::/64",
   ]
@@ -165,4 +165,41 @@ resource "azurerm_virtual_network_peering" "private_public" {
   allow_forwarded_traffic      = true
   allow_gateway_transit        = false
   use_remote_gateways          = false
+}
+
+##################################################################################################################
+###################   TRUSTED   ##################################################################################
+##################################################################################################################
+
+# Resources groups for TRUSTED NETWORK
+resource "azurerm_resource_group" "trusted" {
+  name     = "jenkinsinfra-trusted"
+  location = "East US"
+}
+
+# NETWORKING FOR TRUSTED
+resource "azurerm_virtual_network" "trusted" {
+  name                = "trusted-controller-network"
+  address_space       = ["10.246.0.0/16"]
+  location            = azurerm_resource_group.trusted.location
+  resource_group_name = azurerm_resource_group.trusted.name
+  tags                = local.default_tags
+}
+resource "azurerm_subnet" "trusted_controller" {
+  name                 = "trusted-controller-subnet"
+  resource_group_name  = azurerm_resource_group.trusted.name
+  virtual_network_name = azurerm_virtual_network.trusted.name
+  address_prefixes     = ["10.246.1.0/24"]
+}
+resource "azurerm_subnet" "trusted_vmagents" {
+  name                 = "trusted-vmagents-subnet"
+  resource_group_name  = azurerm_resource_group.trusted.name
+  virtual_network_name = azurerm_virtual_network.trusted.name
+  address_prefixes     = ["10.246.2.0/24"]
+}
+resource "azurerm_subnet" "trusted_permanent_agents" {
+  name                 = "trusted-permanent-agents-subnet"
+  resource_group_name  = azurerm_resource_group.trusted.name
+  virtual_network_name = azurerm_virtual_network.trusted.name
+  address_prefixes     = ["10.246.3.0/24"]
 }
