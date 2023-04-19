@@ -39,7 +39,7 @@ resource "azurerm_resource_group" "private" {
 
 resource "azurerm_resource_group" "trusted" {
   name     = "trusted"
-  location = "East US"
+  location = var.location
 }
 
 ## Virtual networks
