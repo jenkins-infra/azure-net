@@ -17,10 +17,33 @@
 #     │                                           ┌────────────▼───┐
 #     │         ┌───────────────────────┐         │                │
 #     │         │                       │         │                │
-#     └─────────►  Private VPN Gateway  ◄─────────►  Private VNet  │
-#               │                       │         │                │
-#               └───────────────────────┘         │                │
-#                                                 └────────────────┘
+#     ├─────────►  Private VPN Gateway  ◄─────────►  Private VNet  │
+#     │         │                       │         │                │
+#     │         └───────────────────────┘         │                │
+#     │                                           └────────────────┘
+#     │
+#     │                                            ┌────────────────────────────┐
+#     │                                            │                            │
+#     │         ┌───────────────────────┐          │       Trusted VNet         │
+#     │         │                       │          │                            │
+#     │         │      ┌──────────┐     │          │     ┌─────────────────┐    │
+#     └─────────►      │Bounce VM │     ◄──────────┼────►│Controller Subnet│    │
+#               │      └──────────┘     │          │     └─────────────────┘    │
+#               │                       │          │                            │
+#               └───────────────────────┘          │  ┌───────────────────────┐ │
+#                                                  │  │Ephemeral Agents Subnet│ │
+#                                                  │  └───────────────────────┘ │
+#                                                  │                            │
+#                                                  │  ┌───────────────────────┐ │
+#                                                  │  │Permanent Agents Subnet│ │
+#                                                  │  └───────────────────────┘ │
+#                                                  │                            │
+#                                                  │                            │
+#                                                  └────────────────────────────┘
+#
+#
+#
+#
 #
 # See also https://github.com/jenkins-infra/azure/blob/legacy-tf/plans/vnets.tf
 
@@ -35,6 +58,12 @@ resource "azurerm_resource_group" "private" {
   name     = "private"
   location = var.location
   tags     = local.default_tags
+}
+
+resource "azurerm_resource_group" "trusted" {
+  name     = "trusted"
+  location = var.location
+  tags = local.default_tags
 }
 
 ## Virtual networks
@@ -52,6 +81,13 @@ resource "azurerm_virtual_network" "private" {
   location            = azurerm_resource_group.private.location
   resource_group_name = azurerm_resource_group.private.name
   address_space       = ["10.248.0.0/14"]
+  tags                = local.default_tags
+}
+resource "azurerm_virtual_network" "trusted" {
+  name                = "${azurerm_resource_group.trusted.name}-vnet"
+  location            = azurerm_resource_group.trusted.location
+  resource_group_name = azurerm_resource_group.trusted.name
+  address_space       = ["10.252.0.0/21"] # 10.252.0.1 - 10.252.7.254
   tags                = local.default_tags
 }
 
@@ -72,7 +108,6 @@ resource "azurerm_subnet" "cert_ci_jenkins_io_agents" {
   virtual_network_name = azurerm_virtual_network.cert_ci_jenkins_io_agents.name
   address_prefixes     = ["10.0.0.0/24"]
 }
-
 
 # Dedicated subnet for external access (such as VPN external NIC)
 resource "azurerm_subnet" "dmz" {
@@ -124,8 +159,8 @@ resource "azurerm_subnet" "publick8s_tier" {
   name                 = "publick8s-tier"
   resource_group_name  = azurerm_resource_group.public.name
   virtual_network_name = azurerm_virtual_network.public.name
-  address_prefixes     = [
-    "10.245.0.0/24", # 10.245.0.1 - 10.245.0.254
+  address_prefixes = [
+    "10.245.0.0/24",           # 10.245.0.1 - 10.245.0.254
     "fd00:db8:deca:deed::/64", # smaller size as we're using kubenet (required by dual-stack AKS cluster), which allocate one IP per node instead of one IP per pod (in case of Azure CNI)
   ]
 }
@@ -149,7 +184,7 @@ resource "azurerm_subnet" "public_vnet_ci_jenkins_io_controller" {
   name                 = "${azurerm_virtual_network.public.name}-ci_jenkins_io_controller"
   resource_group_name  = azurerm_resource_group.public.name
   virtual_network_name = azurerm_virtual_network.public.name
-  address_prefixes     = [
+  address_prefixes = [
     "10.245.4.0/24", # 10.245.4.1 - 10.245.4.254
     "fd00:db8:deca::/64",
   ]
@@ -165,4 +200,24 @@ resource "azurerm_virtual_network_peering" "private_public" {
   allow_forwarded_traffic      = true
   allow_gateway_transit        = false
   use_remote_gateways          = false
+}
+
+# Dedicated subnets for trusted.ci.jenkins.io (controller and agents)
+resource "azurerm_subnet" "trusted_vnet_trusted_ci_jenkins_io_controller" {
+  name                 = "${azurerm_virtual_network.trusted.name}-trusted-jenkins-ci-io-controller"
+  resource_group_name  = azurerm_resource_group.trusted.name
+  virtual_network_name = azurerm_virtual_network.trusted.name
+  address_prefixes     = ["10.252.0.0/24"] # 10.252.0.1 - 10.252.0.254
+}
+resource "azurerm_subnet" "trusted_vnet_trusted_ci_jenkins_io_ephemeral_agents" {
+  name                 = "${azurerm_virtual_network.trusted.name}-trusted-jenkins-ci-io-ephemeral-agents"
+  resource_group_name  = azurerm_resource_group.trusted.name
+  virtual_network_name = azurerm_virtual_network.trusted.name
+  address_prefixes     = ["10.252.1.0/24"] # 10.252.1.1 - 10.252.1.254
+}
+resource "azurerm_subnet" "trusted_vnet_trusted_ci_jenkins_io_permanent_agents" {
+  name                 = "${azurerm_virtual_network.trusted.name}-trusted-jenkins-ci-io-permanent-agents"
+  resource_group_name  = azurerm_resource_group.trusted.name
+  virtual_network_name = azurerm_virtual_network.trusted.name
+  address_prefixes     = ["10.252.2.0/24"] # 10.252.2.1 - 10.252.2.254
 }
