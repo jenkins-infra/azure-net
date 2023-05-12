@@ -55,7 +55,7 @@ resource "azurerm_resource_group" "private" {
 resource "azurerm_resource_group" "trusted" {
   name     = "trusted"
   location = var.location
-  tags = local.default_tags
+  tags     = local.default_tags
 }
 
 ## Virtual networks

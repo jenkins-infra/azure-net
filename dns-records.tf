@@ -13,7 +13,7 @@ resource "azurerm_dns_a_record" "cert-ci-jenkins-io" {
 }
 
 ### CNAME records
-# CNAME records targetting the public-nginx on publick8s cluster
+# CNAME records targeting the public-nginx on publick8s cluster
 resource "azurerm_dns_cname_record" "target_public_publick8s" {
   # Map of records and corresponding purposes
   for_each = {
@@ -31,7 +31,7 @@ resource "azurerm_dns_cname_record" "target_public_publick8s" {
   })
 }
 
-# CNAME records targetting the public-nginx on privatek8s cluster
+# CNAME records targeting the public-nginx on privatek8s cluster
 resource "azurerm_dns_cname_record" "target_public_privatek8s" {
   # Map of records and corresponding purposes
   for_each = {
@@ -49,7 +49,7 @@ resource "azurerm_dns_cname_record" "target_public_privatek8s" {
   })
 }
 
-# CNAME records targetting the private-nginx on publick8s cluster
+# CNAME records targeting the private-nginx on publick8s cluster
 resource "azurerm_dns_cname_record" "target_private_privatek8s" {
   # Map of records and corresponding purposes
   for_each = {
