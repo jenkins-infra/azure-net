@@ -18,6 +18,7 @@ resource "azurerm_dns_cname_record" "target_public_publick8s" {
   # Map of records and corresponding purposes
   for_each = {
     "repo.azure" = "artifact-caching-proxy on Azure"
+    "weekly.ci"  = "Jenkins Weekly demo controller"
   }
 
   name                = each.key
@@ -80,21 +81,4 @@ resource "azurerm_dns_txt_record" "jenkinsci-transfer-github-verification" {
   }
 
   tags = local.default_tags
-}
-
-# Refactoring
-# TODO: remove after first apply
-moved {
-  from = azurerm_dns_cname_record.target
-  to   = azurerm_dns_cname_record.target_public_publick8s["repo.azure"]
-}
-
-moved {
-  from = azurerm_dns_cname_record.webhook-github-comment-ops
-  to   = azurerm_dns_cname_record.target_public_privatek8s["webhook-github-comment-ops"]
-}
-
-moved {
-  from = azurerm_dns_cname_record.release-ci-jenkins-io
-  to   = azurerm_dns_cname_record.target_private_privatek8s["release.ci"]
 }
