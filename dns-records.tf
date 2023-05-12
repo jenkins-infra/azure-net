@@ -18,6 +18,7 @@ resource "azurerm_dns_cname_record" "target_public_publick8s" {
   # Map of records and corresponding purposes
   for_each = {
     "repo.azure" = "artifact-caching-proxy on Azure"
+    "weekly.ci"  = "Jenkins Weekly demo controller"
   }
 
   name                = each.key
