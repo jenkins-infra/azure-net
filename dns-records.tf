@@ -69,24 +69,7 @@ resource "azurerm_dns_cname_record" "target_private_privatek8s" {
 }
 
 # CNAME records targeting the public-nginx on prodpublick8s cluster
-# # TODO: to be removed after https://github.com/jenkins-infra/helpdesk/issues/3351
-# resource "azurerm_dns_cname_record" "javadoc" {
-#   name                = "javadoc"
-#   zone_name           = data.azurerm_dns_zone.jenkinsio.name
-#   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-#   ttl                 = 60
-#   record              = "public.aks.jenkins.io"
-# }
-
-# # TODO: to be removed after https://github.com/jenkins-infra/helpdesk/issues/3351
-# resource "azurerm_dns_cname_record" "wiki" {
-#   name                = "wiki"
-#   zone_name           = data.azurerm_dns_zone.jenkinsio.name
-#   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-#   ttl                 = 60
-#   record              = "public.aks.jenkins.io"
-# }
-
+# TODO: to be removed after https://github.com/jenkins-infra/helpdesk/issues/3351
 resource "azurerm_dns_cname_record" "target_public_prodpublick8s" {
   # Map of records and corresponding purposes
   for_each = {
