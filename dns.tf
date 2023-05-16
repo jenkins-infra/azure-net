@@ -4,7 +4,8 @@ data "azurerm_resource_group" "proddns_jenkinsio" {
 }
 
 resource "azurerm_resource_group" "proddns_jenkinsisthewayio" {
-  name = "proddns_jenkinsisthewayio"
+  name     = "proddns_jenkinsisthewayio"
+  location = "East US 2"
 }
 
 # TODO: import as resource
@@ -15,7 +16,7 @@ data "azurerm_dns_zone" "jenkinsio" {
 
 resource "azurerm_dns_zone" "jenkinsistheway_io" {
   name                = "jenkinsistheway.io"
-  resource_group_name = data.azurerm_resource_group.proddns_jenkinsisthewayio.name
+  resource_group_name = azurerm_resource_group.proddns_jenkinsisthewayio.name
 }
 
 resource "azurerm_dns_zone" "child_zones" {

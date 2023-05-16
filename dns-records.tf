@@ -91,10 +91,10 @@ resource "azurerm_dns_cname_record" "target_public_prodpublick8s" {
 # TODO: to be removed after https://github.com/jenkins-infra/helpdesk/issues/3351
 resource "azurerm_dns_cname_record" "jenkinsistheway_io" {
   name                = "@"
-  zone_name           = data.azurerm_dns_zone.jenkinsistheway_io.name
-  resource_group_name = data.azurerm_resource_group.proddns_jenkinsisthewayio.name
+  zone_name           = azurerm_dns_zone.jenkinsistheway_io.name
+  resource_group_name = azurerm_resource_group.proddns_jenkinsisthewayio.name
   ttl                 = 60
-  records             = "public.aks.jenkins.io"
+  record              = "public.aks.jenkins.io"
 }
 
 ### TXT records
