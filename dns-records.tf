@@ -12,6 +12,15 @@ resource "azurerm_dns_a_record" "cert-ci-jenkins-io" {
   tags = local.default_tags
 }
 
+# TODO: to be replaced by a CNAME targeting public-nginx on publick8s after https://github.com/jenkins-infra/helpdesk/issues/3351
+resource "azurerm_dns_a_record" "jenkinsistheway_io" {
+  name                = "@"
+  zone_name           = data.azurerm_dns_zone.jenkinsistheway_io.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsisthewayio.name
+  ttl                 = 60
+  records             = ["52.167.253.43"] # aliased as 'prodgw-publick8s' in Azure Portal
+}
+
 ### CNAME records
 # CNAME records targeting the public-nginx on publick8s cluster
 resource "azurerm_dns_cname_record" "target_public_publick8s" {
