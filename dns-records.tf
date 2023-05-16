@@ -68,6 +68,25 @@ resource "azurerm_dns_cname_record" "target_private_privatek8s" {
   })
 }
 
+# CNAME records targeting the public-nginx on prodpublick8s cluster
+# TODO: to be removed after https://github.com/jenkins-infra/helpdesk/issues/3351
+resource "azurerm_dns_cname_record" "javadoc" {
+  name                = "javadoc"
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 60
+  record              = "public.aks.jenkins.io"
+}
+
+# TODO: to be removed after https://github.com/jenkins-infra/helpdesk/issues/3351
+resource "azurerm_dns_cname_record" "wiki" {
+  name                = "wiki"
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 60
+  record              = "public.aks.jenkins.io"
+}
+
 ### TXT records
 # TXT record to verify jenkinsci-transfer GitHub org (https://github.com/jenkins-infra/helpdesk/issues/3448)
 resource "azurerm_dns_txt_record" "jenkinsci-transfer-github-verification" {
