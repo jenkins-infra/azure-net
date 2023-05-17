@@ -73,6 +73,7 @@ resource "azurerm_dns_cname_record" "target_public_publick8s" {
     "javadoc"    = "Jenkins Javadoc"
     "repo.azure" = "artifact-caching-proxy on Azure"
     "weekly.ci"  = "Jenkins Weekly demo controller"
+    "wiki"       = "Static Wiki Confluence export"
   }
 
   name                = each.key
@@ -137,7 +138,6 @@ resource "azurerm_dns_cname_record" "target_public_prodpublick8s" {
     "plugins.origin"     = "Plugins website content origin for Fastly CDN"
     "reports"            = "Public reports about Jenkins services and components consumed by RPU, plugins website and others"
     "uplink"             = "Jenkins telemetry service"
-    "wiki"               = "Static Wiki Confluence export"
     "www.origin"         = "Jenkins website content origin for Fastly CDN"
   }
 
