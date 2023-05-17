@@ -13,12 +13,39 @@ resource "azurerm_dns_a_record" "cert-ci-jenkins-io" {
 }
 
 # A record for the jenkinsistheway.io redirector hosted on publick8s redirecting to stories.jenkins.io
+resource "azurerm_dns_a_record" "jenkins_io" {
+  name                = "@"
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 60
+  records             = ["52.167.253.43"] # prodpublick8s IPv4
+
+  tags = merge(local.default_tags, {
+    purpose = "Jenkins website"
+  })
+}
+
+# A record for the jenkinsistheway.io redirector hosted on publick8s redirecting to stories.jenkins.io
+# TODO: to be replaced by a CNAME targeting public_publick8s in the context of https://github.com/jenkins-infra/helpdesk/issues/3351
+resource "azurerm_dns_a_record" "rating_jenkins_io" {
+  name                = "rating"
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 60
+  records             = ["52.167.253.43"] # prodpublick8s IPv4
+
+  tags = merge(local.default_tags, {
+    purpose = "Jenkins releases rating service"
+  })
+}
+
+# A record for the jenkinsistheway.io redirector hosted on publick8s redirecting to stories.jenkins.io
 resource "azurerm_dns_a_record" "jenkinsistheway_io" {
   name                = "@"
   zone_name           = azurerm_dns_zone.jenkinsistheway_io.name
   resource_group_name = azurerm_resource_group.proddns_jenkinsisthewayio.name
   ttl                 = 60
-  records              = ["20.119.232.75"] # publick8s_public_ipv4_address defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
+  records             = ["20.119.232.75"] # publick8s_public_ipv4_address defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
 
   tags = merge(local.default_tags, {
     purpose = "Jenkinsistheway.io redirector to stories.jenkins.io"
@@ -31,7 +58,7 @@ resource "azurerm_dns_aaaa_record" "jenkinsistheway_io_ipv6" {
   zone_name           = azurerm_dns_zone.jenkinsistheway_io.name
   resource_group_name = azurerm_resource_group.proddns_jenkinsisthewayio.name
   ttl                 = 60
-  records              = ["2603:1030:408:7::44"] # publick8s_public_ipv6_address defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
+  records             = ["2603:1030:408:7::44"] # publick8s_public_ipv6_address defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
 
   tags = merge(local.default_tags, {
     purpose = "Jenkinsistheway.io redirector to stories.jenkins.io"
@@ -100,7 +127,18 @@ resource "azurerm_dns_cname_record" "target_private_privatek8s" {
 resource "azurerm_dns_cname_record" "target_public_prodpublick8s" {
   # Map of records and corresponding purposes
   for_each = {
-    "wiki"    = "Static Wiki Confluence export"
+    "accounts"           = "accountapp for Jenkins users"
+    "fallback.get"       = "Fallback address for mirrorbits" # Note: had a TTL of 10 minutes before, not 1 hour
+    "get"                = "Jenkins binary distribution via mirrorbits"
+    "incrementals"       = "incrementals publisher to incrementals Maven repository"
+    "mirrors"            = "Jenkins binary distribution via mirrorbits"
+    "plugin-health"      = "Plugin Health Scoring application"
+    "plugin-site-issues" = "Plugins website API content origin for Fastly CDN"
+    "plugins.origin"     = "Plugins website content origin for Fastly CDN"
+    "reports"            = "Public reports about Jenkins services and components consumed by RPU, plugins website and others"
+    "uplink"             = "Jenkins telemetry service"
+    "wiki"               = "Static Wiki Confluence export"
+    "www.origin"         = "Jenkins website content origin for Fastly CDN"
   }
 
   name                = each.key
@@ -108,6 +146,25 @@ resource "azurerm_dns_cname_record" "target_public_prodpublick8s" {
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 60
   record              = "public.aks.jenkins.io"
+
+  tags = merge(local.default_tags, {
+    purpose = each.value
+  })
+}
+
+# CNAME records targeting the private-nginx on prodpublick8s cluster
+# TODO: to be removed after https://github.com/jenkins-infra/helpdesk/issues/3351
+resource "azurerm_dns_cname_record" "target_private_prodpublick8s" {
+  # Map of records and corresponding purposes
+  for_each = {
+    "admin.accounts" = "Keycloak admin for Jenkins users"
+  }
+
+  name                = each.key
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 60
+  record              = "private.aks.jenkins.io"
 
   tags = merge(local.default_tags, {
     purpose = each.value
