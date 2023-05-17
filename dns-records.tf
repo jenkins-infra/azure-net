@@ -12,6 +12,19 @@ resource "azurerm_dns_a_record" "cert-ci-jenkins-io" {
   tags = local.default_tags
 }
 
+# A record for the jenkinsistheway.io redirector hosted on publick8s redirecting to stories.jenkins.io
+resource "azurerm_dns_a_record" "jenkinsistheway_io" {
+  name                = "@"
+  zone_name           = azurerm_dns_zone.jenkinsistheway_io.name
+  resource_group_name = azurerm_resource_group.proddns_jenkinsisthewayio.name
+  ttl                 = 60
+  records              = ["20.119.232.75", "2603:1030:408:7::44"] # publick8s_public_ipv4_address & publick8s_public_ipv6_address, defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
+
+  tags = merge(local.default_tags, {
+    purpose = "Jenkinsistheway.io redirector to stories.jenkins.io"
+  })
+}
+
 ### CNAME records
 # CNAME records targeting the public-nginx on publick8s cluster
 resource "azurerm_dns_cname_record" "target_public_publick8s" {
@@ -86,15 +99,6 @@ resource "azurerm_dns_cname_record" "target_public_prodpublick8s" {
   tags = merge(local.default_tags, {
     purpose = each.value
   })
-}
-
-# TODO: to be removed after https://github.com/jenkins-infra/helpdesk/issues/3351
-resource "azurerm_dns_a_record" "jenkinsistheway_io" {
-  name                = "@"
-  zone_name           = azurerm_dns_zone.jenkinsistheway_io.name
-  resource_group_name = azurerm_resource_group.proddns_jenkinsisthewayio.name
-  ttl                 = 60
-  records              = ["52.167.253.43"]
 }
 
 ### TXT records
