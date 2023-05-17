@@ -51,7 +51,7 @@ resource "azurerm_dns_cname_record" "target_public_publick8s" {
   name                = each.key
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-  ttl                 = 300
+  ttl                 = 60
   record              = "public.publick8s.jenkins.io"
 
   tags = merge(local.default_tags, {
