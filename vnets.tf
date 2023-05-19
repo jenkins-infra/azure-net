@@ -185,7 +185,7 @@ resource "azurerm_subnet" "public_vnet_ci_jenkins_io_controller" {
 # This subnet is reserved as "delegated" for the pgsql server on the public network
 # Ref. https://docs.microsoft.com/en-us/azure/postgresql/flexible-server/concepts-networking
 resource "azurerm_subnet" "public_vnet_postgres_tier" {
-  name                 = "${data.azurerm_virtual_network.public.name}-postgres-tier"
+  name                 = "${azurerm_virtual_network.public.name}-postgres-tier"
   resource_group_name  = azurerm_resource_group.public.name
   virtual_network_name = azurerm_virtual_network.public.name
   address_prefixes     = ["10.245.5.0/24"] # 10.245.5.1 - 10.245.5.254
