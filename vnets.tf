@@ -182,6 +182,24 @@ resource "azurerm_subnet" "public_vnet_ci_jenkins_io_controller" {
   ]
 }
 
+# This subnet is reserved as "delegated" for the pgsql server on the public network
+# Ref. https://docs.microsoft.com/en-us/azure/postgresql/flexible-server/concepts-networking
+resource "azurerm_subnet" "public_vnet_postgres_tier" {
+  name                 = "${data.azurerm_virtual_network.public.name}-postgres-tier"
+  resource_group_name  = data.azurerm_resource_group.public.name
+  virtual_network_name = data.azurerm_virtual_network.public.name
+  address_prefixes     = ["10.245.5.0/24"] # 10.245.5.1 - 10.245.5.254
+  delegation {
+    name = "pgsql"
+    service_delegation {
+      name = "Microsoft.DBforPostgreSQL/flexibleServers"
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/join/action",
+      ]
+    }
+  }
+}
+
 ## Peering
 resource "azurerm_virtual_network_peering" "private_public" {
   name                         = "${azurerm_resource_group.public.name}-peering"
