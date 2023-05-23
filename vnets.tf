@@ -66,8 +66,6 @@ resource "azurerm_virtual_network" "public" {
   address_space       = ["10.244.0.0/14", "fd00:db8:deca::/48"]
   tags                = local.default_tags
 }
-
-### Private VNet
 resource "azurerm_virtual_network" "private" {
   name                = "${azurerm_resource_group.private.name}-vnet"
   location            = azurerm_resource_group.private.location
@@ -80,6 +78,14 @@ resource "azurerm_virtual_network" "trusted" {
   location            = azurerm_resource_group.trusted.location
   resource_group_name = azurerm_resource_group.trusted.name
   address_space       = ["10.252.0.0/21"] # 10.252.0.1 - 10.252.7.254
+  tags                = local.default_tags
+}
+# separate vNET as Postgres flexible server currently doesn't support a vNET with ipv4 and ipv6 address spaces
+resource "azurerm_virtual_network" "public_db" {
+  name                = "${azurerm_resource_group.public.name}-db-vnet"
+  location            = azurerm_resource_group.public.location
+  resource_group_name = azurerm_resource_group.public.name
+  address_space       = ["10.253.0.0/21"] # 10.10.253.0.1 - 10.253.7.254
   tags                = local.default_tags
 }
 
@@ -182,13 +188,13 @@ resource "azurerm_subnet" "public_vnet_ci_jenkins_io_controller" {
   ]
 }
 
-# This subnet is reserved as "delegated" for the pgsql server on the public network
+# This subnet is reserved as "delegated" for the pgsql server on the public-db network
 # Ref. https://docs.microsoft.com/en-us/azure/postgresql/flexible-server/concepts-networking
-resource "azurerm_subnet" "public_vnet_postgres_tier" {
-  name                 = "${azurerm_virtual_network.public.name}-postgres-tier"
+resource "azurerm_subnet" "public_db_vnet_postgres_tier" {
+  name                 = "${azurerm_virtual_network.public_db.name}-postgres-tier"
   resource_group_name  = azurerm_resource_group.public.name
-  virtual_network_name = azurerm_virtual_network.public.name
-  address_prefixes     = ["10.245.5.0/24"] # 10.245.5.1 - 10.245.5.254
+  virtual_network_name = azurerm_virtual_network.public_db.name
+  address_prefixes     = ["10.253.0.0/24"] # 10.253.0.1 - 10.253.0.254
   delegation {
     name = "pgsql"
     service_delegation {
@@ -206,6 +212,16 @@ resource "azurerm_virtual_network_peering" "private_public" {
   resource_group_name          = azurerm_resource_group.private.name
   virtual_network_name         = azurerm_virtual_network.private.name
   remote_virtual_network_id    = azurerm_virtual_network.public.id
+  allow_virtual_network_access = true
+  allow_forwarded_traffic      = true
+  allow_gateway_transit        = false
+  use_remote_gateways          = false
+}
+resource "azurerm_virtual_network_peering" "public_public_db" {
+  name                         = "${azurerm_resource_group.public.name}-db-peering"
+  resource_group_name          = azurerm_resource_group.public.name
+  virtual_network_name         = azurerm_virtual_network.public.name
+  remote_virtual_network_id    = azurerm_virtual_network.public_db.id
   allow_virtual_network_access = true
   allow_forwarded_traffic      = true
   allow_gateway_transit        = false
