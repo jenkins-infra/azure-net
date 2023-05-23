@@ -80,11 +80,12 @@ resource "azurerm_virtual_network" "trusted" {
   address_space       = ["10.252.0.0/21"] # 10.252.0.1 - 10.252.7.254
   tags                = local.default_tags
 }
+# separate vNET as Postgres flexible server currently doesn't support a vNET with ipv4 and ipv6 address spaces
 resource "azurerm_virtual_network" "public_db" {
   name                = "${azurerm_resource_group.public.name}-db-vnet"
   location            = azurerm_resource_group.public.location
   resource_group_name = azurerm_resource_group.public.name
-  address_space       = ["10.253.0.0/21"]
+  address_space       = ["10.253.0.0/21"] # 10.10.253.0.1 - 10.253.7.254
   tags                = local.default_tags
 }
 
