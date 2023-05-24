@@ -206,24 +206,65 @@ resource "azurerm_subnet" "public_db_vnet_postgres_tier" {
   }
 }
 
-## Peering
-resource "azurerm_virtual_network_peering" "private_public" {
-  name                         = "${azurerm_resource_group.public.name}-peering"
-  resource_group_name          = azurerm_resource_group.private.name
+## Peerings
+# Each peering needs 2 symetric 'azurerm_virtual_network_peering' resources (ref. https://stackoverflow.com/questions/74948296/azure-vnet-peering-initiated-state-when-run-with-terraform)
+resource "azurerm_virtual_network_peering" "private_to_public" {
+  name                         = "${azurerm_virtual_network.private.name}-to-${azurerm_virtual_network.public.name}"
+  resource_group_name          = azurerm_virtual_network.private.resource_group_name
   virtual_network_name         = azurerm_virtual_network.private.name
   remote_virtual_network_id    = azurerm_virtual_network.public.id
   allow_virtual_network_access = true
-  allow_forwarded_traffic      = true
+  allow_forwarded_traffic      = false
   allow_gateway_transit        = false
   use_remote_gateways          = false
 }
-resource "azurerm_virtual_network_peering" "public_public_db" {
-  name                         = "${azurerm_resource_group.public.name}-db-peering"
-  resource_group_name          = azurerm_resource_group.public.name
+resource "azurerm_virtual_network_peering" "public_to_private" {
+  name                         = "${azurerm_virtual_network.public.name}-to-${azurerm_virtual_network.private.name}"
+  resource_group_name          = azurerm_virtual_network.public.resource_group_name
+  virtual_network_name         = azurerm_virtual_network.public.name
+  remote_virtual_network_id    = azurerm_virtual_network.private.id
+  allow_virtual_network_access = true
+  allow_forwarded_traffic      = false
+  allow_gateway_transit        = false
+  use_remote_gateways          = false
+}
+resource "azurerm_virtual_network_peering" "public_to_public_db" {
+  name                         = "${azurerm_virtual_network.public.name}-to-${azurerm_virtual_network.public_db.name}"
+  resource_group_name          = azurerm_virtual_network.public.resource_group_name
   virtual_network_name         = azurerm_virtual_network.public.name
   remote_virtual_network_id    = azurerm_virtual_network.public_db.id
   allow_virtual_network_access = true
-  allow_forwarded_traffic      = true
+  allow_forwarded_traffic      = false
+  allow_gateway_transit        = false
+  use_remote_gateways          = false
+}
+resource "azurerm_virtual_network_peering" "public_db_to_public" {
+  name                         = "${azurerm_virtual_network.public_db.name}-to-${azurerm_virtual_network.public.name}"
+  resource_group_name          = azurerm_virtual_network.public_db.resource_group_name
+  virtual_network_name         = azurerm_virtual_network.public_db.name
+  remote_virtual_network_id    = azurerm_virtual_network.public.id
+  allow_virtual_network_access = true
+  allow_forwarded_traffic      = false
+  allow_gateway_transit        = false
+  use_remote_gateways          = false
+}
+resource "azurerm_virtual_network_peering" "private_to_public_db" {
+  name                         = "${azurerm_virtual_network.private.name}-to-${azurerm_virtual_network.public_db.name}"
+  resource_group_name          = azurerm_virtual_network.private.resource_group_name
+  virtual_network_name         = azurerm_virtual_network.private.name
+  remote_virtual_network_id    = azurerm_virtual_network.public_db.id
+  allow_virtual_network_access = true
+  allow_forwarded_traffic      = false
+  allow_gateway_transit        = false
+  use_remote_gateways          = false
+}
+resource "azurerm_virtual_network_peering" "public_db_to_private" {
+  name                         = "${azurerm_virtual_network.public_db.name}-to-${azurerm_virtual_network.private.name}"
+  resource_group_name          = azurerm_virtual_network.public_db.resource_group_name
+  virtual_network_name         = azurerm_virtual_network.public_db.name
+  remote_virtual_network_id    = azurerm_virtual_network.private.id
+  allow_virtual_network_access = true
+  allow_forwarded_traffic      = false
   allow_gateway_transit        = false
   use_remote_gateways          = false
 }
