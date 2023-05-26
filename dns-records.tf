@@ -74,8 +74,7 @@ moved {
 resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
   # Map of records and corresponding purposes
   for_each = {
-    "incrementals" = "incrementals publisher to incrementals Maven repository"
-
+    "incrementals"  = "incrementals publisher to incrementals Maven repository"
     "javadoc"       = "Jenkins Javadoc"
     "plugin-health" = "Plugin Health Scoring application"
     "repo.azure"    = "artifact-caching-proxy on Azure"
