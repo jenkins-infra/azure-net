@@ -66,14 +66,19 @@ resource "azurerm_dns_aaaa_record" "jenkinsistheway_io_ipv6" {
 }
 
 ### CNAME records
+moved {
+  from = azurerm_dns_cname_record.target_public_prodpublick8s["plugin-health"]
+  to   = azurerm_dns_cname_record.target_public_publick8s["plugin-health"]
+}
 # CNAME records targeting the public-nginx on publick8s cluster
 resource "azurerm_dns_cname_record" "target_public_publick8s" {
   # Map of records and corresponding purposes
   for_each = {
-    "javadoc"    = "Jenkins Javadoc"
-    "repo.azure" = "artifact-caching-proxy on Azure"
-    "weekly.ci"  = "Jenkins Weekly demo controller"
-    "wiki"       = "Static Wiki Confluence export"
+    "javadoc"       = "Jenkins Javadoc"
+    "plugin-health" = "Plugin Health Scoring application"
+    "repo.azure"    = "artifact-caching-proxy on Azure"
+    "weekly.ci"     = "Jenkins Weekly demo controller"
+    "wiki"          = "Static Wiki Confluence export"
   }
 
   name                = each.key
@@ -151,7 +156,6 @@ resource "azurerm_dns_cname_record" "target_public_prodpublick8s" {
     "get"                = "Jenkins binary distribution via mirrorbits"
     "incrementals"       = "incrementals publisher to incrementals Maven repository"
     "mirrors"            = "Jenkins binary distribution via mirrorbits"
-    "plugin-health"      = "Plugin Health Scoring application"
     "plugin-site-issues" = "Plugins website API content origin for Fastly CDN"
     "plugins.origin"     = "Plugins website content origin for Fastly CDN"
     "reports"            = "Public reports about Jenkins services and components consumed by RPU, plugins website and others"

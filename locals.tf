@@ -9,7 +9,7 @@ locals {
     username      = "jenkins-infra-team"
     ssh_allowed_inbound_ips = {
       dduportal = {
-        ips      = [
+        ips = [
           "85.27.58.68/32",   # Home
           "91.182.56.152/32", # Secondary
         ],
