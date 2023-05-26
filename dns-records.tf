@@ -80,7 +80,25 @@ resource "azurerm_dns_cname_record" "target_public_publick8s" {
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 60
-  record              = "public.publick8s.jenkins.io"
+  record              = "public.publick8s.jenkins.io" # # A record defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
+
+  tags = merge(local.default_tags, {
+    purpose = each.value
+  })
+}
+
+# CNAME records targeting the private-nginx on publick8s cluster
+resource "azurerm_dns_cname_record" "target_private_publick8s" {
+  # Map of records and corresponding purposes
+  for_each = {
+    "admin.accounts" = "Keycloak admin for Jenkins users"
+  }
+
+  name                = each.key
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 60
+  record              = "private.publick8s.jenkins.io" # A record defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
 
   tags = merge(local.default_tags, {
     purpose = each.value
@@ -98,14 +116,14 @@ resource "azurerm_dns_cname_record" "target_public_privatek8s" {
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 300
-  record              = "public.privatek8s.jenkins.io"
+  record              = "public.privatek8s.jenkins.io" # A record defined on https://github.com/jenkins-infra/azure/blob/main/privatek8s.tf
 
   tags = merge(local.default_tags, {
     purpose = each.value
   })
 }
 
-# CNAME records targeting the private-nginx on publick8s cluster
+# CNAME records targeting the private-nginx on privatek8s cluster
 resource "azurerm_dns_cname_record" "target_private_privatek8s" {
   # Map of records and corresponding purposes
   for_each = {
@@ -116,7 +134,7 @@ resource "azurerm_dns_cname_record" "target_private_privatek8s" {
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 300
-  record              = "private.privatek8s.jenkins.io"
+  record              = "private.privatek8s.jenkins.io" # A record managed manually
 
   tags = merge(local.default_tags, {
     purpose = each.value
@@ -146,25 +164,6 @@ resource "azurerm_dns_cname_record" "target_public_prodpublick8s" {
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 60
   record              = "public.aks.jenkins.io"
-
-  tags = merge(local.default_tags, {
-    purpose = each.value
-  })
-}
-
-# CNAME records targeting the private-nginx on prodpublick8s cluster
-# TODO: to be removed after https://github.com/jenkins-infra/helpdesk/issues/3351
-resource "azurerm_dns_cname_record" "target_private_prodpublick8s" {
-  # Map of records and corresponding purposes
-  for_each = {
-    "admin.accounts" = "Keycloak admin for Jenkins users"
-  }
-
-  name                = each.key
-  zone_name           = data.azurerm_dns_zone.jenkinsio.name
-  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-  ttl                 = 60
-  record              = "private.aks.jenkins.io"
 
   tags = merge(local.default_tags, {
     purpose = each.value
