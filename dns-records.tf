@@ -67,10 +67,6 @@ resource "azurerm_dns_aaaa_record" "jenkinsistheway_io_ipv6" {
 
 ### CNAME records
 # CNAME records targeting the public-nginx on publick8s cluster
-moved {
-  from = azurerm_dns_cname_record.target_public_publick8s
-  to   = azurerm_dns_cname_record.jenkinsio_target_public_publick8s
-}
 resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
   # Map of records and corresponding purposes
   for_each = {
@@ -111,10 +107,6 @@ resource "azurerm_dns_cname_record" "jenkinsciorg_target_public_publick8s" {
 }
 
 # CNAME records targeting the private-nginx on publick8s cluster
-moved {
-  from = azurerm_dns_cname_record.target_private_publick8s
-  to   = azurerm_dns_cname_record.jenkinsio_target_private_publick8s
-}
 resource "azurerm_dns_cname_record" "jenkinsio_target_private_publick8s" {
   # Map of records and corresponding purposes
   for_each = {
@@ -133,10 +125,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_private_publick8s" {
 }
 
 # CNAME records targeting the public-nginx on privatek8s cluster
-moved {
-  from = azurerm_dns_cname_record.target_public_privatek8s
-  to   = azurerm_dns_cname_record.jenkinsio_target_public_privatek8s
-}
 resource "azurerm_dns_cname_record" "jenkinsio_target_public_privatek8s" {
   # Map of records and corresponding purposes
   for_each = {
@@ -155,10 +143,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_privatek8s" {
 }
 
 # CNAME records targeting the private-nginx on privatek8s cluster
-moved {
-  from = azurerm_dns_cname_record.target_private_privatek8s
-  to   = azurerm_dns_cname_record.jenkinsio_target_private_privatek8s
-}
 resource "azurerm_dns_cname_record" "jenkinsio_target_private_privatek8s" {
   # Map of records and corresponding purposes
   for_each = {
@@ -178,10 +162,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_private_privatek8s" {
 
 # CNAME records targeting the public-nginx on prodpublick8s cluster
 # TODO: to be removed after https://github.com/jenkins-infra/helpdesk/issues/3351
-moved {
-  from = azurerm_dns_cname_record.target_public_prodpublick8s
-  to   = azurerm_dns_cname_record.jenkinsio_target_public_prodpublick8s
-}
 resource "azurerm_dns_cname_record" "jenkinsio_target_public_prodpublick8s" {
   # Map of records and corresponding purposes
   for_each = {
