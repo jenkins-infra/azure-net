@@ -66,12 +66,12 @@ resource "azurerm_dns_aaaa_record" "jenkinsistheway_io_ipv6" {
 }
 
 ### CNAME records
-moved {
-  from = azurerm_dns_cname_record.target_public_prodpublick8s["plugin-health"]
-  to   = azurerm_dns_cname_record.target_public_publick8s["plugin-health"]
-}
 # CNAME records targeting the public-nginx on publick8s cluster
-resource "azurerm_dns_cname_record" "target_public_publick8s" {
+moved {
+  from = azurerm_dns_cname_record.target_public_publick8s
+  to   = azurerm_dns_cname_record.jenkinsio_target_public_publick8s
+}
+resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
   # Map of records and corresponding purposes
   for_each = {
     "javadoc"       = "Jenkins Javadoc"
@@ -85,7 +85,25 @@ resource "azurerm_dns_cname_record" "target_public_publick8s" {
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 60
-  record              = "public.publick8s.jenkins.io" # # A record defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
+  record              = "public.publick8s.jenkins.io" # A record defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
+
+  tags = merge(local.default_tags, {
+    purpose = each.value
+  })
+}
+# CNAME records for the legacy domain jenkins-ci.org, pointing to their modern counterpart
+resource "azurerm_dns_cname_record" "jenkinsciorg_target_public_publick8s" {
+  # Map of records and corresponding purposes. Some records only exists in jenkins.io as jenkins-ci.org is only legacy
+  for_each = {
+    "javadoc" = "Jenkins Javadoc"
+    "wiki"    = "Static Wiki Confluence export"
+  }
+
+  name                = each.key
+  zone_name           = data.azurerm_dns_zone.jenkinsciorg.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsci.name
+  ttl                 = 60
+  record              = "${each.key}.jenkins.io"
 
   tags = merge(local.default_tags, {
     purpose = each.value
@@ -93,7 +111,11 @@ resource "azurerm_dns_cname_record" "target_public_publick8s" {
 }
 
 # CNAME records targeting the private-nginx on publick8s cluster
-resource "azurerm_dns_cname_record" "target_private_publick8s" {
+moved {
+  from = azurerm_dns_cname_record.target_private_publick8s
+  to   = azurerm_dns_cname_record.jenkinsio_target_private_publick8s
+}
+resource "azurerm_dns_cname_record" "jenkinsio_target_private_publick8s" {
   # Map of records and corresponding purposes
   for_each = {
     "admin.accounts" = "Keycloak admin for Jenkins users"
@@ -111,7 +133,11 @@ resource "azurerm_dns_cname_record" "target_private_publick8s" {
 }
 
 # CNAME records targeting the public-nginx on privatek8s cluster
-resource "azurerm_dns_cname_record" "target_public_privatek8s" {
+moved {
+  from = azurerm_dns_cname_record.target_public_privatek8s
+  to   = azurerm_dns_cname_record.jenkinsio_target_public_privatek8s
+}
+resource "azurerm_dns_cname_record" "jenkinsio_target_public_privatek8s" {
   # Map of records and corresponding purposes
   for_each = {
     "webhook-github-comment-ops" = "github-comment-ops GitHub App"
@@ -129,7 +155,11 @@ resource "azurerm_dns_cname_record" "target_public_privatek8s" {
 }
 
 # CNAME records targeting the private-nginx on privatek8s cluster
-resource "azurerm_dns_cname_record" "target_private_privatek8s" {
+moved {
+  from = azurerm_dns_cname_record.target_private_privatek8s
+  to   = azurerm_dns_cname_record.jenkinsio_target_private_privatek8s
+}
+resource "azurerm_dns_cname_record" "jenkinsio_target_private_privatek8s" {
   # Map of records and corresponding purposes
   for_each = {
     "release.ci" = "release.ci.jenkins.io, accessible only via the private VPN"
@@ -148,7 +178,11 @@ resource "azurerm_dns_cname_record" "target_private_privatek8s" {
 
 # CNAME records targeting the public-nginx on prodpublick8s cluster
 # TODO: to be removed after https://github.com/jenkins-infra/helpdesk/issues/3351
-resource "azurerm_dns_cname_record" "target_public_prodpublick8s" {
+moved {
+  from = azurerm_dns_cname_record.target_public_prodpublick8s
+  to   = azurerm_dns_cname_record.jenkinsio_target_public_prodpublick8s
+}
+resource "azurerm_dns_cname_record" "jenkinsio_target_public_prodpublick8s" {
   # Map of records and corresponding purposes
   for_each = {
     "accounts"           = "accountapp for Jenkins users"
