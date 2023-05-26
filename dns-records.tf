@@ -67,9 +67,14 @@ resource "azurerm_dns_aaaa_record" "jenkinsistheway_io_ipv6" {
 
 ### CNAME records
 # CNAME records targeting the public-nginx on publick8s cluster
+moved {
+  from = azurerm_dns_cname_record.jenkinsio_target_public_prodpublick8s["incrementals"]
+  to   = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["incrementals"]
+}
 resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
   # Map of records and corresponding purposes
   for_each = {
+    "incrementals"  = "incrementals publisher to incrementals Maven repository"
     "javadoc"       = "Jenkins Javadoc"
     "plugin-health" = "Plugin Health Scoring application"
     "repo.azure"    = "artifact-caching-proxy on Azure"
@@ -168,7 +173,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_prodpublick8s" {
     "accounts"           = "accountapp for Jenkins users"
     "fallback.get"       = "Fallback address for mirrorbits" # Note: had a TTL of 10 minutes before, not 1 hour
     "get"                = "Jenkins binary distribution via mirrorbits"
-    "incrementals"       = "incrementals publisher to incrementals Maven repository"
     "mirrors"            = "Jenkins binary distribution via mirrorbits"
     "plugin-site-issues" = "Plugins website API content origin for Fastly CDN"
     "plugins.origin"     = "Plugins website content origin for Fastly CDN"
