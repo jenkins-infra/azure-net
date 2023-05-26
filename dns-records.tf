@@ -87,11 +87,6 @@ resource "azurerm_dns_cname_record" "target_public_publick8s" {
   })
 }
 
-moved {
-  from = azurerm_dns_cname_record.target_private_prodpublick8s["admin.accounts"]
-  to = azurerm_dns_cname_record.target_private_publick8s["admin.accounts"]
-}
-
 # CNAME records targeting the private-nginx on publick8s cluster
 resource "azurerm_dns_cname_record" "target_private_publick8s" {
   # Map of records and corresponding purposes
