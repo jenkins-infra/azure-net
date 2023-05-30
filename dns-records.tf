@@ -26,20 +26,6 @@ resource "azurerm_dns_a_record" "jenkins_io" {
 }
 
 # A record for the jenkinsistheway.io redirector hosted on publick8s redirecting to stories.jenkins.io
-# TODO: to be replaced by a CNAME targeting public_publick8s in the context of https://github.com/jenkins-infra/helpdesk/issues/3351
-resource "azurerm_dns_a_record" "rating_jenkins_io" {
-  name                = "rating"
-  zone_name           = data.azurerm_dns_zone.jenkinsio.name
-  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-  ttl                 = 60
-  records             = ["52.167.253.43"] # prodpublick8s IPv4
-
-  tags = merge(local.default_tags, {
-    purpose = "Jenkins releases rating service"
-  })
-}
-
-# A record for the jenkinsistheway.io redirector hosted on publick8s redirecting to stories.jenkins.io
 resource "azurerm_dns_a_record" "jenkinsistheway_io" {
   name                = "@"
   zone_name           = azurerm_dns_zone.jenkinsistheway_io.name
@@ -77,6 +63,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
     "incrementals"  = "incrementals publisher to incrementals Maven repository"
     "javadoc"       = "Jenkins Javadoc"
     "plugin-health" = "Plugin Health Scoring application"
+    "rating"        = "Jenkins releases rating service"
     "repo.azure"    = "artifact-caching-proxy on Azure"
     "weekly.ci"     = "Jenkins Weekly demo controller"
     "wiki"          = "Static Wiki Confluence export"
