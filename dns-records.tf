@@ -53,10 +53,6 @@ resource "azurerm_dns_aaaa_record" "jenkinsistheway_io_ipv6" {
 
 ### CNAME records
 # CNAME records targeting the public-nginx on publick8s cluster
-moved {
-  from = azurerm_dns_cname_record.jenkinsio_target_public_prodpublick8s["incrementals"]
-  to   = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["incrementals"]
-}
 resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
   # Map of records and corresponding purposes
   for_each = {
