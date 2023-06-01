@@ -1,3 +1,8 @@
+moved {
+  from = azurerm_dns_cname_record.jenkinsio_target_public_prodpublick8s["uplink"]
+  to   = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["uplink"]
+}
+
 ### A records
 # A record for cert.ci.jenkins.io, accessible only via the private VPN
 # TODO: migrate this record to https://github.com/jenkins-infra/azure/blob/3aae66f0443c766301ae81f4d2aac5cec6032935/cert.ci.jenkins.io.tf#L14
@@ -61,6 +66,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
     "plugin-health" = "Plugin Health Scoring application"
     "rating"        = "Jenkins releases rating service"
     "repo.azure"    = "artifact-caching-proxy on Azure"
+    "uplink"        = "Jenkins telemetry service"
     "weekly.ci"     = "Jenkins Weekly demo controller"
     "wiki"          = "Static Wiki Confluence export"
   }
@@ -160,7 +166,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_prodpublick8s" {
     "plugin-site-issues" = "Plugins website API content origin for Fastly CDN"
     "plugins.origin"     = "Plugins website content origin for Fastly CDN"
     "reports"            = "Public reports about Jenkins services and components consumed by RPU, plugins website and others"
-    "uplink"             = "Jenkins telemetry service"
     "www.origin"         = "Jenkins website content origin for Fastly CDN"
   }
 
