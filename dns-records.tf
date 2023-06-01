@@ -1,6 +1,6 @@
 moved {
-  from = azurerm_dns_cname_record.target_public_prodpublick8s["uplink"]
-  to   = azurerm_dns_cname_record.target_public_publick8s["uplink"]
+  from = azurerm_dns_cname_record.jenkinsio_target_public_prodpublick8s["uplink"]
+  to   = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["uplink"]
 }
 
 ### A records
