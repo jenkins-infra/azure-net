@@ -1,3 +1,8 @@
+moved {
+  from = azurerm_dns_cname_record.target_public_prodpublick8s["uplink"]
+  to   = azurerm_dns_cname_record.target_public_publick8s["uplink"]
+}
+
 ### A records
 # A record for cert.ci.jenkins.io, accessible only via the private VPN
 # TODO: migrate this record to https://github.com/jenkins-infra/azure/blob/3aae66f0443c766301ae81f4d2aac5cec6032935/cert.ci.jenkins.io.tf#L14
