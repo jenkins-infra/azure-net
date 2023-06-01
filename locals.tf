@@ -30,7 +30,7 @@ locals {
     }
     puppet_outbound_ips = {
       # dig puppet.jenkins.io
-      puppet_jenkins_io = "140.211.9.94"
+      puppet_jenkins_io = "20.12.27.65"
     }
   }
 
