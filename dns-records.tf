@@ -1,6 +1,6 @@
 moved {
-  from = azurerm_dns_cname_record.jenkinsio_target_public_prodpublick8s["uplink"]
-  to   = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["uplink"]
+  from = azurerm_dns_cname_record.jenkinsio_target_public_prodpublick8s["reports"]
+  to   = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["reports"]
 }
 
 ### A records
@@ -66,6 +66,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
     "plugin-health" = "Plugin Health Scoring application"
     "rating"        = "Jenkins releases rating service"
     "repo.azure"    = "artifact-caching-proxy on Azure"
+    "reports"       = "Public reports about Jenkins services and components consumed by RPU, plugins website and others"
     "uplink"        = "Jenkins telemetry service"
     "weekly.ci"     = "Jenkins Weekly demo controller"
     "wiki"          = "Static Wiki Confluence export"
@@ -165,7 +166,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_prodpublick8s" {
     "mirrors"            = "Jenkins binary distribution via mirrorbits"
     "plugin-site-issues" = "Plugins website API content origin for Fastly CDN"
     "plugins.origin"     = "Plugins website content origin for Fastly CDN"
-    "reports"            = "Public reports about Jenkins services and components consumed by RPU, plugins website and others"
     "www.origin"         = "Jenkins website content origin for Fastly CDN"
   }
 
