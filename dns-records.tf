@@ -1,6 +1,6 @@
 moved {
-  from = azurerm_dns_cname_record.jenkinsio_target_public_prodpublick8s["uplink"]
-  to   = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["uplink"]
+  from = azurerm_dns_cname_record.jenkinsio_target_public_prodpublick8s["accounts"]
+  to   = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["accounts"]
 }
 
 ### A records
@@ -61,11 +61,13 @@ resource "azurerm_dns_aaaa_record" "jenkinsistheway_io_ipv6" {
 resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
   # Map of records and corresponding purposes
   for_each = {
+    "accounts"      = "accountapp for Jenkins users"
     "incrementals"  = "incrementals publisher to incrementals Maven repository"
     "javadoc"       = "Jenkins Javadoc"
     "plugin-health" = "Plugin Health Scoring application"
     "rating"        = "Jenkins releases rating service"
     "repo.azure"    = "artifact-caching-proxy on Azure"
+    "reports"       = "Public reports about Jenkins services and components consumed by RPU, plugins website and others"
     "uplink"        = "Jenkins telemetry service"
     "weekly.ci"     = "Jenkins Weekly demo controller"
     "wiki"          = "Static Wiki Confluence export"
@@ -85,8 +87,9 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
 resource "azurerm_dns_cname_record" "jenkinsciorg_target_public_publick8s" {
   # Map of records and corresponding purposes. Some records only exists in jenkins.io as jenkins-ci.org is only legacy
   for_each = {
-    "javadoc" = "Jenkins Javadoc"
-    "wiki"    = "Static Wiki Confluence export"
+    "accounts" = "accountapp for Jenkins users"
+    "javadoc"  = "Jenkins Javadoc"
+    "wiki"     = "Static Wiki Confluence export"
   }
 
   name                = each.key
@@ -159,13 +162,11 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_private_privatek8s" {
 resource "azurerm_dns_cname_record" "jenkinsio_target_public_prodpublick8s" {
   # Map of records and corresponding purposes
   for_each = {
-    "accounts"           = "accountapp for Jenkins users"
     "fallback.get"       = "Fallback address for mirrorbits" # Note: had a TTL of 10 minutes before, not 1 hour
     "get"                = "Jenkins binary distribution via mirrorbits"
     "mirrors"            = "Jenkins binary distribution via mirrorbits"
     "plugin-site-issues" = "Plugins website API content origin for Fastly CDN"
     "plugins.origin"     = "Plugins website content origin for Fastly CDN"
-    "reports"            = "Public reports about Jenkins services and components consumed by RPU, plugins website and others"
     "www.origin"         = "Jenkins website content origin for Fastly CDN"
   }
 
