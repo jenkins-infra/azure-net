@@ -161,6 +161,8 @@ resource "azurerm_subnet" "publick8s_tier" {
     "10.245.0.0/24",           # 10.245.0.1 - 10.245.0.254
     "fd00:db8:deca:deed::/64", # smaller size as we're using kubenet (required by dual-stack AKS cluster), which allocate one IP per node instead of one IP per pod (in case of Azure CNI)
   ]
+  # Enable Storage service endpoint so the cluster can access restricted storage accounts
+  service_endpoints = ["Microsoft.Storage"]
 }
 
 # Dedicated subnet for machine to machine private communications
