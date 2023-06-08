@@ -11,7 +11,7 @@ locals {
       dduportal = {
         ips = [
           "85.27.58.68/32",   # Home
-          "91.182.56.152/32", # Secondary
+          "86.202.255.126/32", # Secondary
         ],
         priority = 101,
       },
