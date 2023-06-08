@@ -201,7 +201,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_prodpublick8s" {
   })
 }
 
-# jenkins.io CNAME records pointing to status incident for maintainance reasons
+# jenkins.io CNAME records pointing to status incident for maintenance reasons
 resource "azurerm_dns_cname_record" "jenkinsio_target_status_incident" {
   # Map of records and corresponding purposes
   for_each = {
@@ -219,7 +219,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_status_incident" {
   })
 }
 
-# jenkins-ci.org CNAME records pointing to status incident for maintainance reasons
+# jenkins-ci.org CNAME records pointing to status incident for maintenance reasons
 resource "azurerm_dns_cname_record" "jenkinsciorg_target_status_incident" {
   # Map of records and corresponding purposes. Some records only exists in jenkins.io as jenkins-ci.org is only legacy
   for_each = {
