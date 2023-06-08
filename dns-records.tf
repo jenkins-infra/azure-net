@@ -4,6 +4,7 @@ moved {
 }
 
 ### A records
+## jenkins.io DNS zone records
 # A record for cert.ci.jenkins.io, accessible only via the private VPN
 # TODO: migrate this record to https://github.com/jenkins-infra/azure/blob/3aae66f0443c766301ae81f4d2aac5cec6032935/cert.ci.jenkins.io.tf#L14
 # once the associated resource will be imported and managed in jenkins-infra/azure (Public IP, VM, etc.)
@@ -17,7 +18,7 @@ resource "azurerm_dns_a_record" "cert-ci-jenkins-io" {
   tags = local.default_tags
 }
 
-# A record for the jenkinsistheway.io redirector hosted on publick8s redirecting to stories.jenkins.io
+# A record for the jenkins.io website hosted on prodpublick8s
 resource "azurerm_dns_a_record" "jenkins_io" {
   name                = "@"
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
@@ -30,6 +31,20 @@ resource "azurerm_dns_a_record" "jenkins_io" {
   })
 }
 
+# A record for ldap.jenkins.io pointing to its own public LB IP from prodpublick8s cluster
+resource "azurerm_dns_a_record" "ldap_jenkins_io" {
+  name                = "ldap"
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 60
+  records             = ["52.184.219.77"] # ldap load balancer IP on prodpublick8s
+
+  tags = merge(local.default_tags, {
+    purpose = "Jenkins user authentication service"
+  })
+}
+
+## jenkinsistheway.io DNS zone records
 # A record for the jenkinsistheway.io redirector hosted on publick8s redirecting to stories.jenkins.io
 resource "azurerm_dns_a_record" "jenkinsistheway_io" {
   name                = "@"
