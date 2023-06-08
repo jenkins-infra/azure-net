@@ -1,6 +1,10 @@
 moved {
-  from = azurerm_dns_cname_record.jenkinsio_target_public_prodpublick8s["accounts"]
+  from = azurerm_dns_cname_record.jenkinsio_target_status_incident["accounts"]
   to   = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["accounts"]
+}
+moved {
+  from = azurerm_dns_cname_record.jenkinsciorg_target_status_incident["accounts"]
+  to   = azurerm_dns_cname_record.jenkinsciorg_target_public_publick8s["accounts"]
 }
 
 ### A records
