@@ -1,10 +1,10 @@
 moved {
-  from = azurerm_dns_cname_record.jenkinsio_target_status_incident["accounts"]
-  to   = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["accounts"]
+  from = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["accounts"]
+  to   = azurerm_dns_cname_record.jenkinsio_target_status_incident["accounts"]
 }
 moved {
-  from = azurerm_dns_cname_record.jenkinsciorg_target_status_incident["accounts"]
-  to   = azurerm_dns_cname_record.jenkinsciorg_target_public_publick8s["accounts"]
+  from = azurerm_dns_cname_record.jenkinsciorg_target_public_publick8s["accounts"]
+  to   = azurerm_dns_cname_record.jenkinsciorg_target_status_incident["accounts"]
 }
 
 ### A records
@@ -80,7 +80,7 @@ resource "azurerm_dns_aaaa_record" "jenkinsistheway_io_ipv6" {
 resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
   # Map of records and corresponding purposes
   for_each = {
-    "accounts"      = "accountapp for Jenkins users"
+    # "accounts"      = "accountapp for Jenkins users"
     "incrementals"  = "incrementals publisher to incrementals Maven repository"
     "javadoc"       = "Jenkins Javadoc"
     "plugin-health" = "Plugin Health Scoring application"
@@ -102,11 +102,12 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
     purpose = each.value
   })
 }
+
 # CNAME records for the legacy domain jenkins-ci.org, pointing to their modern counterpart
 resource "azurerm_dns_cname_record" "jenkinsciorg_target_public_publick8s" {
   # Map of records and corresponding purposes. Some records only exists in jenkins.io as jenkins-ci.org is only legacy
   for_each = {
-    "accounts" = "accountapp for Jenkins users"
+    # "accounts" = "accountapp for Jenkins users"
     "javadoc"  = "Jenkins Javadoc"
     "wiki"     = "Static Wiki Confluence export"
   }
@@ -199,6 +200,43 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_prodpublick8s" {
     purpose = each.value
   })
 }
+
+# jenkins.io CNAME records pointing to status incident for maintainance reasons
+resource "azurerm_dns_cname_record" "jenkinsio_target_status_incident" {
+  # Map of records and corresponding purposes
+  for_each = {
+    "accounts"      = "accountapp for Jenkins users, redirected to status.jenkins.io while migrating LDAP, see https://github.com/jenkins-infra/helpdesk/issues/3351#issuecomment-1576741071"
+  }
+
+  name                = each.key
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 60
+  record              = "pedantic-kepler-514f4a.netlify.app" # status.jenkins.io netlify origin domain
+
+  tags = merge(local.default_tags, {
+    purpose = each.value
+  })
+}
+
+# jenkins-ci.org CNAME records pointing to status incident for maintainance reasons
+resource "azurerm_dns_cname_record" "jenkinsciorg_target_status_incident" {
+  # Map of records and corresponding purposes. Some records only exists in jenkins.io as jenkins-ci.org is only legacy
+  for_each = {
+    "accounts" = "accountapp for Jenkins users, redirected to status.jenkins.io while migrating LDAP, see https://github.com/jenkins-infra/helpdesk/issues/3351#issuecomment-1576741071"
+  }
+
+  name                = each.key
+  zone_name           = data.azurerm_dns_zone.jenkinsciorg.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsci.name
+  ttl                 = 60
+  record              = "pedantic-kepler-514f4a.netlify.app" # status.jenkins.io netlify origin domain
+
+  tags = merge(local.default_tags, {
+    purpose = each.value
+  })
+}
+
 
 ### TXT records
 # TXT record to verify jenkinsci-transfer GitHub org (https://github.com/jenkins-infra/helpdesk/issues/3448)
