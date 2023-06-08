@@ -35,13 +35,13 @@ resource "azurerm_dns_a_record" "jenkins_io" {
   })
 }
 
-# A record for ldap.jenkins.io pointing to its own public LB IP from prodpublick8s cluster
+# A record for ldap.jenkins.io pointing to its own public LB IP from publick8s cluster
 resource "azurerm_dns_a_record" "ldap_jenkins_io" {
   name                = "ldap"
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 60
-  records             = ["52.184.219.77"] # ldap load balancer IP on prodpublick8s
+  records             = ["20.10.205.3"] # ldap_jenkins_io_ipv4_address defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
 
   tags = merge(local.default_tags, {
     purpose = "Jenkins user authentication service"
