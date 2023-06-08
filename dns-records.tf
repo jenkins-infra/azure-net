@@ -212,7 +212,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_status_incident" {
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 60
-  record              = "status.jenkins.io/issues/2023-06-08-ldap-migration-to-publick8s"
+  record              = "pedantic-kepler-514f4a.netlify.app" # status.jenkins.io netlify origin domain
 
   tags = merge(local.default_tags, {
     purpose = each.value
@@ -230,7 +230,7 @@ resource "azurerm_dns_cname_record" "jenkinsciorg_target_status_incident" {
   zone_name           = data.azurerm_dns_zone.jenkinsciorg.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsci.name
   ttl                 = 60
-  record              = "status.jenkins.io/issues/2023-06-08-ldap-migration-to-publick8s"
+  record              = "pedantic-kepler-514f4a.netlify.app" # status.jenkins.io netlify origin domain
 
   tags = merge(local.default_tags, {
     purpose = each.value
