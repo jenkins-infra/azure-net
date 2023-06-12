@@ -108,6 +108,7 @@ resource "azurerm_dns_cname_record" "jenkinsciorg_target_public_publick8s" {
   for_each = {
     "accounts" = "accountapp for Jenkins users"
     "javadoc"  = "Jenkins Javadoc"
+    "mirrors"  = "Jenkins binary distribution via mirrorbits"
     "wiki"     = "Static Wiki Confluence export"
   }
 
