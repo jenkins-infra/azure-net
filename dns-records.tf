@@ -1,14 +1,6 @@
 moved {
-  from = azurerm_dns_cname_record.jenkinsio_target_public_prodpublick8s["fallback.get"]
-  to   = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["fallback.get"]
-}
-moved {
-  from = azurerm_dns_cname_record.jenkinsio_target_public_prodpublick8s["get"]
-  to   = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["get"]
-}
-moved {
-  from = azurerm_dns_cname_record.jenkinsio_target_public_prodpublick8s["mirrors"]
-  to   = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["mirrors"]
+  from = azurerm_dns_cname_record.jenkinsio_target_public_prodpublick8s["plugin-site-issues"]
+  to   = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["plugin-site-issues"]
 }
 
 ### A records
@@ -91,6 +83,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
     "javadoc"       = "Jenkins Javadoc"
     "mirrors"       = "Jenkins binary distribution via mirrorbits"
     "plugin-health" = "Plugin Health Scoring application"
+    "plugin-site-issues" = "Plugins website API content origin for Fastly CDN"
     "rating"        = "Jenkins releases rating service"
     "repo.azure"    = "artifact-caching-proxy on Azure"
     "reports"       = "Public reports about Jenkins services and components consumed by RPU, plugins website and others"
@@ -189,7 +182,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_private_privatek8s" {
 resource "azurerm_dns_cname_record" "jenkinsio_target_public_prodpublick8s" {
   # Map of records and corresponding purposes
   for_each = {
-    "plugin-site-issues" = "Plugins website API content origin for Fastly CDN"
     "plugins.origin"     = "Plugins website content origin for Fastly CDN"
     "www.origin"         = "Jenkins website content origin for Fastly CDN"
   }
