@@ -1,10 +1,14 @@
 moved {
-  from = azurerm_dns_cname_record.jenkinsio_target_status_incident["accounts"]
-  to   = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["accounts"]
+  from = azurerm_dns_cname_record.jenkinsio_target_public_prodpublick8s["fallback.get"]
+  to   = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["fallback.get"]
 }
 moved {
-  from = azurerm_dns_cname_record.jenkinsciorg_target_status_incident["accounts"]
-  to   = azurerm_dns_cname_record.jenkinsciorg_target_public_publick8s["accounts"]
+  from = azurerm_dns_cname_record.jenkinsio_target_public_prodpublick8s["get"]
+  to   = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["get"]
+}
+moved {
+  from = azurerm_dns_cname_record.jenkinsio_target_public_prodpublick8s["mirrors"]
+  to   = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["mirrors"]
 }
 
 ### A records
@@ -81,8 +85,11 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
   # Map of records and corresponding purposes
   for_each = {
     "accounts"      = "accountapp for Jenkins users"
+    "fallback.get"  = "Fallback address for mirrorbits" # Note: had a TTL of 10 minutes before, not 1 hour
+    "get"           = "Jenkins binary distribution via mirrorbits"
     "incrementals"  = "incrementals publisher to incrementals Maven repository"
     "javadoc"       = "Jenkins Javadoc"
+    "mirrors"       = "Jenkins binary distribution via mirrorbits"
     "plugin-health" = "Plugin Health Scoring application"
     "rating"        = "Jenkins releases rating service"
     "repo.azure"    = "artifact-caching-proxy on Azure"
@@ -182,9 +189,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_private_privatek8s" {
 resource "azurerm_dns_cname_record" "jenkinsio_target_public_prodpublick8s" {
   # Map of records and corresponding purposes
   for_each = {
-    "fallback.get"       = "Fallback address for mirrorbits" # Note: had a TTL of 10 minutes before, not 1 hour
-    "get"                = "Jenkins binary distribution via mirrorbits"
-    "mirrors"            = "Jenkins binary distribution via mirrorbits"
     "plugin-site-issues" = "Plugins website API content origin for Fastly CDN"
     "plugins.origin"     = "Plugins website content origin for Fastly CDN"
     "www.origin"         = "Jenkins website content origin for Fastly CDN"
