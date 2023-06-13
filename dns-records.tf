@@ -1,8 +1,3 @@
-moved {
-  from = azurerm_dns_cname_record.jenkinsio_target_public_prodpublick8s["www.origin"]
-  to   = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["www.origin"]
-}
-
 ### A records
 ## jenkins.io DNS zone records
 # A record for cert.ci.jenkins.io, accessible only via the private VPN
@@ -18,13 +13,13 @@ resource "azurerm_dns_a_record" "cert-ci-jenkins-io" {
   tags = local.default_tags
 }
 
-# A record for the jenkins.io website hosted on prodpublick8s
+# A record for the jenkins.io website hosted on publick8s
 resource "azurerm_dns_a_record" "jenkins_io" {
   name                = "@"
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 60
-  records             = ["52.167.253.43"] # prodpublick8s IPv4
+  records             = ["20.119.232.75"] # publick8s_public_ipv4_address defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
 
   tags = merge(local.default_tags, {
     purpose = "Jenkins website"
