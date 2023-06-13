@@ -1,9 +1,10 @@
 moved {
-  from = azurerm_dns_cname_record.jenkinsio_target_public_prodpublick8s["accounts"]
-  to   = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["accounts"]
+  from = azurerm_dns_cname_record.jenkinsio_target_public_prodpublick8s["plugin-site-issues"]
+  to   = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["plugin-site-issues"]
 }
 
 ### A records
+## jenkins.io DNS zone records
 # A record for cert.ci.jenkins.io, accessible only via the private VPN
 # TODO: migrate this record to https://github.com/jenkins-infra/azure/blob/3aae66f0443c766301ae81f4d2aac5cec6032935/cert.ci.jenkins.io.tf#L14
 # once the associated resource will be imported and managed in jenkins-infra/azure (Public IP, VM, etc.)
@@ -17,7 +18,7 @@ resource "azurerm_dns_a_record" "cert-ci-jenkins-io" {
   tags = local.default_tags
 }
 
-# A record for the jenkinsistheway.io redirector hosted on publick8s redirecting to stories.jenkins.io
+# A record for the jenkins.io website hosted on prodpublick8s
 resource "azurerm_dns_a_record" "jenkins_io" {
   name                = "@"
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
@@ -30,6 +31,20 @@ resource "azurerm_dns_a_record" "jenkins_io" {
   })
 }
 
+# A record for ldap.jenkins.io pointing to its own public LB IP from publick8s cluster
+resource "azurerm_dns_a_record" "ldap_jenkins_io" {
+  name                = "ldap"
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 60
+  records             = ["20.10.205.3"] # ldap_jenkins_io_ipv4_address defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
+
+  tags = merge(local.default_tags, {
+    purpose = "Jenkins user authentication service"
+  })
+}
+
+## jenkinsistheway.io DNS zone records
 # A record for the jenkinsistheway.io redirector hosted on publick8s redirecting to stories.jenkins.io
 resource "azurerm_dns_a_record" "jenkinsistheway_io" {
   name                = "@"
@@ -62,9 +77,13 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
   # Map of records and corresponding purposes
   for_each = {
     "accounts"      = "accountapp for Jenkins users"
+    "fallback.get"  = "Fallback address for mirrorbits" # Note: had a TTL of 10 minutes before, not 1 hour
+    "get"           = "Jenkins binary distribution via mirrorbits"
     "incrementals"  = "incrementals publisher to incrementals Maven repository"
     "javadoc"       = "Jenkins Javadoc"
+    "mirrors"       = "Jenkins binary distribution via mirrorbits"
     "plugin-health" = "Plugin Health Scoring application"
+    "plugin-site-issues" = "Plugins website API content origin for Fastly CDN"
     "rating"        = "Jenkins releases rating service"
     "repo.azure"    = "artifact-caching-proxy on Azure"
     "reports"       = "Public reports about Jenkins services and components consumed by RPU, plugins website and others"
@@ -89,6 +108,7 @@ resource "azurerm_dns_cname_record" "jenkinsciorg_target_public_publick8s" {
   for_each = {
     "accounts" = "accountapp for Jenkins users"
     "javadoc"  = "Jenkins Javadoc"
+    "mirrors"  = "Jenkins binary distribution via mirrorbits"
     "wiki"     = "Static Wiki Confluence export"
   }
 
@@ -162,10 +182,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_private_privatek8s" {
 resource "azurerm_dns_cname_record" "jenkinsio_target_public_prodpublick8s" {
   # Map of records and corresponding purposes
   for_each = {
-    "fallback.get"       = "Fallback address for mirrorbits" # Note: had a TTL of 10 minutes before, not 1 hour
-    "get"                = "Jenkins binary distribution via mirrorbits"
-    "mirrors"            = "Jenkins binary distribution via mirrorbits"
-    "plugin-site-issues" = "Plugins website API content origin for Fastly CDN"
     "plugins.origin"     = "Plugins website content origin for Fastly CDN"
     "www.origin"         = "Jenkins website content origin for Fastly CDN"
   }
