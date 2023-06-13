@@ -1,6 +1,6 @@
 moved {
-  from = azurerm_dns_cname_record.jenkinsio_target_public_prodpublick8s["plugins.origin"]
-  to   = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["plugins.origin"]
+  from = azurerm_dns_cname_record.jenkinsio_target_public_prodpublick8s["www.origin"]
+  to   = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["www.origin"]
 }
 
 ### A records
@@ -91,6 +91,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
     "uplink"             = "Jenkins telemetry service"
     "weekly.ci"          = "Jenkins Weekly demo controller"
     "wiki"               = "Static Wiki Confluence export"
+    "www.origin"         = "Jenkins website content origin for Fastly CDN"
   }
 
   name                = each.key
@@ -172,25 +173,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_private_privatek8s" {
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 300
   record              = "private.privatek8s.jenkins.io" # A record managed manually
-
-  tags = merge(local.default_tags, {
-    purpose = each.value
-  })
-}
-
-# CNAME records targeting the public-nginx on prodpublick8s cluster
-# TODO: to be removed after https://github.com/jenkins-infra/helpdesk/issues/3351
-resource "azurerm_dns_cname_record" "jenkinsio_target_public_prodpublick8s" {
-  # Map of records and corresponding purposes
-  for_each = {
-    "www.origin" = "Jenkins website content origin for Fastly CDN"
-  }
-
-  name                = each.key
-  zone_name           = data.azurerm_dns_zone.jenkinsio.name
-  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-  ttl                 = 60
-  record              = "public.aks.jenkins.io"
 
   tags = merge(local.default_tags, {
     purpose = each.value
