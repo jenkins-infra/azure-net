@@ -1,6 +1,6 @@
 moved {
-  from = azurerm_dns_cname_record.jenkinsio_target_public_prodpublick8s["plugin-site"]
-  to   = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["plugin-site"]
+  from = azurerm_dns_cname_record.jenkinsio_target_public_prodpublick8s["plugins.origin"]
+  to   = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["plugins.origin"]
 }
 
 ### A records
