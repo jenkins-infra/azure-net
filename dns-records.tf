@@ -13,13 +13,26 @@ resource "azurerm_dns_a_record" "cert-ci-jenkins-io" {
   tags = local.default_tags
 }
 
-# A record for the jenkins.io website hosted on publick8s
+# Apex ("A") record for the jenkins.io zone
 resource "azurerm_dns_a_record" "jenkins_io" {
   name                = "@"
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 60
   records             = ["20.119.232.75"] # publick8s_public_ipv4_address defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
+
+  tags = merge(local.default_tags, {
+    purpose = "Jenkins website"
+  })
+}
+
+# Apex ("A") record for the jenkins-ci.org zone
+resource "azurerm_dns_a_record" "jenkinsciorg" {
+  name                = "@"
+  zone_name           = data.azurerm_dns_zone.jenkinsciorg.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsci.name
+  ttl                 = 60
+  records             = ["52.167.253.43"] # publick8s_public_ipv4_address defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
 
   tags = merge(local.default_tags, {
     purpose = "Jenkins website"
