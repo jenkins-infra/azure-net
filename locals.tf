@@ -41,4 +41,8 @@ locals {
     # TODO: add support for workload identities by providing an empty expiration date
     # "<something>.jenkins.io" = ""
   }
+
+  public_ips = {
+    "publick8s-inbound" = "20.119.232.75"
+  }
 }
