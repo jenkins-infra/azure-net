@@ -19,7 +19,7 @@ resource "azurerm_dns_a_record" "jenkins_io" {
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 60
-  records             = ["20.119.232.75"] # publick8s_public_ipv4_address defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
+  records             = [local.public_ips["publick8s-inbound"]] # publick8s_public_ipv4_address defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
 
   tags = merge(local.default_tags, {
     purpose = "Jenkins website"
@@ -32,7 +32,7 @@ resource "azurerm_dns_a_record" "jenkinsciorg" {
   zone_name           = data.azurerm_dns_zone.jenkinsciorg.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsci.name
   ttl                 = 60
-  records             = ["52.167.253.43"] # publick8s_public_ipv4_address defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
+  records             = [local.public_ips["publick8s-inbound"]] # publick8s_public_ipv4_address defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
 
   tags = merge(local.default_tags, {
     purpose = "Jenkins website"
@@ -59,7 +59,7 @@ resource "azurerm_dns_a_record" "jenkinsistheway_io" {
   zone_name           = azurerm_dns_zone.jenkinsistheway_io.name
   resource_group_name = azurerm_resource_group.proddns_jenkinsisthewayio.name
   ttl                 = 60
-  records             = ["20.119.232.75"] # publick8s_public_ipv4_address defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
+  records             = [local.public_ips["publick8s-inbound"]] # publick8s_public_ipv4_address defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
 
   tags = merge(local.default_tags, {
     purpose = "Jenkinsistheway.io redirector to stories.jenkins.io"
