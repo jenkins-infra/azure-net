@@ -187,6 +187,25 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_private_privatek8s" {
   })
 }
 
+# Cname records used for Fastly ACME validations
+resource "azurerm_dns_cname_record" "jenkinsio_acme_fastly" {
+  # Map of records and corresponding purposes
+  for_each = {
+    "_acme-challenge" = "ohh97689e0dknl1rqp.fastly-validations.com"
+  }
+
+  name                = each.key
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 300
+  record              = each.value
+
+  tags = merge(local.default_tags, {
+    purpose = "ACME validation for Fastly (${each.key})"
+  })
+}
+
+
 ### TXT records
 # TXT record to verify jenkinsci-transfer GitHub org (https://github.com/jenkins-infra/helpdesk/issues/3448)
 resource "azurerm_dns_txt_record" "jenkinsci-transfer-github-verification" {
