@@ -191,11 +191,11 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_private_privatek8s" {
 resource "azurerm_dns_cname_record" "jenkinsio_acme_fastly" {
   # Map of records and corresponding purposes
   for_each = {
-    "_acme-challenge"         = "ohh97689e0dknl1rqp.fastly-validations.com",
     "_acme-challenge.pkg"     = "f44lzqsppt1dj85jf3.fastly-validations.com",
     "_acme-challenge.plugins" = "tr8qxfomlsxfq1grha.fastly-validations.com",
-    "_acme-challenge.www"     = "1vt5byhannlhjvm56n.fastly-validations.com",
     "_acme-challenge.stories" = "k31jn864ll8jjqhmik.fastly-validations.com",
+    "_acme-challenge.www"     = "1vt5byhannlhjvm56n.fastly-validations.com",
+    "_acme-challenge"         = "ohh97689e0dknl1rqp.fastly-validations.com",
   }
 
   name                = each.key
@@ -209,6 +209,27 @@ resource "azurerm_dns_cname_record" "jenkinsio_acme_fastly" {
   })
 }
 
+# Cname records used for Fastly to serve some of our websites through their CDN
+resource "azurerm_dns_cname_record" "jenkinsio_fastly" {
+  # Map of records and corresponding purposes
+  for_each = {
+    "pkg"        = "Website to download Jenkins packages",
+    "plugins"    = "Website to browse and download Jenkins plugins",
+    "stories"    = "Website with Jenkins User stories and testimonies",
+    "way.the.is" = "Old alias for stories.jenkins.io",
+    "www"        = "Jenkins official website",
+  }
+
+  name                = each.key
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 300
+  record              = "dualstack.d.sni.global.fastly.net"
+
+  tags = merge(local.default_tags, {
+    purpose = each.value
+  })
+}
 
 ### TXT records
 # TXT record to verify jenkinsci-transfer GitHub org (https://github.com/jenkins-infra/helpdesk/issues/3448)
