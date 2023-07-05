@@ -1,4 +1,4 @@
-### A records
+### A and AAAA records
 ## jenkins.io DNS zone records
 # A record for cert.ci.jenkins.io, accessible only via the private VPN
 # TODO: migrate this record to https://github.com/jenkins-infra/azure/blob/3aae66f0443c766301ae81f4d2aac5cec6032935/cert.ci.jenkins.io.tf#L14
@@ -13,26 +13,48 @@ resource "azurerm_dns_a_record" "cert-ci-jenkins-io" {
   tags = local.default_tags
 }
 
-# Apex ("A") record for the jenkins.io zone
+# Apex ("@") records for the jenkins.io zone
 resource "azurerm_dns_a_record" "jenkins_io" {
   name                = "@"
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 60
-  records             = [local.public_ips["publick8s-inbound"]] # publick8s_public_ipv4_address defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
+  records             = [local.public_ips["publick8s_public_ipv4_address"]]
+
+  tags = merge(local.default_tags, {
+    purpose = "Jenkins website"
+  })
+}
+resource "azurerm_dns_aaaa_record" "jenkins_io" {
+  name                = "@"
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 60
+  records             = [local.public_ips["publick8s_public_ipv6_address"]]
 
   tags = merge(local.default_tags, {
     purpose = "Jenkins website"
   })
 }
 
-# Apex ("A") record for the jenkins-ci.org zone
+# Apex ("@") records for the jenkins-ci.org zone
 resource "azurerm_dns_a_record" "jenkinsciorg" {
   name                = "@"
   zone_name           = data.azurerm_dns_zone.jenkinsciorg.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsci.name
   ttl                 = 60
-  records             = [local.public_ips["publick8s-inbound"]] # publick8s_public_ipv4_address defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
+  records             = [local.public_ips["publick8s_public_ipv4_address"]]
+
+  tags = merge(local.default_tags, {
+    purpose = "Jenkins website"
+  })
+}
+resource "azurerm_dns_aaaa_record" "jenkinsciorg" {
+  name                = "@"
+  zone_name           = data.azurerm_dns_zone.jenkinsciorg.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsci.name
+  ttl                 = 60
+  records             = [local.public_ips["publick8s_public_ipv6_address"]]
 
   tags = merge(local.default_tags, {
     purpose = "Jenkins website"
@@ -45,7 +67,7 @@ resource "azurerm_dns_a_record" "ldap_jenkins_io" {
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 60
-  records             = ["20.10.205.3"] # ldap_jenkins_io_ipv4_address defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
+  records             = [local.public_ips["ldap_jenkins_io_ipv4_address"]]
 
   tags = merge(local.default_tags, {
     purpose = "Jenkins user authentication service"
@@ -53,26 +75,24 @@ resource "azurerm_dns_a_record" "ldap_jenkins_io" {
 }
 
 ## jenkinsistheway.io DNS zone records
-# A record for the jenkinsistheway.io redirector hosted on publick8s redirecting to stories.jenkins.io
+# Apex records for the jenkinsistheway.io redirector hosted on publick8s redirecting to stories.jenkins.io
 resource "azurerm_dns_a_record" "jenkinsistheway_io" {
   name                = "@"
   zone_name           = azurerm_dns_zone.jenkinsistheway_io.name
   resource_group_name = azurerm_resource_group.proddns_jenkinsisthewayio.name
   ttl                 = 60
-  records             = [local.public_ips["publick8s-inbound"]] # publick8s_public_ipv4_address defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
+  records             = [local.public_ips["publick8s_public_ipv4_address"]]
 
   tags = merge(local.default_tags, {
     purpose = "Jenkinsistheway.io redirector to stories.jenkins.io"
   })
 }
-
-# A record for the jenkinsistheway.io redirector hosted on publick8s redirecting to stories.jenkins.io
 resource "azurerm_dns_aaaa_record" "jenkinsistheway_io_ipv6" {
   name                = "@"
   zone_name           = azurerm_dns_zone.jenkinsistheway_io.name
   resource_group_name = azurerm_resource_group.proddns_jenkinsisthewayio.name
   ttl                 = 60
-  records             = ["2603:1030:408:7::44"] # publick8s_public_ipv6_address defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
+  records             = [local.public_ips["publick8s_public_ipv6_address"]]
 
   tags = merge(local.default_tags, {
     purpose = "Jenkinsistheway.io redirector to stories.jenkins.io"
@@ -187,7 +207,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_private_privatek8s" {
   })
 }
 
-# Cname records used for Fastly ACME validations
+# CNAME records used for Fastly ACME validations
 resource "azurerm_dns_cname_record" "jenkinsio_acme_fastly" {
   # Map of records and corresponding purposes
   for_each = {
@@ -209,7 +229,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_acme_fastly" {
   })
 }
 
-# Cname records used for Fastly to serve some of our websites through their CDN
+# CNAME records used for Fastly to serve some of our websites through their CDN
 resource "azurerm_dns_cname_record" "jenkinsio_fastly" {
   # Map of records and corresponding purposes
   for_each = {
