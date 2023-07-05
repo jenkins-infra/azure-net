@@ -49,7 +49,7 @@ resource "azurerm_dns_a_record" "jenkinsciorg" {
     purpose = "Jenkins website"
   })
 }
-resource "azurerm_dns_aaaaa_record" "jenkinsciorg" {
+resource "azurerm_dns_aaaa_record" "jenkinsciorg" {
   name                = "@"
   zone_name           = data.azurerm_dns_zone.jenkinsciorg.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsci.name
