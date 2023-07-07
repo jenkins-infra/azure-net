@@ -42,8 +42,8 @@ locals {
   }
 
   public_ips = {
-    "publick8s_public_ipv4_address" = "20.119.232.75"       # defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
-    "publick8s_public_ipv6_address" = "2603:1030:408:7::44" # defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
-    "ldap_jenkins_io_ipv4_address"  = "20.10.205.3"         # defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
+    "publick8s_public_ipv4_address" = "20.7.178.24"          # defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
+    "publick8s_public_ipv6_address" = "2603:1030:408:5::15a" # defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
+    "ldap_jenkins_io_ipv4_address"  = "20.7.180.148"         # defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
   }
 }
