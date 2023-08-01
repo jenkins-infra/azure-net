@@ -40,11 +40,29 @@ resource "azurerm_dns_zone" "child_zones" {
   tags = local.default_tags
 }
 
+# Child zone dedicated and delegated to CloudFlare (hence its non inclusion into the existing local variable)
+resource "azurerm_dns_zone" "cloudflarejenkinsio" {
+  name                = "cloudflare.jenkins.io"
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+}
+
+# NS delegation to CloudFlare
+resource "azurerm_dns_zone" "cloudflarejenkinsio" {
+  name                = azurerm_dns_zone.cloudflarejenkinsio.name
+  zone_name           = azurerm_dns_zone.cloudflarejenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 60
+
+  records = ["patryk.ns.cloudflare.com", "tessa.ns.cloudflare.com"]
+
+  tags = local.default_tags
+}
+
 # create DNS record of type NS for child-zone in the parent zone (to allow propagation of DNS records)
 resource "azurerm_dns_ns_record" "child_zone_ns_records" {
   for_each = local.lets_encrypt_dns_challenged_domains
 
-  name                = trimsuffix(each.key, ".jenkins.io") # only the flat name not the fqdn
+  name                = "cloudflare.jenkins.io"
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 60
