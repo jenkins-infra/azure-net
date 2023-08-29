@@ -97,17 +97,16 @@ resource "azurerm_network_security_group" "public_apptier" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
+  #tfsec:ignore:azure-network-no-public-ingress
   security_rule {
-    name                   = "allow-rsyncd-inbound"
-    priority               = 103
-    direction              = "Inbound"
-    access                 = "Allow"
-    protocol               = "Tcp"
-    source_port_range      = "*"
-    destination_port_range = "873"
-    # 52.202.51.185: pkg.origin.jenkins.io
-    # TODO: replace by the object reference data when all DNS entries will be imported
-    source_address_prefixes    = ["52.202.51.185/32"]
+    name                       = "allow-rsyncd-inbound"
+    priority                   = 103
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "873"
+    source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
   security_rule {
