@@ -1,17 +1,5 @@
 ### A and AAAA records
 ## jenkins.io DNS zone records
-# A record for cert.ci.jenkins.io, accessible only via the private VPN
-# TODO: migrate this record to https://github.com/jenkins-infra/azure/blob/3aae66f0443c766301ae81f4d2aac5cec6032935/cert.ci.jenkins.io.tf#L14
-# once the associated resource will be imported and managed in jenkins-infra/azure (Public IP, VM, etc.)
-resource "azurerm_dns_a_record" "cert-ci-jenkins-io" {
-  name                = "@"
-  zone_name           = azurerm_dns_zone.child_zones["cert.ci.jenkins.io"].name
-  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-  ttl                 = 300
-  records             = ["10.0.2.252"]
-
-  tags = local.default_tags
-}
 
 # Apex ("@") records for the jenkins.io zone
 resource "azurerm_dns_a_record" "jenkins_io" {
