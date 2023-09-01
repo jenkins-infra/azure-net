@@ -109,24 +109,6 @@ resource "azurerm_virtual_network" "public_db" {
   tags                = local.default_tags
 }
 
-### dedicated to cert.ci.jenkins.io
-data "azurerm_resource_group" "cert_ci_jenkins_io_agents" {
-  name = "certci-agents-2"
-}
-resource "azurerm_virtual_network" "cert_ci_jenkins_io_agents" {
-  name                = "jenkinsarm-vnet"
-  location            = data.azurerm_resource_group.cert_ci_jenkins_io_agents.location
-  resource_group_name = data.azurerm_resource_group.cert_ci_jenkins_io_agents.name
-  address_space       = ["10.0.0.0/16"]
-  tags                = local.default_tags
-}
-resource "azurerm_subnet" "cert_ci_jenkins_io_agents" {
-  name                 = "jenkinsarm-snet"
-  resource_group_name  = data.azurerm_resource_group.cert_ci_jenkins_io_agents.name
-  virtual_network_name = azurerm_virtual_network.cert_ci_jenkins_io_agents.name
-  address_prefixes     = ["10.0.0.0/24"]
-}
-
 # Dedicated subnet for external access (such as VPN external NIC)
 resource "azurerm_subnet" "dmz" {
   name                 = "${azurerm_virtual_network.private.name}-dmz"
