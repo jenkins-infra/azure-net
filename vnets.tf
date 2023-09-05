@@ -60,8 +60,8 @@ resource "azurerm_resource_group" "private" {
   location = var.location
   tags     = local.default_tags
 }
-resource "azurerm_resource_group" "trusted" {
-  name     = "trusted" # TODO: rename (dangerous!) to have same naming convention as cert-ci below
+resource "azurerm_resource_group" "trusted_ci_jenkins_io" {
+  name     = "trusted-ci-jenkins-io"
   location = var.location
   tags     = local.default_tags
 }
@@ -86,10 +86,10 @@ resource "azurerm_virtual_network" "private" {
   address_space       = ["10.248.0.0/14"]
   tags                = local.default_tags
 }
-resource "azurerm_virtual_network" "trusted" {
-  name                = "${azurerm_resource_group.trusted.name}-vnet"
-  location            = azurerm_resource_group.trusted.location
-  resource_group_name = azurerm_resource_group.trusted.name
+resource "azurerm_virtual_network" "trusted_ci_jenkins_io" {
+  name                = "${azurerm_resource_group.trusted_ci_jenkins_io.name}-vnet"
+  location            = azurerm_resource_group.trusted_ci_jenkins_io.location
+  resource_group_name = azurerm_resource_group.trusted_ci_jenkins_io.name
   address_space       = ["10.252.0.0/21"] # 10.252.0.1 - 10.252.7.254
   tags                = local.default_tags
 }
@@ -292,24 +292,43 @@ resource "azurerm_virtual_network_peering" "cert_to_private" {
   allow_gateway_transit        = false
   use_remote_gateways          = false
 }
+resource "azurerm_virtual_network_peering" "private_to_trusted" {
+  name                         = "${azurerm_virtual_network.private.name}-to-${azurerm_virtual_network.trusted_ci_jenkins_io.name}"
+  resource_group_name          = azurerm_virtual_network.private.resource_group_name
+  virtual_network_name         = azurerm_virtual_network.private.name
+  remote_virtual_network_id    = azurerm_virtual_network.trusted_ci_jenkins_io.id
+  allow_virtual_network_access = true
+  allow_forwarded_traffic      = false
+  allow_gateway_transit        = false
+  use_remote_gateways          = false
+}
+resource "azurerm_virtual_network_peering" "trusted_to_private" {
+  name                         = "${azurerm_virtual_network.trusted_ci_jenkins_io.name}-to-${azurerm_virtual_network.private.name}"
+  resource_group_name          = azurerm_virtual_network.trusted_ci_jenkins_io.resource_group_name
+  virtual_network_name         = azurerm_virtual_network.trusted_ci_jenkins_io.name
+  remote_virtual_network_id    = azurerm_virtual_network.private.id
+  allow_virtual_network_access = true
+  allow_forwarded_traffic      = false
+  allow_gateway_transit        = false
+  use_remote_gateways          = false
+}
 
-# Dedicated subnets for trusted.ci.jenkins.io (controller and agents)
-resource "azurerm_subnet" "trusted_vnet_trusted_ci_jenkins_io_controller" {
-  name                 = "${azurerm_virtual_network.trusted.name}-trusted-jenkins-ci-io-controller"
-  resource_group_name  = azurerm_resource_group.trusted.name
-  virtual_network_name = azurerm_virtual_network.trusted.name
+resource "azurerm_subnet" "trusted_ci_jenkins_io_controller" {
+  name                 = "${azurerm_virtual_network.trusted_ci_jenkins_io.name}-controller"
+  resource_group_name  = azurerm_resource_group.trusted_ci_jenkins_io.name
+  virtual_network_name = azurerm_virtual_network.trusted_ci_jenkins_io.name
   address_prefixes     = ["10.252.0.0/24"] # 10.252.0.1 - 10.252.0.254
 }
-resource "azurerm_subnet" "trusted_vnet_trusted_ci_jenkins_io_ephemeral_agents" {
-  name                 = "${azurerm_virtual_network.trusted.name}-trusted-jenkins-ci-io-ephemeral-agents"
-  resource_group_name  = azurerm_resource_group.trusted.name
-  virtual_network_name = azurerm_virtual_network.trusted.name
+resource "azurerm_subnet" "trusted_ci_jenkins_io_ephemeral_agents" {
+  name                 = "${azurerm_virtual_network.trusted_ci_jenkins_io.name}-ephemeral-agents"
+  resource_group_name  = azurerm_resource_group.trusted_ci_jenkins_io.name
+  virtual_network_name = azurerm_virtual_network.trusted_ci_jenkins_io.name
   address_prefixes     = ["10.252.1.0/24"] # 10.252.1.1 - 10.252.1.254
 }
-resource "azurerm_subnet" "trusted_vnet_trusted_ci_jenkins_io_permanent_agents" {
-  name                 = "${azurerm_virtual_network.trusted.name}-trusted-jenkins-ci-io-permanent-agents"
-  resource_group_name  = azurerm_resource_group.trusted.name
-  virtual_network_name = azurerm_virtual_network.trusted.name
+resource "azurerm_subnet" "trusted_ci_jenkins_io_permanent_agents" {
+  name                 = "${azurerm_virtual_network.trusted_ci_jenkins_io.name}-permanent-agents"
+  resource_group_name  = azurerm_resource_group.trusted_ci_jenkins_io.name
+  virtual_network_name = azurerm_virtual_network.trusted_ci_jenkins_io.name
   address_prefixes     = ["10.252.2.0/24"] # 10.252.2.1 - 10.252.2.254
 }
 
