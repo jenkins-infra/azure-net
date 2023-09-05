@@ -100,7 +100,7 @@ resource "azurerm_virtual_network" "cert_ci_jenkins_io" {
   address_space       = ["10.252.8.0/21"] # 10.252.8.1 - 10.252.15.254
   tags                = local.default_tags
 }
-# separate vNET as Postgres flexible server currently doesn't support a vNET with ipv4 and ipv6 address spaces
+# separate vNET as Postgres/Mysql flexible server currently doesn't support a vNET with ipv4 and ipv6 address spaces
 resource "azurerm_virtual_network" "public_db" {
   name                = "${azurerm_resource_group.public.name}-db-vnet"
   location            = azurerm_resource_group.public.location
@@ -203,6 +203,26 @@ resource "azurerm_subnet" "public_db_vnet_postgres_tier" {
     name = "pgsql"
     service_delegation {
       name = "Microsoft.DBforPostgreSQL/flexibleServers"
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/join/action",
+      ]
+    }
+  }
+}
+
+# This subnet is reserved as "delegated" for the mysql server on the public-db network
+# Ref. https://docs.microsoft.com/en-us/azure/mysql/flexible-server/concepts-networking
+resource "azurerm_subnet" "public_db_vnet_mysql_tier" {
+  name                 = "${azurerm_virtual_network.public_db.name}-mysql-tier"
+  resource_group_name  = azurerm_resource_group.public.name
+  virtual_network_name = azurerm_virtual_network.public_db.name
+  address_prefixes     = ["10.253.1.0/24"]     # 10.253.1.1 - 10.253.1.254
+  service_endpoints    = ["Microsoft.Storage"] #check with dduporal if this is needed
+
+  delegation {
+    name = "mysql"
+    service_delegation {
+      name = "Microsoft.DBforMySQL/flexibleServers"
       actions = [
         "Microsoft.Network/virtualNetworks/subnets/join/action",
       ]
