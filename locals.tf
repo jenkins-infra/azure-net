@@ -10,8 +10,8 @@ locals {
     ssh_allowed_inbound_ips = {
       dduportal = {
         ips = [
-          "85.27.34.43/32",    # Home
-          "86.202.255.126/32", # Cowork
+          "85.27.34.43/32",   # Home
+          "91.182.56.152/32", # Cowork
         ],
         priority = 101,
       },
