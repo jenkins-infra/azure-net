@@ -62,6 +62,20 @@ resource "azurerm_dns_a_record" "ldap_jenkins_io" {
   })
 }
 
+# A record pointing to doks-public cluster public IPv4 address
+# Note: no IPv6 record as DO LB do not support them (mid-2023): https://docs.digitalocean.com/products/networking/load-balancers/details/limits/
+resource "azurerm_dns_a_record" "doks_public_public_ipv4_address" {
+  name                = "doks-public-public-ipv4-address"
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 60
+  records             = [local.public_ips["doks_public_public_ipv4_address"]]
+
+  tags = merge(local.default_tags, {
+    purpose = "Public IPv4 address of doks-public cluster for common reference"
+  })
+}
+
 ## jenkinsistheway.io DNS zone records
 # Apex records for the jenkinsistheway.io redirector hosted on publick8s redirecting to stories.jenkins.io
 resource "azurerm_dns_a_record" "jenkinsistheway_io" {
