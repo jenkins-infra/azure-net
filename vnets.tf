@@ -216,7 +216,7 @@ resource "azurerm_subnet" "public_db_vnet_mysql_tier" {
   name                 = "${azurerm_virtual_network.public_db.name}-mysql-tier"
   resource_group_name  = azurerm_resource_group.public.name
   virtual_network_name = azurerm_virtual_network.public_db.name
-  address_prefixes     = ["10.253.1.0/24"]     # 10.253.1.1 - 10.253.1.254
+  address_prefixes     = ["10.253.1.0/24"] # 10.253.1.1 - 10.253.1.254
 
   delegation {
     name = "mysql"

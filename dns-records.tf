@@ -217,7 +217,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_acme_fastly" {
     "_acme-challenge.plugins" = "tr8qxfomlsxfq1grha.fastly-validations.com",
     "_acme-challenge.stories" = "k31jn864ll8jjqhmik.fastly-validations.com",
     "_acme-challenge.www"     = "1vt5byhannlhjvm56n.fastly-validations.com",
-    "_acme-challenge"         = "ohh97689e0dknl1rqp.fastly-validations.com",
   }
 
   name                = each.key
