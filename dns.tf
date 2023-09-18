@@ -40,6 +40,15 @@ resource "azurerm_dns_zone" "child_zones" {
   tags = local.default_tags
 }
 
+resource "azurerm_dns_zone" "cloudflare_jenkins_io" {
+  name = "cloudflare.jenkins.io"
+
+  # Use the same resource group for all DNS zones
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+
+  tags = local.default_tags
+}
+
 # create DNS record of type NS for child-zone in the parent zone (to allow propagation of DNS records)
 resource "azurerm_dns_ns_record" "child_zone_ns_records" {
   for_each = local.lets_encrypt_dns_challenged_domains
