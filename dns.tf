@@ -30,7 +30,6 @@ resource "azurerm_dns_zone" "jenkinsistheway_io" {
   resource_group_name = azurerm_resource_group.proddns_jenkinsisthewayio.name
 }
 
-
 # NS records pointing to CloudFlare name servers to delegate cloudflare.jenkins.io to them
 resource "azurerm_dns_ns_record" "cloudflare_jenkins_io" {
   name                = "cloudflare"
