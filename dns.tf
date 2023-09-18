@@ -37,7 +37,7 @@ resource "azurerm_dns_ns_record" "cloudflare_jenkins_io" {
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 60
 
-  records = ["cody.ns.cloudflare.com", "kallie.ns.cloudflare.com"]
+  records = ["anton.ns.cloudflare.com", "bailey.ns.cloudflare.com"]
 
   tags = local.default_tags
 }
