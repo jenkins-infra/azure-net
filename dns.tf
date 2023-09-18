@@ -30,19 +30,10 @@ resource "azurerm_dns_zone" "jenkinsistheway_io" {
   resource_group_name = azurerm_resource_group.proddns_jenkinsisthewayio.name
 }
 
-# Child zone dedicated to CloudFlare
-resource "azurerm_dns_zone" "cloudflare_jenkins_io" {
-  name = "cloudflare.jenkins.io"
-
-  # Use the same resource group for all DNS zones
-  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-
-  tags = local.default_tags
-}
 
 # NS records pointing to CloudFlare name servers to delegate cloudflare.jenkins.io to them
 resource "azurerm_dns_ns_record" "cloudflare_jenkins_io" {
-  name                = "cloudflare-delegation"
+  name                = "cloudflare"
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 60
