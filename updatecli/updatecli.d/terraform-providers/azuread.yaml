@@ -41,6 +41,7 @@ actions:
     kind: github/pullrequest
     scmid: default
     spec:
+      title: Bump Terraform `azuread` provider version to {{ source "lastVersion" }}
       labels:
         - terraform-providers
         - hashicorp/azuread

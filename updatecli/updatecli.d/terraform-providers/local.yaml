@@ -41,6 +41,7 @@ actions:
     kind: github/pullrequest
     scmid: default
     spec:
+      title: Bump Terraform `local` provider version to {{ source "lastVersion" }}
       labels:
         - terraform-providers
         - hashicorp/local
