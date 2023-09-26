@@ -42,6 +42,18 @@ resource "azurerm_dns_ns_record" "cloudflare_jenkins_io" {
   tags = local.default_tags
 }
 
+# NS records pointing to DigitalOcean name servers to delegate do.jenkins.io to them
+resource "azurerm_dns_ns_record" "do_jenkins_io" {
+  name                = "do"
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 60
+
+  records = ["ns1.digitalocean.com", "ns2.digitalocean.com", "ns3.digitalocean.com"]
+
+  tags = local.default_tags
+}
+
 resource "azurerm_dns_zone" "child_zones" {
   for_each = local.lets_encrypt_dns_challenged_domains
 
