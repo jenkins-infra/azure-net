@@ -121,7 +121,7 @@ resource "azurerm_dns_caa_record" "westeurope_cloudflare_jenkins_io" {
   }
 
   tags = merge(local.default_tags, {
-    purpose = "Jenkins user authentication service"
+    purpose = "CAA record to allow CloudFlare creating an Edge Certificate for westeurope.cloudflare.jenkins.io"
   })
 }
 
