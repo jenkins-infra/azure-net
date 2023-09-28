@@ -49,6 +49,46 @@ resource "azurerm_dns_aaaa_record" "jenkinsciorg" {
   })
 }
 
+# CAA records to restrict Certificate Authorities
+resource "azurerm_dns_caa_record" "jenkins_caa" {
+  for_each = {
+    "${data.azurerm_dns_zone.jenkinsio.name}"    = "${data.azurerm_dns_zone.jenkinsio.resource_group_name}",
+    "${data.azurerm_dns_zone.jenkinsciorg.name}" = "${data.azurerm_dns_zone.jenkinsciorg.resource_group_name}",
+  }
+  name                = "@"
+  zone_name           = each.key
+  resource_group_name = each.value
+  ttl                 = 60
+
+  record {
+    flags = 0
+    tag   = "issue"
+    value = "letsencrypt.org"
+  }
+
+  record {
+    flags = 0
+    tag   = "issue"
+    value = "godaddy.com"
+  }
+
+  record {
+    flags = 0
+    tag   = "issue"
+    value = "amazon.com"
+  }
+
+  record {
+    flags = 0
+    tag   = "issue"
+    value = "globalsign.com"
+  }
+
+  tags = merge(local.default_tags, {
+    purpose = "Jenkins user authentication service"
+  })
+}
+
 # A record for ldap.jenkins.io pointing to its own public LB IP from publick8s cluster
 resource "azurerm_dns_a_record" "ldap_jenkins_io" {
   name                = "ldap"
