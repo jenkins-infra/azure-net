@@ -49,11 +49,6 @@ resource "azurerm_dns_aaaa_record" "jenkinsciorg" {
   })
 }
 
-moved {
-  from = azurerm_dns_caa_record.jenkins_caa
-  to   = azurerm_dns_caa_record.jenkinsio_caa
-}
-
 # CAA records to restrict Certificate Authorities
 resource "azurerm_dns_caa_record" "jenkins_caa" {
   for_each = {
