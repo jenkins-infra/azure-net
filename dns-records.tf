@@ -89,6 +89,42 @@ resource "azurerm_dns_caa_record" "jenkins_caa" {
   })
 }
 
+# CAA records to restrict Certificate Authorities for westeurope.cloudflare.jenkins.io
+resource "azurerm_dns_caa_record" "westeurope_cloudflare_jenkins_io" {
+  name                = "westeurope.cloudflare"
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_dns_zone.jenkinsio.resource_group_name
+  ttl                 = 60
+
+  record {
+    flags = 0
+    tag   = "issue"
+    value = "letsencrypt.org"
+  }
+
+  record {
+    flags = 0
+    tag   = "issue"
+    value = "digicert.com"
+  }
+
+  record {
+    flags = 0
+    tag   = "issue"
+    value = "sectigo.com"
+  }
+
+  record {
+    flags = 0
+    tag   = "issue"
+    value = "pki.goog"
+  }
+
+  tags = merge(local.default_tags, {
+    purpose = "Jenkins user authentication service"
+  })
+}
+
 # A record for ldap.jenkins.io pointing to its own public LB IP from publick8s cluster
 resource "azurerm_dns_a_record" "ldap_jenkins_io" {
   name                = "ldap"
