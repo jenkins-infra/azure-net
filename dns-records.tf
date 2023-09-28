@@ -84,24 +84,6 @@ resource "azurerm_dns_caa_record" "jenkins_caa" {
     value = "globalsign.com"
   }
 
-  tags = merge(local.default_tags, {
-    purpose = "Jenkins user authentication service"
-  })
-}
-
-# CAA records to restrict Certificate Authorities for westeurope.cloudflare.jenkins.io
-resource "azurerm_dns_caa_record" "westeurope_cloudflare_jenkins_io" {
-  name                = "westeurope.cloudflare"
-  zone_name           = data.azurerm_dns_zone.jenkinsio.name
-  resource_group_name = data.azurerm_dns_zone.jenkinsio.resource_group_name
-  ttl                 = 60
-
-  record {
-    flags = 0
-    tag   = "issue"
-    value = "letsencrypt.org"
-  }
-
   record {
     flags = 0
     tag   = "issue"
@@ -121,7 +103,7 @@ resource "azurerm_dns_caa_record" "westeurope_cloudflare_jenkins_io" {
   }
 
   tags = merge(local.default_tags, {
-    purpose = "CAA record to allow CloudFlare creating an Edge Certificate for westeurope.cloudflare.jenkins.io"
+    purpose = "Jenkins user authentication service"
   })
 }
 
