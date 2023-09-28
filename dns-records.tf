@@ -105,7 +105,7 @@ resource "azurerm_dns_caa_record" "westeurope_cloudflare_jenkins_io" {
   record {
     flags = 0
     tag   = "issue"
-    value = "digicert.com"
+    value = "digicert.com; cansignhttpexchanges=yes"
   }
 
   record {
@@ -117,7 +117,7 @@ resource "azurerm_dns_caa_record" "westeurope_cloudflare_jenkins_io" {
   record {
     flags = 0
     tag   = "issue"
-    value = "pki.goog"
+    value = "pki.goog; cansignhttpexchanges=yes"
   }
 
   tags = merge(local.default_tags, {
