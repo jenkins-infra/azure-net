@@ -52,16 +52,16 @@ resource "azurerm_network_interface" "internal" {
 }
 
 resource "azurerm_network_security_rule" "allow_ssh_from_admins_to_vpn" {
-  for_each = local.vpn.ssh_allowed_inbound_ips
+  for_each = module.jenkins_infra_shared_data.admin_public_ips
 
   name                        = "allow-ssh-from-${each.key}-to-vpn"
-  priority                    = each.value.priority
+  priority                    = 101 + (index(keys(module.jenkins_infra_shared_data.admin_public_ips), each.key))
   direction                   = "Inbound"
   access                      = "Allow"
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = "22"
-  source_address_prefixes     = each.value.ips
+  source_address_prefixes     = each.value
   destination_address_prefix  = azurerm_network_interface.main.private_ip_address
   resource_group_name         = azurerm_resource_group.private.name
   network_security_group_name = azurerm_network_security_group.private_dmz.name
