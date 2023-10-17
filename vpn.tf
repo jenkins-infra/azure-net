@@ -115,7 +115,7 @@ resource "azurerm_linux_virtual_machine" "vpn" {
   name                = "${azurerm_virtual_network.private.name}-vpn"
   resource_group_name = azurerm_resource_group.vpn.name
   location            = azurerm_resource_group.vpn.location
-  size                = "Standard_B1s"
+  size                = "Standard_B2s"
   admin_username      = local.vpn.username
   network_interface_ids = [
     azurerm_network_interface.main.id,
