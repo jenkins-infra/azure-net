@@ -199,6 +199,7 @@ resource "azurerm_dns_cname_record" "jenkinsciorg_target_public_publick8s" {
     "accounts" = "accountapp for Jenkins users"
     "javadoc"  = "Jenkins Javadoc"
     "mirrors"  = "Jenkins binary distribution via mirrorbits"
+    "stats"    = "Graphical representations of numbers and information around Jenkins"
     "wiki"     = "Static Wiki Confluence export"
   }
 
@@ -307,6 +308,31 @@ resource "azurerm_dns_cname_record" "jenkinsio_fastly" {
 
   tags = merge(local.default_tags, {
     purpose = each.value
+  })
+}
+
+# Custom CNAME records
+resource "azurerm_dns_cname_record" "jenkinsio_customs" {
+  # Map of records and corresponding purposes
+  for_each = {
+    "stats" = {
+      "target"      = "jenkins-infra.github.io"
+      "description" = "Website to download Jenkins packages",
+    },
+    "charts" = {
+      "target"      = "jenkinsci.github.io"
+      "description" = "Jenkins Helm Chart repository",
+    },
+  }
+
+  name                = each.key
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 300
+  record              = each.value["target"]
+
+  tags = merge(local.default_tags, {
+    purpose = each.value["description"]
   })
 }
 
