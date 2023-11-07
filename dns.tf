@@ -93,15 +93,15 @@ resource "azuread_service_principal" "child_zone_service_principals" {
   app_role_assignment_required = false
   owners                       = [data.azuread_service_principal.terraform-azure-net-production.id]
 
-  application_id = azuread_application.letsencrypt_dns_challenges[each.key].application_id
+  client_id = azuread_application.letsencrypt_dns_challenges[each.key].application_id
 }
 
 resource "azuread_application_password" "child_zone_app_passwords" {
   for_each = { for key, value in local.lets_encrypt_dns_challenged_domains : key => value if value != "" }
 
-  display_name          = "${each.key}-tf-managed"
-  application_object_id = azuread_application.letsencrypt_dns_challenges[each.key].id
-  end_date              = each.value
+  display_name   = "${each.key}-tf-managed"
+  application_id = azuread_application.letsencrypt_dns_challenges[each.key].id
+  end_date       = each.value
 }
 
 resource "azurerm_role_assignment" "child_zone_service_principal_assignements" {
