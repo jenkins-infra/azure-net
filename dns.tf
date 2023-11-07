@@ -93,7 +93,7 @@ resource "azuread_service_principal" "child_zone_service_principals" {
   app_role_assignment_required = false
   owners                       = [data.azuread_service_principal.terraform-azure-net-production.id]
 
-  client_id = azuread_application.letsencrypt_dns_challenges[each.key].application_id
+  client_id = azuread_application.letsencrypt_dns_challenges[each.key].client_id
 }
 
 resource "azuread_application_password" "child_zone_app_passwords" {
