@@ -199,7 +199,6 @@ resource "azurerm_dns_cname_record" "jenkinsciorg_target_public_publick8s" {
     "accounts" = "accountapp for Jenkins users"
     "javadoc"  = "Jenkins Javadoc"
     "mirrors"  = "Jenkins binary distribution via mirrorbits"
-    "stats"    = "Graphical representations of numbers and information around Jenkins"
     "wiki"     = "Static Wiki Confluence export"
   }
 
