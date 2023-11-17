@@ -3,47 +3,46 @@
 #   <https://github.com/jenkins-infra/iep/tree/master/iep-002>
 #
 #
-#                                                  ┌────────────────┐
-#                ┌───────────────────────┐         │                │
-#                │                       │         │                │
-#      ┌─────────►   Public VPN Gateway  ◄─────────►  Public VNet   │
-#      │         │                       │         │                │
-#      │         └───────────────────────┘         │                │
-#      │                                           └─▲──────────▲───┘
-#      │                                             │          │
-#                                                    │          │
-#  The Internet ─────────────────────────────────────┘    VNet peering
-#                                                               │
-#      │                                                        │
-#      │                                           ┌────────────▼───┐
-#      │         ┌───────────────────────┐         │                │
-#      │         │                       │         │                │
-#      ├─────────►  Private VPN Gateway  ◄─────────►  Private VNet  │
-#      │         │                       │         │                │
-#      │         └───────────────────────┘         │                │
-#      │                                           └────────────▲───┘
-#      │                                                        │
-#      │                                                        │
-#      │                                 ┌──────────────────┐  VNet peering
-#      │                                 │                  │   │
-#      │                                 │                  │   │
-#      │                                 │                  │   │
-#      │                                 │   Cert CI VNet   ◄───┘
-#      │                                 │                  │
-#      │                                 │                  │
-#      │                                 │                  │
-#      │                                 └──────────────────┘
-#      │
-#      │                                 ┌──────────────────┐
-#      │         ┌───────────────────────┤                  │
-#      │         │                       │                  │
-#      │         │      ┌──────────┐     │                  │
-#      └─────────►      │Bounce VM │     │   Trusted VNet   │
-#                │      └──────────┘     │                  │
-#                │                       │                  │
-#                └───────────────────────┤                  │
-#                                        └──────────────────┘
-#
+#                                                 ┌────────────────┐                              ┌───────────────────────────┐
+#               ┌───────────────────────┐         │                │                              │                           │
+#               │                       │         │                │                              │                           │
+#     ┌─────────►   Public VPN Gateway  ◄─────────►  Public VNet   ◄─────────────────────────────►│  Public-Sponsored Vnet    │
+#     │         │                       │         │                │          VNet peering        │                           │
+#     │         └───────────────────────┘         │                │                              │                           │
+#     │                                           └─▲──────────▲───┘                              └───────────────────────────┘
+#     │                                             │          │
+#                                                   │          │
+# The Internet ─────────────────────────────────────┘    VNet peering
+#                                                              │
+#     │                                                        │
+#     │                                           ┌────────────▼───┐
+#     │         ┌───────────────────────┐         │                │
+#     │         │                       │         │                │
+#     ├─────────►  Private VPN Gateway  ◄─────────►  Private VNet  │
+#     │         │                       │         │                │
+#     │         └───────────────────────┘         │                │
+#     │                                           └────────────▲───┘
+#     │                                                        │
+#     │                                                        │
+#     │                                 ┌──────────────────┐  VNet peering
+#     │                                 │                  │   │
+#     │                                 │                  │   │
+#     │                                 │                  │   │
+#     │                                 │   Cert CI VNet   ◄───┘
+#     │                                 │                  │
+#     │                                 │                  │
+#     │                                 │                  │
+#     │                                 └──────────────────┘
+#     │
+#     │                                 ┌──────────────────┐
+#     │         ┌───────────────────────┤                  │
+#     │         │                       │                  │
+#     │         │      ┌──────────┐     │                  │
+#     └─────────►      │Bounce VM │     │   Trusted VNet   │
+#               │      └──────────┘     │                  │
+#               │                       │                  │
+#               └───────────────────────┤                  │
+#                                       └──────────────────┘
 #
 #
 #
@@ -52,6 +51,12 @@
 ## Resource groups
 resource "azurerm_resource_group" "public" {
   name     = "public"
+  location = var.location
+  tags     = local.default_tags
+}
+resource "azurerm_resource_group" "public_jenkins_sponsorship" {
+  provider = azurerm.jenkins-sponsorship
+  name     = "public-jenkins-sponsorship"
   location = var.location
   tags     = local.default_tags
 }
@@ -77,6 +82,14 @@ resource "azurerm_virtual_network" "public" {
   location            = azurerm_resource_group.public.location
   resource_group_name = azurerm_resource_group.public.name
   address_space       = ["10.244.0.0/14", "fd00:db8:deca::/48"]
+  tags                = local.default_tags
+}
+resource "azurerm_virtual_network" "public_jenkins_sponsorship" {
+  provider            = azurerm.jenkins-sponsorship
+  name                = "${azurerm_resource_group.public_jenkins_sponsorship.name}-vnet"
+  location            = azurerm_resource_group.public_jenkins_sponsorship.location
+  resource_group_name = azurerm_resource_group.public_jenkins_sponsorship.name
+  address_space       = ["10.200.0.0/14"]
   tags                = local.default_tags
 }
 resource "azurerm_virtual_network" "private" {
