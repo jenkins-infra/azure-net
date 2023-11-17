@@ -195,6 +195,13 @@ resource "azurerm_subnet" "public_vnet_ci_jenkins_io_agents" {
   virtual_network_name = azurerm_virtual_network.public.name
   address_prefixes     = ["10.245.2.0/23"] # 10.245.2.1 - 10.245.3.254
 }
+resource "azurerm_subnet" "public_jenkins_sponsorship_vnet_ci_jenkins_io_agents" {
+  provider             = azurerm.jenkins-sponsorship
+  name                 = "${azurerm_virtual_network.public_jenkins_sponsorship.name}-ci_jenkins_io_agents"
+  resource_group_name  = azurerm_resource_group.public_jenkins_sponsorship.name
+  virtual_network_name = azurerm_virtual_network.public_jenkins_sponsorship.name
+  address_prefixes     = ["10.200.2.0/24"] # 10.200.2.1 - 10.200.3.254
+}
 resource "azurerm_subnet" "public_vnet_ci_jenkins_io_controller" {
   name                 = "${azurerm_virtual_network.public.name}-ci_jenkins_io_controller"
   resource_group_name  = azurerm_resource_group.public.name
@@ -339,6 +346,27 @@ resource "azurerm_virtual_network_peering" "trusted_to_private" {
   resource_group_name          = azurerm_virtual_network.trusted_ci_jenkins_io.resource_group_name
   virtual_network_name         = azurerm_virtual_network.trusted_ci_jenkins_io.name
   remote_virtual_network_id    = azurerm_virtual_network.private.id
+  allow_virtual_network_access = true
+  allow_forwarded_traffic      = false
+  allow_gateway_transit        = false
+  use_remote_gateways          = false
+}
+resource "azurerm_virtual_network_peering" "public_jenkins_sponsorship_to_public" {
+  provider                     = azurerm.jenkins-sponsorship
+  name                         = "${azurerm_virtual_network.public_jenkins_sponsorship.name}-to-${azurerm_virtual_network.public.name}"
+  resource_group_name          = azurerm_virtual_network.public_jenkins_sponsorship.resource_group_name
+  virtual_network_name         = azurerm_virtual_network.public_jenkins_sponsorship.name
+  remote_virtual_network_id    = azurerm_virtual_network.public.id
+  allow_virtual_network_access = true
+  allow_forwarded_traffic      = false
+  allow_gateway_transit        = false
+  use_remote_gateways          = false
+}
+resource "azurerm_virtual_network_peering" "public_to_public_jenkins_sponsorship" {
+  name                         = "${azurerm_virtual_network.public.name}-to-${azurerm_virtual_network.public_jenkins_sponsorship.name}"
+  resource_group_name          = azurerm_virtual_network.public.resource_group_name
+  virtual_network_name         = azurerm_virtual_network.public.name
+  remote_virtual_network_id    = azurerm_virtual_network.public_jenkins_sponsorship.id
   allow_virtual_network_access = true
   allow_forwarded_traffic      = false
   allow_gateway_transit        = false
