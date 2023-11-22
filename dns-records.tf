@@ -164,22 +164,23 @@ resource "azurerm_dns_aaaa_record" "jenkinsistheway_io_ipv6" {
 resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
   # Map of records and corresponding purposes
   for_each = {
-    "accounts"           = "accountapp for Jenkins users"
-    "fallback.get"       = "Fallback address for mirrorbits" # Note: had a TTL of 10 minutes before, not 1 hour
-    "get"                = "Jenkins binary distribution via mirrorbits"
-    "incrementals"       = "incrementals publisher to incrementals Maven repository"
-    "javadoc"            = "Jenkins Javadoc"
-    "mirrors"            = "Jenkins binary distribution via mirrorbits"
-    "plugin-health"      = "Plugin Health Scoring application"
-    "plugin-site-issues" = "Plugins website API content origin for Fastly CDN"
-    "plugins.origin"     = "Plugins website content origin for Fastly CDN"
-    "rating"             = "Jenkins releases rating service"
-    "repo.azure"         = "artifact-caching-proxy on Azure"
-    "reports"            = "Public reports about Jenkins services and components consumed by RPU, plugins website and others"
-    "uplink"             = "Jenkins telemetry service"
-    "weekly.ci"          = "Jenkins Weekly demo controller"
-    "wiki"               = "Static Wiki Confluence export"
-    "www.origin"         = "Jenkins website content origin for Fastly CDN"
+    "accounts"            = "accountapp for Jenkins users"
+    "contributors.origin" = "Jenkins Contributors Spotlight website content origin for Fastly CDN"
+    "fallback.get"        = "Fallback address for mirrorbits" # Note: had a TTL of 10 minutes before, not 1 hour
+    "get"                 = "Jenkins binary distribution via mirrorbits"
+    "incrementals"        = "incrementals publisher to incrementals Maven repository"
+    "javadoc"             = "Jenkins Javadoc"
+    "mirrors"             = "Jenkins binary distribution via mirrorbits"
+    "plugin-health"       = "Plugin Health Scoring application"
+    "plugin-site-issues"  = "Plugins website API content origin for Fastly CDN"
+    "plugins.origin"      = "Plugins website content origin for Fastly CDN"
+    "rating"              = "Jenkins releases rating service"
+    "repo.azure"          = "artifact-caching-proxy on Azure"
+    "reports"             = "Public reports about Jenkins services and components consumed by RPU, plugins website and others"
+    "uplink"              = "Jenkins telemetry service"
+    "weekly.ci"           = "Jenkins Weekly demo controller"
+    "wiki"                = "Static Wiki Confluence export"
+    "www.origin"          = "Jenkins website content origin for Fastly CDN"
   }
 
   name                = each.key
@@ -292,11 +293,12 @@ resource "azurerm_dns_cname_record" "jenkinsio_acme_fastly" {
 resource "azurerm_dns_cname_record" "jenkinsio_fastly" {
   # Map of records and corresponding purposes
   for_each = {
-    "pkg"        = "Website to download Jenkins packages",
-    "plugins"    = "Website to browse and download Jenkins plugins",
-    "stories"    = "Website with Jenkins User stories and testimonies",
-    "way.the.is" = "Old alias for stories.jenkins.io",
-    "www"        = "Jenkins official website",
+    "contributors" = "Jenkins Contributors Spotlight website",
+    "pkg"          = "Website to download Jenkins packages",
+    "plugins"      = "Website to browse and download Jenkins plugins",
+    "stories"      = "Website with Jenkins User stories and testimonies",
+    "way.the.is"   = "Old alias for stories.jenkins.io",
+    "www"          = "Jenkins official website",
   }
 
   name                = each.key
