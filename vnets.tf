@@ -2,48 +2,46 @@
 # Networks in Azure according to IEP-002:
 #   <https://github.com/jenkins-infra/iep/tree/master/iep-002>
 #
-#
-#                                                 ┌────────────────┐                              ┌───────────────────────────┐
-#               ┌───────────────────────┐         │                │                              │                           │
-#               │                       │         │                │                              │                           │
-#     ┌─────────►   Public VPN Gateway  ◄─────────►  Public VNet   ◄─────────────────────────────►│  Public-Sponsored Vnet    │
-#     │         │                       │         │                │          VNet peering        │                           │
-#     │         └───────────────────────┘         │                │                              │                           │
-#     │                                           └─▲──────────▲───┘                              └───────────────────────────┘
-#     │                                             │          │
-#                                                   │          │
-# The Internet ─────────────────────────────────────┘    VNet peering
-#                                                              │
-#     │                                                        │
-#     │                                           ┌────────────▼───┐
-#     │         ┌───────────────────────┐         │                │
-#     │         │                       │         │                │
-#     ├─────────►  Private VPN Gateway  ◄─────────►  Private VNet  │
-#     │         │                       │         │                │
-#     │         └───────────────────────┘         │                │
-#     │                                           └────────────▲───┘
-#     │                                                        │
-#     │                                                        │
-#     │                                 ┌──────────────────┐  VNet peering
-#     │                                 │                  │   │
-#     │                                 │                  │   │
-#     │                                 │                  │   │
-#     │                                 │   Cert CI VNet   ◄───┘
-#     │                                 │                  │
-#     │                                 │                  │
-#     │                                 │                  │
-#     │                                 └──────────────────┘
-#     │
-#     │                                 ┌──────────────────┐
-#     │         ┌───────────────────────┤                  │
-#     │         │                       │                  │
-#     │         │      ┌──────────┐     │                  │
-#     └─────────►      │Bounce VM │     │   Trusted VNet   │
-#               │      └──────────┘     │                  │
-#               │                       │                  │
-#               └───────────────────────┤                  │
-#                                       └──────────────────┘
-#
+#                                                        ┌────────────────┐                              ┌───────────────────────────┐
+#                      ┌───────────────────────┐         │                │                              │                           │
+#                      │                       │         │                │                              │                           │
+#            ┌─────────►   Public VPN Gateway  ◄─────────►  Public VNet   ◄─────────────────────────────►│  Public-Sponsored Vnet    │
+#            │         │                       │         │                │          VNet peering        │                           │
+#            │         └───────────────────────┘         │   IPv4 + IPv6  │◄───────────────────┐         │                           │
+#            │                                           └─▲──────────▲───┘     Vnet peering   │         └───────────────────────────┘
+#            │                                             │          │                        │
+#                                                          │          │                        │
+#        The Internet ─────────────────────────────────────┘    VNet peering             ┌─────▼──────────────┐
+#                                                                     │                  │                    │
+#            │                                                        │                  │                    │
+#            │                                           ┌────────────▼───┐              │   Public DB        │
+#            │         ┌───────────────────────┐         │                │◄────────────►│                    │
+#            │         │                       │         │                │ Vnet peering │                    │
+#            ├─────────►  Private VPN Gateway  ◄─────────►  Private VNet  │              └────────────────────┘
+#            │         │                       │         │                │
+#            │         └───────────────────────┘         │                │
+#            │                                           └────────────▲───┘
+#            │                                                        │  ▲
+#            │                                                        │  │
+#            │                                 ┌──────────────────┐  VNet│peerings
+#            │                                 │                  │   │  │
+#            │                                 │                  │   │  │
+#            │                                 │                  │   │  │
+#            │                                 │   Cert CI VNet   ◄───┘  │
+#            │                                 │                  │      │
+#            │                                 │                  │      │
+#            │                                 │                  │      │
+#            │                                 └──────────────────┘      │
+#            │                                                           │
+#            │                                 ┌──────────────────┐      │
+#            │         ┌───────────────────────┤                  │      │                              ┌───────────────────────────┐
+#            │         │                       │                  ◄──────┘                              │                           │
+#            │         │      ┌──────────┐     │                  │                                     │                           │
+#            └─────────►      │Bounce VM │     │   Trusted VNet   │◄───────────────────────────────────►│  Trusted-sponsoredVVnet   │
+#                      │      └──────────┘     │                  │               Vnet peering          │                           │
+#                      │                       │                  │                                     │                           │
+#                      └───────────────────────┤                  │                                     └───────────────────────────┘
+#                                              └──────────────────┘
 #
 #
 # See also https://github.com/jenkins-infra/azure/blob/legacy-tf/plans/vnets.tf
@@ -70,6 +68,12 @@ resource "azurerm_resource_group" "trusted_ci_jenkins_io" {
   location = var.location
   tags     = local.default_tags
 }
+resource "azurerm_resource_group" "trusted_ci_jenkins_io_sponsorship" {
+  provider = azurerm.jenkins-sponsorship
+  name     = "trusted-ci-jenkins-io-sponsorship"
+  location = var.location
+  tags     = local.default_tags
+}
 resource "azurerm_resource_group" "cert_ci_jenkins_io" {
   name     = "cert-ci-jenkins-io"
   location = var.location
@@ -89,14 +93,14 @@ resource "azurerm_virtual_network" "public_jenkins_sponsorship" {
   name                = "${azurerm_resource_group.public_jenkins_sponsorship.name}-vnet"
   location            = azurerm_resource_group.public_jenkins_sponsorship.location
   resource_group_name = azurerm_resource_group.public_jenkins_sponsorship.name
-  address_space       = ["10.200.0.0/14"]
+  address_space       = ["10.200.0.0/14"] # 10.200.0.1 - 10.203.255.254
   tags                = local.default_tags
 }
 resource "azurerm_virtual_network" "private" {
   name                = "${azurerm_resource_group.private.name}-vnet"
   location            = azurerm_resource_group.private.location
   resource_group_name = azurerm_resource_group.private.name
-  address_space       = ["10.248.0.0/14"]
+  address_space       = ["10.248.0.0/14"] # 10.248.0.1 - 10.251.255.254
   tags                = local.default_tags
 }
 resource "azurerm_virtual_network" "trusted_ci_jenkins_io" {
@@ -104,6 +108,14 @@ resource "azurerm_virtual_network" "trusted_ci_jenkins_io" {
   location            = azurerm_resource_group.trusted_ci_jenkins_io.location
   resource_group_name = azurerm_resource_group.trusted_ci_jenkins_io.name
   address_space       = ["10.252.0.0/21"] # 10.252.0.1 - 10.252.7.254
+  tags                = local.default_tags
+}
+resource "azurerm_virtual_network" "trusted_ci_jenkins_io_sponsorship" {
+  provider            = azurerm.jenkins-sponsorship
+  name                = "${azurerm_resource_group.trusted_ci_jenkins_io_sponsorship.name}-vnet"
+  location            = azurerm_resource_group.trusted_ci_jenkins_io_sponsorship.location
+  resource_group_name = azurerm_resource_group.trusted_ci_jenkins_io_sponsorship.name
+  address_space       = ["10.201.0.0/24"] # 10.201.0.1 - 10.201.0.254
   tags                = local.default_tags
 }
 resource "azurerm_virtual_network" "cert_ci_jenkins_io" {
@@ -351,6 +363,27 @@ resource "azurerm_virtual_network_peering" "trusted_to_private" {
   allow_gateway_transit        = false
   use_remote_gateways          = false
 }
+resource "azurerm_virtual_network_peering" "trusted_jenkins_sponsorship_to_trusted" {
+  provider                     = azurerm.jenkins-sponsorship
+  name                         = "${azurerm_virtual_network.trusted_ci_jenkins_io_sponsorship.name}-to-${azurerm_virtual_network.trusted_ci_jenkins_io.name}"
+  resource_group_name          = azurerm_virtual_network.trusted_ci_jenkins_io_sponsorship.resource_group_name
+  virtual_network_name         = azurerm_virtual_network.trusted_ci_jenkins_io_sponsorship.name
+  remote_virtual_network_id    = azurerm_virtual_network.trusted_ci_jenkins_io.id
+  allow_virtual_network_access = true
+  allow_forwarded_traffic      = false
+  allow_gateway_transit        = false
+  use_remote_gateways          = false
+}
+resource "azurerm_virtual_network_peering" "trusted_to_trusted_jenkins_sponsorship" {
+  name                         = "${azurerm_virtual_network.trusted_ci_jenkins_io.name}-to-${azurerm_virtual_network.trusted_ci_jenkins_io_sponsorship.name}"
+  resource_group_name          = azurerm_virtual_network.trusted_ci_jenkins_io.resource_group_name
+  virtual_network_name         = azurerm_virtual_network.trusted_ci_jenkins_io.name
+  remote_virtual_network_id    = azurerm_virtual_network.trusted_ci_jenkins_io_sponsorship.id
+  allow_virtual_network_access = true
+  allow_forwarded_traffic      = false
+  allow_gateway_transit        = false
+  use_remote_gateways          = false
+}
 resource "azurerm_virtual_network_peering" "public_jenkins_sponsorship_to_public" {
   provider                     = azurerm.jenkins-sponsorship
   name                         = "${azurerm_virtual_network.public_jenkins_sponsorship.name}-to-${azurerm_virtual_network.public.name}"
@@ -384,6 +417,13 @@ resource "azurerm_subnet" "trusted_ci_jenkins_io_ephemeral_agents" {
   resource_group_name  = azurerm_resource_group.trusted_ci_jenkins_io.name
   virtual_network_name = azurerm_virtual_network.trusted_ci_jenkins_io.name
   address_prefixes     = ["10.252.1.0/24"] # 10.252.1.1 - 10.252.1.254
+}
+resource "azurerm_subnet" "trusted_ci_jenkins_io_sponsorship_ephemeral_agents" {
+  provider             = azurerm.jenkins-sponsorship
+  name                 = "${azurerm_virtual_network.trusted_ci_jenkins_io_sponsorship.name}-ephemeral-agents"
+  resource_group_name  = azurerm_resource_group.trusted_ci_jenkins_io_sponsorship.name
+  virtual_network_name = azurerm_virtual_network.trusted_ci_jenkins_io_sponsorship.name
+  address_prefixes     = ["10.201.0.0/24"] # 10.201.0.1 - 10.201.0.254
 }
 resource "azurerm_subnet" "trusted_ci_jenkins_io_permanent_agents" {
   name                 = "${azurerm_virtual_network.trusted_ci_jenkins_io.name}-permanent-agents"
