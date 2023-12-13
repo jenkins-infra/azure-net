@@ -214,6 +214,17 @@ resource "azurerm_dns_cname_record" "jenkinsciorg_target_public_publick8s" {
   })
 }
 
+# CNAME records for the legacy domain jenkins-ci.org, pointing to their modern counterpart
+resource "azurerm_dns_cname_record" "repo_jenkinsci_org" {
+  name                = "repo"
+  zone_name           = data.azurerm_dns_zone.jenkinsciorg.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsci.name
+  ttl                 = 60
+  record              = "jenkinsci.jfrog.org"
+
+  tags = local.default_tags
+}
+
 # CNAME records targeting the private-nginx on publick8s cluster
 resource "azurerm_dns_cname_record" "jenkinsio_target_private_publick8s" {
   # Map of records and corresponding purposes
@@ -347,6 +358,27 @@ resource "azurerm_dns_txt_record" "jenkinsci-transfer-github-verification" {
 
   record {
     value = "b4df95a7b9"
+  }
+
+  tags = local.default_tags
+}
+
+resource "azurerm_dns_txt_record" "apex_jenkinsciorg" {
+  name                = "@"
+  zone_name           = data.azurerm_dns_zone.jenkinsciorg.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsci.name
+  ttl                 = 60
+  record {
+    # Sendgrid email setup and SPF
+    value = "v=spf1 mx ip4:199.193.196.24 ip4:140.211.15.0/24 ip4:140.211.8.0/23 ip4:173.203.60.151 ip4:140.211.166.128/25 include:sendgrid.net -all"
+  }
+  record {
+    # TODO: identify this value
+    value = "d9g3op5gq2093d1q9kqc4mteqr"
+  }
+  record {
+    # TXT record for Godaddy 2023 Dec. certificate renewal - https://groups.google.com/g/jenkins-infra/c/EgbRESb74oA/m/GogykGRFAwAJ
+    value = "37vdk1n5ihnd474hlm060uiek6"
   }
 
   tags = local.default_tags
