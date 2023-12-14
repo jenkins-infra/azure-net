@@ -357,6 +357,27 @@ resource "azurerm_virtual_network_peering" "cert_to_private" {
   allow_gateway_transit        = false
   use_remote_gateways          = false
 }
+resource "azurerm_virtual_network_peering" "cert_jenkins_sponsorship_to_cert" {
+  provider                     = azurerm.jenkins-sponsorship
+  name                         = "${azurerm_virtual_network.cert_ci_jenkins_io_sponsorship.name}-to-${azurerm_virtual_network.cert_ci_jenkins_io.name}"
+  resource_group_name          = azurerm_virtual_network.cert_ci_jenkins_io_sponsorship.resource_group_name
+  virtual_network_name         = azurerm_virtual_network.cert_ci_jenkins_io_sponsorship.name
+  remote_virtual_network_id    = azurerm_virtual_network.cert_ci_jenkins_io.id
+  allow_virtual_network_access = true
+  allow_forwarded_traffic      = false
+  allow_gateway_transit        = false
+  use_remote_gateways          = false
+}
+resource "azurerm_virtual_network_peering" "cert_to_cert_jenkins_sponsorship" {
+  name                         = "${azurerm_virtual_network.cert_ci_jenkins_io.name}-to-${azurerm_virtual_network.cert_ci_jenkins_io_sponsorship.name}"
+  resource_group_name          = azurerm_virtual_network.cert_ci_jenkins_io.resource_group_name
+  virtual_network_name         = azurerm_virtual_network.cert_ci_jenkins_io.name
+  remote_virtual_network_id    = azurerm_virtual_network.cert_ci_jenkins_io_sponsorship.id
+  allow_virtual_network_access = true
+  allow_forwarded_traffic      = false
+  allow_gateway_transit        = false
+  use_remote_gateways          = false
+}
 resource "azurerm_virtual_network_peering" "private_to_trusted" {
   name                         = "${azurerm_virtual_network.private.name}-to-${azurerm_virtual_network.trusted_ci_jenkins_io.name}"
   resource_group_name          = azurerm_virtual_network.private.resource_group_name
