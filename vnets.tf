@@ -15,13 +15,13 @@
 #                                                               │                  │                    │
 #      │                                                        │                  │                    │
 #      │                                           ┌────────────▼───┐              │   Public DB        │
-#      │         ┌───────────────────────┐         │                │◄────────────►│                    │
-#      │         │                       │         │                │ Vnet peering │                    │
-#      ├─────────►  Private VPN Gateway  ◄─────────►  Private VNet  │              └────────────────────┘
-#      │         │                       │         │                │
-#      │         └───────────────────────┘ ┌──────►│                │
-#      │                                   │       └───────▲────────┘
-#      │                                   │               │Vnet Peering
+#      │         ┌───────────────────────┐         │                │◄────────────►│                    │        ┌──────────────────────────┐
+#      │         │                       │         │                │ Vnet peering │                    │        │                          │
+#      ├─────────►  Private VPN Gateway  ◄─────────►  Private VNet  │              └────────────────────┘        │                          │
+#      │         │                       │         │                │                                            │   InfraCi-sponsoredvnet  │
+#      │         └───────────────────────┘ ┌──────►│                │◄──────────────────────────────────────────►│                          │
+#      │                                   │       └───────▲────────┘              Vnet peering                  │                          │
+#      │                                   │               │Vnet Peering                                         └──────────────────────────┘
 #      │                                   │               │
 #      │                            VNet Peering      ┌────▼─────────────┐                        ┌───────────────────────────┐
 #      │                                   │          │                  │                        │                           │
@@ -84,6 +84,12 @@ resource "azurerm_resource_group" "cert_ci_jenkins_io_sponsorship" {
   location = var.location
   tags     = local.default_tags
 }
+resource "azurerm_resource_group" "infra_ci_jenkins_io_sponsorship" {
+  provider = azurerm.jenkins-sponsorship
+  name     = "infra-ci-jenkins-io-sponsorship"
+  location = var.location
+  tags     = local.default_tags
+}
 
 ## Virtual networks
 resource "azurerm_virtual_network" "public" {
@@ -136,6 +142,14 @@ resource "azurerm_virtual_network" "cert_ci_jenkins_io_sponsorship" {
   location            = azurerm_resource_group.cert_ci_jenkins_io_sponsorship.location
   resource_group_name = azurerm_resource_group.cert_ci_jenkins_io_sponsorship.name
   address_space       = ["10.202.0.0/24"] # 10.202.0.1 - 10.202.0.254
+  tags                = local.default_tags
+}
+resource "azurerm_virtual_network" "infra_ci_jenkins_io_sponsorship" {
+  provider            = azurerm.jenkins-sponsorship
+  name                = "${azurerm_resource_group.infra_ci_jenkins_io_sponsorship.name}-vnet"
+  location            = azurerm_resource_group.infra_ci_jenkins_io_sponsorship.location
+  resource_group_name = azurerm_resource_group.infra_ci_jenkins_io_sponsorship.name
+  address_space       = ["10.203.0.0/24"] # 10.203.0.1 - 10.203.0.254
   tags                = local.default_tags
 }
 
@@ -441,6 +455,28 @@ resource "azurerm_virtual_network_peering" "public_to_public_jenkins_sponsorship
   use_remote_gateways          = false
 }
 
+resource "azurerm_virtual_network_peering" "infraci_jenkins_sponsorship_to_private" {
+  provider                     = azurerm.jenkins-sponsorship
+  name                         = "${azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.name}-to-${azurerm_virtual_network.private.name}"
+  resource_group_name          = azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.resource_group_name
+  virtual_network_name         = azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.name
+  remote_virtual_network_id    = azurerm_virtual_network.private.id
+  allow_virtual_network_access = true
+  allow_forwarded_traffic      = false
+  allow_gateway_transit        = false
+  use_remote_gateways          = false
+}
+resource "azurerm_virtual_network_peering" "private_to_infraci_jenkins_sponsorship" {
+  name                         = "${azurerm_virtual_network.private.name}-to-${azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.name}"
+  resource_group_name          = azurerm_virtual_network.private.resource_group_name
+  virtual_network_name         = azurerm_virtual_network.private.name
+  remote_virtual_network_id    = azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.id
+  allow_virtual_network_access = true
+  allow_forwarded_traffic      = false
+  allow_gateway_transit        = false
+  use_remote_gateways          = false
+}
+
 resource "azurerm_subnet" "trusted_ci_jenkins_io_controller" {
   name                 = "${azurerm_virtual_network.trusted_ci_jenkins_io.name}-controller"
   resource_group_name  = azurerm_resource_group.trusted_ci_jenkins_io.name
@@ -486,4 +522,13 @@ resource "azurerm_subnet" "cert_ci_jenkins_io_sponsorship_ephemeral_agents" {
   resource_group_name  = azurerm_resource_group.cert_ci_jenkins_io_sponsorship.name
   virtual_network_name = azurerm_virtual_network.cert_ci_jenkins_io_sponsorship.name
   address_prefixes     = ["10.202.0.0/24"] # 10.202.0.1 - 10.202.0.254
+}
+
+# Dedicated subnets for infra.ci.jenkins.io (agents)
+resource "azurerm_subnet" "infra_ci_jenkins_io_sponsorship_ephemeral_agents" {
+  provider             = azurerm.jenkins-sponsorship
+  name                 = "${azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.name}-ephemeral-agents"
+  resource_group_name  = azurerm_resource_group.infra_ci_jenkins_io_sponsorship.name
+  virtual_network_name = azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.name
+  address_prefixes     = ["10.203.0.0/24"] # 10.203.0.1 - 10.203.0.254
 }
