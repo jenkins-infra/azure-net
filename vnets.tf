@@ -126,7 +126,7 @@ resource "azurerm_virtual_network" "trusted_ci_jenkins_io_sponsorship" {
   name                = "${azurerm_resource_group.trusted_ci_jenkins_io_sponsorship.name}-vnet"
   location            = azurerm_resource_group.trusted_ci_jenkins_io_sponsorship.location
   resource_group_name = azurerm_resource_group.trusted_ci_jenkins_io_sponsorship.name
-  address_space       = ["10.201.0.0/24"] # 10.201.0.1 - 10.201.0.254
+  address_space       = ["10.204.0.0/24"] # 10.204.0.1 - 10.204.0.254
   tags                = local.default_tags
 }
 resource "azurerm_virtual_network" "cert_ci_jenkins_io" {
@@ -141,7 +141,7 @@ resource "azurerm_virtual_network" "cert_ci_jenkins_io_sponsorship" {
   name                = "${azurerm_resource_group.cert_ci_jenkins_io_sponsorship.name}-vnet"
   location            = azurerm_resource_group.cert_ci_jenkins_io_sponsorship.location
   resource_group_name = azurerm_resource_group.cert_ci_jenkins_io_sponsorship.name
-  address_space       = ["10.202.0.0/24"] # 10.202.0.1 - 10.202.0.254
+  address_space       = ["10.205.0.0/24"] # 10.205.0.1 - 10.205.0.254
   tags                = local.default_tags
 }
 resource "azurerm_virtual_network" "infra_ci_jenkins_io_sponsorship" {
@@ -149,7 +149,7 @@ resource "azurerm_virtual_network" "infra_ci_jenkins_io_sponsorship" {
   name                = "${azurerm_resource_group.infra_ci_jenkins_io_sponsorship.name}-vnet"
   location            = azurerm_resource_group.infra_ci_jenkins_io_sponsorship.location
   resource_group_name = azurerm_resource_group.infra_ci_jenkins_io_sponsorship.name
-  address_space       = ["10.203.0.0/24"] # 10.203.0.1 - 10.203.0.254
+  address_space       = ["10.206.0.0/23"] # 10.206.0.1 - 10.206.1.254
   tags                = local.default_tags
 }
 
@@ -494,7 +494,7 @@ resource "azurerm_subnet" "trusted_ci_jenkins_io_sponsorship_ephemeral_agents" {
   name                 = "${azurerm_virtual_network.trusted_ci_jenkins_io_sponsorship.name}-ephemeral-agents"
   resource_group_name  = azurerm_resource_group.trusted_ci_jenkins_io_sponsorship.name
   virtual_network_name = azurerm_virtual_network.trusted_ci_jenkins_io_sponsorship.name
-  address_prefixes     = ["10.201.0.0/24"] # 10.201.0.1 - 10.201.0.254
+  address_prefixes     = ["10.204.0.0/24"] # 10.204.0.1 - 10.204.0.254
 }
 resource "azurerm_subnet" "trusted_ci_jenkins_io_permanent_agents" {
   name                 = "${azurerm_virtual_network.trusted_ci_jenkins_io.name}-permanent-agents"
@@ -521,7 +521,7 @@ resource "azurerm_subnet" "cert_ci_jenkins_io_sponsorship_ephemeral_agents" {
   name                 = "${azurerm_virtual_network.cert_ci_jenkins_io_sponsorship.name}-ephemeral-agents"
   resource_group_name  = azurerm_resource_group.cert_ci_jenkins_io_sponsorship.name
   virtual_network_name = azurerm_virtual_network.cert_ci_jenkins_io_sponsorship.name
-  address_prefixes     = ["10.202.0.0/24"] # 10.202.0.1 - 10.202.0.254
+  address_prefixes     = ["10.205.0.0/24"] # 10.205.0.1 - 10.205.0.254
 }
 
 # Dedicated subnets for infra.ci.jenkins.io (agents)
@@ -530,5 +530,12 @@ resource "azurerm_subnet" "infra_ci_jenkins_io_sponsorship_ephemeral_agents" {
   name                 = "${azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.name}-ephemeral-agents"
   resource_group_name  = azurerm_resource_group.infra_ci_jenkins_io_sponsorship.name
   virtual_network_name = azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.name
-  address_prefixes     = ["10.203.0.0/24"] # 10.203.0.1 - 10.203.0.254
+  address_prefixes     = ["10.206.0.0/24"] # 10.206.0.1 - 10.206.0.254
+}
+resource "azurerm_subnet" "infra_ci_jenkins_io_sponsorship_packer_builds" {
+  provider             = azurerm.jenkins-sponsorship
+  name                 = "${azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.name}-packer-builds"
+  resource_group_name  = azurerm_resource_group.infra_ci_jenkins_io_sponsorship.name
+  virtual_network_name = azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.name
+  address_prefixes     = ["10.206.1.0/24"] # 10.206.1.1 - 10.206.1.254
 }
