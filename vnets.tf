@@ -201,7 +201,7 @@ resource "azurerm_subnet" "privatek8s_release_tier" {
   virtual_network_name = azurerm_virtual_network.private.name
   address_prefixes     = ["10.250.0.0/25"]
   # Enable KeyVault and Storage service endpoints so the cluster can access secrets to update other clusters
-  service_endpoints = ["Microsoft.KeyVault"]
+  service_endpoints = ["Microsoft.KeyVault", "Microsoft.Storage"]
 }
 
 # Dedicated subnet for the  "publick8s" AKS cluster resources
@@ -488,6 +488,8 @@ resource "azurerm_subnet" "trusted_ci_jenkins_io_ephemeral_agents" {
   resource_group_name  = azurerm_resource_group.trusted_ci_jenkins_io.name
   virtual_network_name = azurerm_virtual_network.trusted_ci_jenkins_io.name
   address_prefixes     = ["10.252.1.0/24"] # 10.252.1.1 - 10.252.1.254
+  # Enable Storage service endpoint so agents can access Storage Account through internal routes
+  service_endpoints = ["Microsoft.Storage"]
 }
 resource "azurerm_subnet" "trusted_ci_jenkins_io_sponsorship_ephemeral_agents" {
   provider             = azurerm.jenkins-sponsorship
@@ -495,12 +497,16 @@ resource "azurerm_subnet" "trusted_ci_jenkins_io_sponsorship_ephemeral_agents" {
   resource_group_name  = azurerm_resource_group.trusted_ci_jenkins_io_sponsorship.name
   virtual_network_name = azurerm_virtual_network.trusted_ci_jenkins_io_sponsorship.name
   address_prefixes     = ["10.204.0.0/24"] # 10.204.0.1 - 10.204.0.254
+  # Enable Storage service endpoint so agents can access Storage Account through internal routes
+  service_endpoints = ["Microsoft.Storage"]
 }
 resource "azurerm_subnet" "trusted_ci_jenkins_io_permanent_agents" {
   name                 = "${azurerm_virtual_network.trusted_ci_jenkins_io.name}-permanent-agents"
   resource_group_name  = azurerm_resource_group.trusted_ci_jenkins_io.name
   virtual_network_name = azurerm_virtual_network.trusted_ci_jenkins_io.name
   address_prefixes     = ["10.252.2.0/24"] # 10.252.2.1 - 10.252.2.254
+  # Enable Storage service endpoint so agents can access Storage Account through internal routes
+  service_endpoints = ["Microsoft.Storage"]
 }
 
 # Dedicated subnets for cert.ci.jenkins.io (controller and agents)
@@ -531,6 +537,8 @@ resource "azurerm_subnet" "infra_ci_jenkins_io_sponsorship_ephemeral_agents" {
   resource_group_name  = azurerm_resource_group.infra_ci_jenkins_io_sponsorship.name
   virtual_network_name = azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.name
   address_prefixes     = ["10.206.0.0/24"] # 10.206.0.1 - 10.206.0.254
+  # Enable KeyVault and Storage service endpoints so agents can access Storage Account through internal routes + secrets
+  service_endpoints = ["Microsoft.KeyVault", "Microsoft.Storage"]
 }
 resource "azurerm_subnet" "infra_ci_jenkins_io_sponsorship_packer_builds" {
   provider             = azurerm.jenkins-sponsorship
@@ -538,4 +546,6 @@ resource "azurerm_subnet" "infra_ci_jenkins_io_sponsorship_packer_builds" {
   resource_group_name  = azurerm_resource_group.infra_ci_jenkins_io_sponsorship.name
   virtual_network_name = azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.name
   address_prefixes     = ["10.206.1.0/24"] # 10.206.1.1 - 10.206.1.254
+  # Enable KeyVault and Storage service endpoints so agents can access Storage Account through internal routes + secrets
+  service_endpoints = ["Microsoft.KeyVault", "Microsoft.Storage"]
 }
