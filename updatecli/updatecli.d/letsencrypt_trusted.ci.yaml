@@ -1,0 +1,61 @@
+name: "Bump lets_encrypt_dns_challenged_domains `expiry` date for trusted.ci"
+
+scms:
+  default:
+    kind: github
+    spec:
+      user: "{{ .github.user }}"
+      email: "{{ .github.email }}"
+      owner: "{{ .github.owner }}"
+      repository: "{{ .github.repository }}"
+      token: "{{ requiredEnv .github.token }}"
+      username: "{{ .github.username }}"
+      branch: "{{ .github.branch }}"
+
+sources:
+  currentExpiryTrusted:
+    name: Get current lets_encrypt_dns_challenged_domains `expiry` date for trusted.ci
+    kind: terraform/file
+    spec:
+      file: locals.tf
+      path: 'locals.lets_encrypt_dns_challenged_domains'
+    transformers:
+      - findsubmatch:
+          pattern: '"trusted.ci.jenkins.io".*=.(.*)'
+          captureindex: 1
+  nextExpiry:
+    name: Prepare next lets_encrypt_dns_challenged_domains `expiry` date within 3 months
+    kind: shell
+    spec:
+      command: bash ./updatecli/scripts/dateadd.sh
+      environments:
+        - name: PATH
+
+conditions:
+  checkIfExpirySoonExpiredTrusted:
+    kind: shell
+    sourceid: currentExpiryTrusted
+    spec:
+      command: bash ./updatecli/scripts/datediff.sh # current expiry date value passed as argument
+      environments:
+        - name: PATH
+
+targets:
+  updateNextExpiryTrusted:
+    name: Update Terraform file `locals.tf` with new expiration date for trusted.ci
+    kind: file
+    sourceid: nextExpiry
+    spec:
+      file: locals.tf
+      matchpattern: (lets_encrypt_dns_challenged_domains.*(\r\n|\r|\n).*\"trusted.ci.jenkins.io\".*=.*\")(.*)(\".*)
+      replacepattern: ${1}{{ source "nextExpiry" }}"
+    scmid: default
+
+actions:
+  default:
+    kind: github/pullrequest
+    scmid: default
+    spec:
+      title: Bump lets_encrypt_dns_challenged_domains `expiry` date for trusted.ci {{ source "nextExpiry" }}
+      labels:
+        - terraform
