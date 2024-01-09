@@ -22,7 +22,7 @@ fi
 
 datediff=$(((expirydateepoch-currentdateepoch)/(60*60*24))) # diff per days
 
-if [ "$datediff" -lt 100 ] # launch renew 10 days before expiration
+if [ "$datediff" -lt 10 ] # launch renew 10 days before expiration
 then
     echo "time for update"
     exit 0
