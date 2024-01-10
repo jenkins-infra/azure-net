@@ -1,4 +1,4 @@
-name: "Bump lets_encrypt_dns_challenged_domains `expiry` date for trusted.ci"
+name: "Generate new letsencrypt certificate for trusted.ci"
 
 scms:
   default:
@@ -56,6 +56,7 @@ actions:
     kind: github/pullrequest
     scmid: default
     spec:
-      title: Bump lets_encrypt_dns_challenged_domains `expiry` date for trusted.ci {{ source "nextExpiry" }}
+      title: Generate new letsencrypt certificate for trusted.ci new expiration date  {{ source "nextExpiry" }}
+      description: paste this certicate output here https://github.com/jenkins-infra/jenkins-infra/blob/587d065d9fc609db2cd5ececc01a8159657a73fa/hieradata/clients/controller.trusted.ci.jenkins.io.yaml#L35
       labels:
         - terraform
