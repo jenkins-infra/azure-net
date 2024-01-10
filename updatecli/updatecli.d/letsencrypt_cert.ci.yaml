@@ -19,7 +19,7 @@ sources:
     spec:
       file: locals.tf
       path: 'locals.lets_encrypt_dns_challenged_domains'
-    transformers:
+    transformers: #  as per updatecli/updatecli#1859 need to use findsubmatch for now
       - findsubmatch:
           pattern: '"cert.ci.jenkins.io".*=.(.*)'
           captureindex: 1
@@ -43,7 +43,7 @@ conditions:
 targets:
   updateNextExpirycert:
     name: Update Terraform file `locals.tf` with new expiration date for cert.ci
-    kind: file
+    kind: file #  as per updatecli/updatecli#1859 need to use matchpattern and replacepattern for now
     sourceid: nextExpiry
     spec:
       file: locals.tf
