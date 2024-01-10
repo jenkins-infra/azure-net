@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # This script calculate next date for certificates
 ##
 set -eux -o pipefail

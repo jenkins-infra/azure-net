@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # This script calculate diff between dates for letsencrypt expiration
 set -eux -o pipefail
 
