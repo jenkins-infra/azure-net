@@ -57,5 +57,6 @@ actions:
     scmid: default
     spec:
       title: Bump lets_encrypt_dns_challenged_domains `expiry` date for cert.ci {{ source "nextExpiry" }}
+      description: paste certicate output here https://github.com/jenkins-infra/jenkins-infra/blob/587d065d9fc609db2cd5ececc01a8159657a73fa/hieradata/clients/controller.cert.ci.jenkins.io.yaml#L30
       labels:
         - terraform
