@@ -240,7 +240,7 @@ resource "azurerm_subnet" "public_jenkins_sponsorship_vnet_ci_jenkins_io_agents"
   name                 = "${azurerm_virtual_network.public_jenkins_sponsorship.name}-ci_jenkins_io_agents"
   resource_group_name  = azurerm_resource_group.public_jenkins_sponsorship.name
   virtual_network_name = azurerm_virtual_network.public_jenkins_sponsorship.name
-  address_prefixes     = ["10.200.2.0/24"] # 10.200.2.1 - 10.200.3.254
+  address_prefixes     = ["10.200.2.0/24"] # 10.200.2.1 - 10.200.2.254
 }
 resource "azurerm_subnet" "public_vnet_ci_jenkins_io_controller" {
   name                 = "${azurerm_virtual_network.public.name}-ci_jenkins_io_controller"
@@ -250,6 +250,13 @@ resource "azurerm_subnet" "public_vnet_ci_jenkins_io_controller" {
     "10.245.4.0/24", # 10.245.4.1 - 10.245.4.254
     "fd00:db8:deca::/64",
   ]
+}
+resource "azurerm_subnet" "ci_jenkins_io_controller_sponsorship" {
+  provider             = azurerm.jenkins-sponsorship
+  name                 = "${azurerm_virtual_network.public_jenkins_sponsorship.name}-ci_jenkins_io_controller"
+  resource_group_name  = azurerm_virtual_network.public_jenkins_sponsorship.resource_group_name
+  virtual_network_name = azurerm_virtual_network.public_jenkins_sponsorship.name
+  address_prefixes     = ["10.200.1.0/24"] # 10.200.1.1 - 10.200.1.254
 }
 
 # This subnet is reserved as "delegated" for the pgsql server on the public-db network
