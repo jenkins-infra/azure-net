@@ -15,12 +15,12 @@ scms:
 sources:
   currentExpiryTrusted:
     name: Get current lets_encrypt_dns_challenged_domains `expiry` date for trusted.ci
-    kind: terraform/file
+    kind: terraform/file #  as per updatecli/updatecli#1859 need to use terraform/file findsubmatch for now
     spec:
       file: locals.tf
       path: 'locals.lets_encrypt_dns_challenged_domains'
     transformers:
-      - findsubmatch:
+      - findsubmatch: #  as per updatecli/updatecli#1859 need to use terraform/file findsubmatch for now
           pattern: '"trusted.ci.jenkins.io".*=.(.*)'
           captureindex: 1
   nextExpiry:
