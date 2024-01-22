@@ -56,7 +56,6 @@ actions:
     kind: github/pullrequest
     scmid: default
     spec:
-      title: Generate new letsencrypt certificate for cert.ci new expiration date {{ source "nextExpiry" }}
-      description: paste this certicate output here https://github.com/jenkins-infra/jenkins-infra/blob/587d065d9fc609db2cd5ececc01a8159657a73fa/hieradata/clients/controller.cert.ci.jenkins.io.yaml#L30
+      title: Generate a new password for the Azure Service Principal "cert.ci.jenkins.io - Let's Encrypt" with (https://github.com/jenkins-infra/jenkins-infra/blob/d76e72a6c1ee06a0d321ed4d04c5d3e1b81d061d/hieradata/clients/controller.cert.ci.jenkins.io.yaml#L27)
       labels:
         - terraform
