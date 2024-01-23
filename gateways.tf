@@ -93,6 +93,8 @@ module "privatek8s_outbound" {
   vnet_name           = azurerm_virtual_network.private.name
   subnet_names = [
     azurerm_subnet.privatek8s_tier.name,
+    azurerm_subnet.privatek8s_release_tier.name,
+    azurerm_subnet.private_vnet_data_tier.name,
   ]
 }
 
