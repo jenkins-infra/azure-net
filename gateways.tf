@@ -84,3 +84,25 @@ module "ci_jenkins_io_outbound_sponsorship" {
     azurerm_subnet.public_jenkins_sponsorship_vnet_ci_jenkins_io_agents.name,
   ]
 }
+
+module "privatek8s_outbound" {
+  source = "./.shared-tools/terraform/modules/azure-nat-gateway"
+
+  name                = "privatek8s-outbound"
+  resource_group_name = azurerm_virtual_network.private.resource_group_name
+  vnet_name           = azurerm_virtual_network.private.name
+  subnet_names = [
+    azurerm_subnet.privatek8s_tier.name,
+  ]
+}
+
+module "publick8s_outbound" {
+  source = "./.shared-tools/terraform/modules/azure-nat-gateway"
+
+  name                = "publick8s-outbound"
+  resource_group_name = azurerm_virtual_network.public.resource_group_name
+  vnet_name           = azurerm_virtual_network.public.name
+  subnet_names = [
+    azurerm_subnet.publick8s_tier.name,
+  ]
+}
