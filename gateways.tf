@@ -105,7 +105,6 @@ module "publick8s_outbound" {
   resource_group_name = azurerm_virtual_network.public.resource_group_name
   vnet_name           = azurerm_virtual_network.public.name
   subnet_names = [
-    ## ## Commented for phase 1 of https://github.com/jenkins-infra/helpdesk/issues/3908#issuecomment-1905856702
-    # azurerm_subnet.publick8s_tier.name,
+    azurerm_subnet.publick8s_tier.name,
   ]
 }
