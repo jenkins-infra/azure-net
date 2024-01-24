@@ -96,6 +96,10 @@ module "privatek8s_outbound" {
 module "infra_ci_outbound_sponsorship" {
   source = "./.shared-tools/terraform/modules/azure-nat-gateway"
 
+  providers = {
+    azurerm = azurerm.jenkins-sponsorship
+  }
+
   name                = "infra-ci-outbound-sponsorship"
   resource_group_name = azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.resource_group_name
   vnet_name           = azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.name
