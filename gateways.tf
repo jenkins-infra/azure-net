@@ -26,9 +26,7 @@ module "cert_ci_jenkins_io_outbound_sponsorship" {
     azurerm_subnet.cert_ci_jenkins_io_sponsorship_ephemeral_agents.name,
   ]
 }
-####################################################################################
-## NAT gateway to allow outbound connection on a centralized and scalable appliance
-####################################################################################
+
 module "trusted_outbound" {
   source = "./.shared-tools/terraform/modules/azure-nat-gateway"
 
@@ -56,9 +54,6 @@ module "trusted_outbound_sponsorship" {
   ]
 }
 
-####################################################################################
-## NAT gateway to allow outbound connection on a centralized and scalable appliance
-####################################################################################
 module "ci_jenkins_io_outbound" {
   source = "./.shared-tools/terraform/modules/azure-nat-gateway"
 
@@ -95,6 +90,18 @@ module "privatek8s_outbound" {
     azurerm_subnet.privatek8s_tier.name,
     azurerm_subnet.privatek8s_release_tier.name,
     azurerm_subnet.private_vnet_data_tier.name,
+  ]
+}
+
+module "infra_ci_outbound_sponsorship" {
+  source = "./.shared-tools/terraform/modules/azure-nat-gateway"
+
+  name                = "infra-ci-outbound-sponsorship"
+  resource_group_name = azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.resource_group_name
+  vnet_name           = azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.name
+  subnet_names = [
+    azurerm_subnet.infra_ci_jenkins_io_sponsorship_ephemeral_agents.name,
+    azurerm_subnet.infra_ci_jenkins_io_sponsorship_packer_builds.name,
   ]
 }
 
