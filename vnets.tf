@@ -318,6 +318,29 @@ resource "azurerm_virtual_network_peering" "public_to_private" {
   allow_gateway_transit        = false
   use_remote_gateways          = false
 }
+
+resource "azurerm_virtual_network_peering" "private_to_public_sponsorship" {
+  name                         = "${azurerm_virtual_network.private.name}-to-${azurerm_virtual_network.public_jenkins_sponsorship.name}"
+  resource_group_name          = azurerm_virtual_network.private.resource_group_name
+  virtual_network_name         = azurerm_virtual_network.private.name
+  remote_virtual_network_id    = azurerm_virtual_network.public_jenkins_sponsorship.id
+  allow_virtual_network_access = true
+  allow_forwarded_traffic      = false
+  allow_gateway_transit        = false
+  use_remote_gateways          = false
+}
+resource "azurerm_virtual_network_peering" "public_sponsorship_to_private" {
+  provider                     = azurerm.jenkins-sponsorship
+  name                         = "${azurerm_virtual_network.public_jenkins_sponsorship.name}-to-${azurerm_virtual_network.private.name}"
+  resource_group_name          = azurerm_virtual_network.public_jenkins_sponsorship.resource_group_name
+  virtual_network_name         = azurerm_virtual_network.public_jenkins_sponsorship.name
+  remote_virtual_network_id    = azurerm_virtual_network.private.id
+  allow_virtual_network_access = true
+  allow_forwarded_traffic      = false
+  allow_gateway_transit        = false
+  use_remote_gateways          = false
+}
+
 resource "azurerm_virtual_network_peering" "public_to_public_db" {
   name                         = "${azurerm_virtual_network.public.name}-to-${azurerm_virtual_network.public_db.name}"
   resource_group_name          = azurerm_virtual_network.public.resource_group_name
