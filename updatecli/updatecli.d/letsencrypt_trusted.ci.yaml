@@ -57,6 +57,6 @@ actions:
     scmid: default
     spec:
       title: Generate new letsencrypt certificate for trusted.ci new expiration date  {{ source "nextExpiry" }}
-      description: Generate a new password for the Azure Service Principal "trusted.ci.jenkins.io - Let's Encrypt". Set the new password value in the following encrypted file: <https://github.com/jenkins-infra/jenkins-infra/blob/48cccaf73204026274c783da5a8f22db1b2c18bb/hieradata/clients/controller.trusted.ci.jenkins.io.yaml#L32> (open a PR : https://github.com/jenkins-infra/jenkins-infra/edit/production/hieradata/clients/controller.trusted.ci.jenkins.io.yaml).
+      description: Generate a new password for the Azure Service Principal `trusted.ci.jenkins.io - Let's Encrypt`. Set the new password value in the following encrypted file: <https://github.com/jenkins-infra/jenkins-infra/blob/48cccaf73204026274c783da5a8f22db1b2c18bb/hieradata/clients/controller.trusted.ci.jenkins.io.yaml#L32> (open a PR : https://github.com/jenkins-infra/jenkins-infra/edit/production/hieradata/clients/controller.trusted.ci.jenkins.io.yaml).
       labels:
         - terraform
