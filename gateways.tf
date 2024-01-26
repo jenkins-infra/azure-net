@@ -77,6 +77,7 @@ module "ci_jenkins_io_outbound_sponsorship" {
   vnet_name           = azurerm_virtual_network.public_jenkins_sponsorship.name
   subnet_names = [
     azurerm_subnet.public_jenkins_sponsorship_vnet_ci_jenkins_io_agents.name,
+    azurerm_subnet.ci_jenkins_io_controller_sponsorship.name,
   ]
 }
 
