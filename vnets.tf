@@ -215,7 +215,7 @@ resource "azurerm_subnet" "privatek8s_infra_ci_controller_tier" {
 }
 
 # Dedicated subnet for the private nodes of the "privatek8s" for the controller releaseci AKS cluster resources
-resource "azurerm_subnet" "privatek8s_infra_ci_controller_tier" {
+resource "azurerm_subnet" "privatek8s_release_ci_controller_tier" {
   name                 = "privatek8s-releaseci-ctrl-tier"
   resource_group_name  = azurerm_resource_group.private.name
   virtual_network_name = azurerm_virtual_network.private.name
