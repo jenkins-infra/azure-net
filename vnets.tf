@@ -224,8 +224,6 @@ resource "azurerm_subnet" "privatek8s_infra_ci_controller_tier" {
   service_endpoints = ["Microsoft.KeyVault", "Microsoft.Storage"]
 }
 
-
-
 # Dedicated subnet for the  "publick8s" AKS cluster resources
 ## Important: the "terraform-production" Enterprise Application used by this repo pipeline needs to be able to manage this virtual network.
 ## See the corresponding role assignment for this vnet added in the (private) terraform-state repo:
