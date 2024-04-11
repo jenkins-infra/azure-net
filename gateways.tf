@@ -52,6 +52,7 @@ module "trusted_outbound_sponsorship" {
   subnet_names = [
     azurerm_subnet.trusted_ci_jenkins_io_sponsorship_ephemeral_agents.name,
   ]
+  outbound_ip_count = 3
 }
 
 module "ci_jenkins_io_outbound" {
