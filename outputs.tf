@@ -1,5 +1,5 @@
 ######################################################## Gateways Outbound IPs
-output "cert_ci_outbound_ip_list" {
+output "cert_ci_outbound_ips" {
   value = module.cert_ci_jenkins_io_outbound.public_ip_list
 }
 output "cert_ci_sponsorship_outbound_ip_list" {
