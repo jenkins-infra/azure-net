@@ -209,7 +209,7 @@ resource "azurerm_subnet" "privatek8s_infra_ci_controller_tier" {
   name                 = "privatek8s-infraci-ctrl-tier"
   resource_group_name  = azurerm_resource_group.private.name
   virtual_network_name = azurerm_virtual_network.private.name
-  address_prefixes     = ["10.250.0.128/28"] # from 10.250.0.128 to 10.250.0.143
+  address_prefixes     = ["10.250.0.128/27"] # from 10.250.0.128 to 10.250.0.159
   # Enable KeyVault and Storage service endpoints so the cluster can access secrets to update other clusters
   service_endpoints = ["Microsoft.KeyVault", "Microsoft.Storage"]
 }
@@ -219,7 +219,7 @@ resource "azurerm_subnet" "privatek8s_release_ci_controller_tier" {
   name                 = "privatek8s-releaseci-ctrl-tier"
   resource_group_name  = azurerm_resource_group.private.name
   virtual_network_name = azurerm_virtual_network.private.name
-  address_prefixes     = ["10.250.0.144/28"] # from 10.250.0.144 to 10.250.0.159
+  address_prefixes     = ["10.250.0.160/27"] # from 10.250.0.160 to 10.250.0.191
   # Enable KeyVault and Storage service endpoints so the cluster can access secrets to update other clusters
   service_endpoints = ["Microsoft.KeyVault", "Microsoft.Storage"]
 }
