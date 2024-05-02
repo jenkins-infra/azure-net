@@ -166,6 +166,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
   for_each = {
     "accounts"            = "accountapp for Jenkins users"
     "contributors.origin" = "Jenkins Contributors Spotlight website content origin for Fastly CDN"
+    "docs.origin"         = "Versioned docs of jenkins.io content origin for Fastly CDN"
     "fallback.get"        = "Fallback address for mirrorbits" # Note: had a TTL of 10 minutes before, not 1 hour
     "get"                 = "Jenkins binary distribution via mirrorbits"
     "incrementals"        = "incrementals publisher to incrementals Maven repository"
@@ -305,6 +306,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_fastly" {
   # Map of records and corresponding purposes
   for_each = {
     "contributors" = "Jenkins Contributors Spotlight website",
+    "docs"         = "Versioned docs of jenkins.io",
     "pkg"          = "Website to download Jenkins packages",
     "plugins"      = "Website to browse and download Jenkins plugins",
     "stories"      = "Website with Jenkins User stories and testimonies",
