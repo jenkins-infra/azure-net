@@ -92,6 +92,7 @@ module "privatek8s_outbound" {
     azurerm_subnet.privatek8s_tier.name,
     azurerm_subnet.privatek8s_release_tier.name,
     azurerm_subnet.private_vnet_data_tier.name,
+    azurerm_subnet.privatek8s_infra_ci_controller_tier.name,
   ]
 }
 
