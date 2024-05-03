@@ -110,6 +110,8 @@ module "infra_ci_outbound_sponsorship" {
     azurerm_subnet.infra_ci_jenkins_io_sponsorship_ephemeral_agents.name,
     azurerm_subnet.infra_ci_jenkins_io_sponsorship_packer_builds.name,
   ]
+
+  outbound_ip_count = 2
 }
 
 module "publick8s_outbound" {
