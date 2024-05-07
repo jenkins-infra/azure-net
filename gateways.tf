@@ -81,6 +81,8 @@ module "ci_jenkins_io_outbound_sponsorship" {
     azurerm_subnet.ci_jenkins_io_controller_sponsorship.name,
     azurerm_subnet.ci_jenkins_io_kubernetes_sponsorship.name,
   ]
+
+  outbound_ip_count = 2
 }
 
 module "privatek8s_outbound" {
