@@ -278,6 +278,13 @@ resource "azurerm_subnet" "ci_jenkins_io_controller_sponsorship" {
   virtual_network_name = azurerm_virtual_network.public_jenkins_sponsorship.name
   address_prefixes     = ["10.200.1.0/24"] # 10.200.1.1 - 10.200.1.254
 }
+resource "azurerm_subnet" "ci_jenkins_io_kubernetes_sponsorship" {
+  provider             = azurerm.jenkins-sponsorship
+  name                 = "${azurerm_virtual_network.public_jenkins_sponsorship.name}-ci_jenkins_io_kubernetes"
+  resource_group_name  = azurerm_virtual_network.public_jenkins_sponsorship.resource_group_name
+  virtual_network_name = azurerm_virtual_network.public_jenkins_sponsorship.name
+  address_prefixes     = ["10.201.0.0/24"] # 10.201.0.0 - 10.201.0.254
+}
 
 # This subnet is reserved as "delegated" for the pgsql server on the public-db network
 # Ref. https://docs.microsoft.com/en-us/azure/postgresql/flexible-server/concepts-networking
