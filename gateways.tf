@@ -79,8 +79,7 @@ module "ci_jenkins_io_outbound_sponsorship" {
   subnet_names = [
     azurerm_subnet.public_jenkins_sponsorship_vnet_ci_jenkins_io_agents.name,
     azurerm_subnet.ci_jenkins_io_controller_sponsorship.name,
-    ## TODO: uncomment once the subnet is created to avoid "not found" errors
-    # azurerm_subnet.ci_jenkins_io_kubernetes_sponsorship.name,
+    azurerm_subnet.ci_jenkins_io_kubernetes_sponsorship.name,
   ]
 }
 
