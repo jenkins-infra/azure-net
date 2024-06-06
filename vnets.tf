@@ -158,7 +158,7 @@ resource "azurerm_virtual_network" "public_db" {
   name                = "${azurerm_resource_group.public.name}-db-vnet"
   location            = azurerm_resource_group.public.location
   resource_group_name = azurerm_resource_group.public.name
-  address_space       = ["10.253.0.0/21"] # 10.10.253.0.1 - 10.253.7.254
+  address_space       = ["10.253.0.0/21"] # 10.253.0.1 - 10.253.7.254
   tags                = local.default_tags
 }
 

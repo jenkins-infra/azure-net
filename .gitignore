@@ -11,3 +11,4 @@
 backend-config
 terraform-plan-output.txt
 tfplan
+jenkins-infra-data-reports/
