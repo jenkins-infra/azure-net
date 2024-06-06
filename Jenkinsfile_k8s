@@ -1,3 +1,5 @@
+@Library('pipeline-library@pull/862/head') _
+
 parallel(
   failFast: false,
   'terraform': {
@@ -28,6 +30,7 @@ parallel(
           variable: 'BACKEND_CONFIG_FILE',
         ),
       ],
+      publishReports: ['jenkins-infra-data-reports/azure-net.json'],
     )
   },
   'updatecli': {
