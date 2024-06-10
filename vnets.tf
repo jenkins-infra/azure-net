@@ -287,7 +287,7 @@ resource "azurerm_subnet" "ci_jenkins_io_kubernetes_sponsorship" {
 }
 resource "azurerm_subnet" "infra_ci_jenkins_io_kubernetes_agent_sponsorship" {
   provider             = azurerm.jenkins-sponsorship
-  name                 = "${azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.name}-infraci_jenkins_io_kubernetes-agent"
+  name                 = "${azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.name}-kubernetes-agents"
   resource_group_name  = azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.resource_group_name
   virtual_network_name = azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.name
   address_prefixes     = ["10.206.2.0/24"] # 10.206.2.0 - 10.206.2.254
