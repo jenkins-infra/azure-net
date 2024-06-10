@@ -112,6 +112,7 @@ module "infra_ci_outbound_sponsorship" {
   subnet_names = [
     azurerm_subnet.infra_ci_jenkins_io_sponsorship_ephemeral_agents.name,
     azurerm_subnet.infra_ci_jenkins_io_sponsorship_packer_builds.name,
+    azurerm_subnet.infra_ci_jenkins_io_kubernetes_agent_sponsorship.name,
   ]
 
   outbound_ip_count = 2
