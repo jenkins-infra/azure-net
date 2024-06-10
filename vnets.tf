@@ -149,7 +149,7 @@ resource "azurerm_virtual_network" "infra_ci_jenkins_io_sponsorship" {
   name                = "${azurerm_resource_group.infra_ci_jenkins_io_sponsorship.name}-vnet"
   location            = azurerm_resource_group.infra_ci_jenkins_io_sponsorship.location
   resource_group_name = azurerm_resource_group.infra_ci_jenkins_io_sponsorship.name
-  address_space       = ["10.206.0.0/23"] # 10.206.0.1 - 10.206.1.254
+  address_space       = ["10.206.0.0/22"] # 10.206.0.1 - 10.206.3.254
   tags                = local.default_tags
 }
 
@@ -284,6 +284,13 @@ resource "azurerm_subnet" "ci_jenkins_io_kubernetes_sponsorship" {
   resource_group_name  = azurerm_virtual_network.public_jenkins_sponsorship.resource_group_name
   virtual_network_name = azurerm_virtual_network.public_jenkins_sponsorship.name
   address_prefixes     = ["10.201.0.0/24"] # 10.201.0.0 - 10.201.0.254
+}
+resource "azurerm_subnet" "infra_ci_jenkins_io_kubernetes_agent_sponsorship" {
+  provider             = azurerm.jenkins-sponsorship
+  name                 = "${azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.name}-infraci_jenkins_io_kubernetes-agent"
+  resource_group_name  = azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.resource_group_name
+  virtual_network_name = azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.name
+  address_prefixes     = ["10.206.2.0/24"] # 10.206.2.0 - 10.206.2.254
 }
 
 # This subnet is reserved as "delegated" for the pgsql server on the public-db network
