@@ -18,6 +18,17 @@ resource "local_file" "jenkins_infra_data_report" {
     "publick8s.jenkins.io" = {
       "outbound_ips" = split(",", module.publick8s_outbound.public_ip_list),
     },
+    "vnets" = {
+      "public-vnet"                            = azurerm_virtual_network.public.address_space,
+      "public-jenkins-sponsorship-vnet"        = azurerm_virtual_network.public_jenkins_sponsorship.address_space,
+      "private-vnet"                           = azurerm_virtual_network.private.address_space,
+      "trusted-ci-jenkins-io-vnet"             = azurerm_virtual_network.trusted_ci_jenkins_io.address_space,
+      "trusted-ci-jenkins-io-sponsorship-vnet" = azurerm_virtual_network.trusted_ci_jenkins_io_sponsorship.address_space,
+      "cert-ci-jenkins-io-vnet"                = azurerm_virtual_network.cert_ci_jenkins_io.address_space,
+      "cert-ci-jenkins-io-sponsorship-vnet"    = azurerm_virtual_network.cert_ci_jenkins_io_sponsorship.address_space,
+      "infra-ci-jenkins-io-sponsorship-vnet"   = azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.address_space,
+      "public-db-vnet"                         = azurerm_virtual_network.public_db.address_space,
+    }
   })
   filename = "${path.module}/jenkins-infra-data-reports/azure-net.json"
 }
