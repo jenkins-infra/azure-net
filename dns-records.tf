@@ -158,6 +158,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
     "incrementals"        = "incrementals publisher to incrementals Maven repository"
     "javadoc"             = "Jenkins Javadoc"
     "mirrors"             = "Jenkins binary distribution via mirrorbits"
+    "new.stats"           = "New Jenkins Statistics website"
     "plugin-health"       = "Plugin Health Scoring application"
     "plugin-site-issues"  = "Plugins website API content origin for Fastly CDN"
     "plugins.origin"      = "Plugins website content origin for Fastly CDN"
