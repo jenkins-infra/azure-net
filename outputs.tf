@@ -13,11 +13,17 @@ resource "local_file" "jenkins_infra_data_report" {
       "outbound_ips" = concat(split(",", module.infra_ci_outbound_sponsorship.public_ip_list), split(",", module.privatek8s_outbound.public_ip_list)),
     },
     "privatek8s.jenkins.io" = {
-      "outbound_ips" = split(",", module.publick8s_outbound.public_ip_list),
+      "outbound_ips" = split(",", module.privatek8s_outbound.public_ip_list),
     },
     "publick8s.jenkins.io" = {
       "outbound_ips" = split(",", module.publick8s_outbound.public_ip_list),
     },
+    "cijenkinsioagents1.jenkins.io" = {
+      "outbound_ips" = split(",", module.ci_jenkins_io_outbound_sponsorship.public_ip_list),
+    }
+    "infracijenkinsioagents1.jenkins.io" = {
+      "outbound_ips" = split(",", module.infra_ci_outbound_sponsorship.public_ip_list),
+    }
     "vnets" = {
       "cert-ci-jenkins-io-sponsorship-vnet"    = azurerm_virtual_network.cert_ci_jenkins_io_sponsorship.address_space,
       "cert-ci-jenkins-io-vnet"                = azurerm_virtual_network.cert_ci_jenkins_io.address_space,
