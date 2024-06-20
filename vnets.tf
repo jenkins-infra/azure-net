@@ -378,6 +378,7 @@ resource "azurerm_virtual_network_peering" "public_sponsorship_to_private" {
 }
 
 resource "azurerm_virtual_network_peering" "infraci_jenkins_sponsorship_to_public_sponsorship" {
+  provider                     = azurerm.jenkins-sponsorship
   name                         = "${azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.name}-to-${azurerm_virtual_network.public_jenkins_sponsorship.name}"
   resource_group_name          = azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.resource_group_name
   virtual_network_name         = azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.name
