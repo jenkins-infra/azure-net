@@ -291,6 +291,8 @@ resource "azurerm_subnet" "infra_ci_jenkins_io_kubernetes_agent_sponsorship" {
   resource_group_name  = azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.resource_group_name
   virtual_network_name = azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.name
   address_prefixes     = ["10.206.2.0/24"] # 10.206.2.0 - 10.206.2.254
+  # Enable KeyVault and Storage service endpoints so agents can access Storage Account through internal routes + secrets
+  service_endpoints = ["Microsoft.KeyVault", "Microsoft.Storage"]
 }
 
 # This subnet is reserved as "delegated" for the pgsql server on the public-db network
