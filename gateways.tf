@@ -100,8 +100,7 @@ module "privatek8s_outbound" {
     module.private_vnet.subnets["privatek8s-release-tier"],
     module.private_vnet.subnets["private-vnet-data-tier"],
     module.private_vnet.subnets["privatek8s-infraci-ctrl-tier"],
-    ## TODO: uncomment to move release.ci controller under the NAT gateway outbound method
-    # module.private_vnet.subnets["privatek8s-releaseci-ctrl-tier"],
+    module.private_vnet.subnets["privatek8s-releaseci-ctrl-tier"],
   ]
 }
 
