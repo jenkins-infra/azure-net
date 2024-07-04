@@ -25,15 +25,15 @@ resource "local_file" "jenkins_infra_data_report" {
       "outbound_ips" = split(",", module.infra_ci_outbound_sponsorship.public_ip_list),
     }
     "vnets" = {
-      "cert-ci-jenkins-io-sponsorship-vnet"    = azurerm_virtual_network.cert_ci_jenkins_io_sponsorship.address_space,
-      "cert-ci-jenkins-io-vnet"                = azurerm_virtual_network.cert_ci_jenkins_io.address_space,
-      "infra-ci-jenkins-io-sponsorship-vnet"   = azurerm_virtual_network.infra_ci_jenkins_io_sponsorship.address_space,
-      "private-vnet"                           = azurerm_virtual_network.private.address_space,
-      "public-db-vnet"                         = azurerm_virtual_network.public_db.address_space,
-      "public-jenkins-sponsorship-vnet"        = azurerm_virtual_network.public_jenkins_sponsorship.address_space,
-      "public-vnet"                            = azurerm_virtual_network.public.address_space,
-      "trusted-ci-jenkins-io-sponsorship-vnet" = azurerm_virtual_network.trusted_ci_jenkins_io_sponsorship.address_space,
-      "trusted-ci-jenkins-io-vnet"             = azurerm_virtual_network.trusted_ci_jenkins_io.address_space,
+      "cert-ci-jenkins-io-sponsorship-vnet"    = module.cert_ci_jenkins_io_sponsorship_vnet.vnet_address_space,
+      "cert-ci-jenkins-io-vnet"                = module.cert_ci_jenkins_io_vnet.vnet_address_space,
+      "infra-ci-jenkins-io-sponsorship-vnet"   = module.infra_ci_jenkins_io_sponsorship_vnet.vnet_address_space,
+      "private-vnet"                           = module.private_vnet.vnet_address_space,
+      "public-db-vnet"                         = module.public_db_vnet.vnet_address_space,
+      "public-jenkins-sponsorship-vnet"        = module.public_sponsorship_vnet.vnet_address_space,
+      "public-vnet"                            = module.public_vnet.vnet_address_space,
+      "trusted-ci-jenkins-io-sponsorship-vnet" = module.trusted_ci_jenkins_io_sponsorship_vnet.vnet_address_space,
+      "trusted-ci-jenkins-io-vnet"             = module.trusted_ci_jenkins_io_vnet.vnet_address_space,
     }
   })
   filename = "${path.module}/jenkins-infra-data-reports/azure-net.json"
