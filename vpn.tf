@@ -23,13 +23,13 @@ resource "azurerm_dns_a_record" "vpn" {
 }
 
 resource "azurerm_network_interface" "main" {
-  name                = "${azurerm_virtual_network.private.name}-vpn-nic-main"
+  name                = "${module.private_vnet.vnet_name}-vpn-nic-main"
   location            = azurerm_resource_group.vpn.location
   resource_group_name = azurerm_resource_group.vpn.name
 
   ip_configuration {
     name                          = "main"
-    subnet_id                     = azurerm_subnet.dmz.id
+    subnet_id                     = module.private_vnet.subnets["private-vnet-dmz"]
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.public.id
   }
@@ -38,13 +38,13 @@ resource "azurerm_network_interface" "main" {
 }
 
 resource "azurerm_network_interface" "internal" {
-  name                = "${azurerm_virtual_network.private.name}-vpn-nic-internal"
+  name                = "${module.private_vnet.vnet_name}-vpn-nic-internal"
   location            = azurerm_resource_group.vpn.location
   resource_group_name = azurerm_resource_group.vpn.name
 
   ip_configuration {
     name                          = "internal"
-    subnet_id                     = azurerm_subnet.private_vnet_data_tier.id
+    subnet_id                     = module.private_vnet.subnets["private-vnet-data-tier"]
     private_ip_address_allocation = "Dynamic"
   }
 
@@ -63,7 +63,7 @@ resource "azurerm_network_security_rule" "allow_ssh_from_admins_to_vpn" {
   destination_port_range      = "22"
   source_address_prefixes     = each.value
   destination_address_prefix  = azurerm_network_interface.main.private_ip_address
-  resource_group_name         = azurerm_resource_group.private.name
+  resource_group_name         = module.private_vnet.vnet_rg_name
   network_security_group_name = azurerm_network_security_group.private_dmz.name
 }
 
@@ -77,7 +77,7 @@ resource "azurerm_network_security_rule" "allow_openvpn_from_internet_to_vpn" {
   destination_port_range      = "443"
   source_address_prefix       = "Internet"
   destination_address_prefix  = azurerm_network_interface.main.private_ip_address
-  resource_group_name         = azurerm_resource_group.private.name
+  resource_group_name         = module.private_vnet.vnet_rg_name
   network_security_group_name = azurerm_network_security_group.private_dmz.name
 }
 
@@ -93,7 +93,7 @@ resource "azurerm_network_security_rule" "allow_puppet_from_vpn_to_puppetmasters
   destination_port_range      = "8140"
   source_address_prefix       = azurerm_network_interface.main.private_ip_address
   destination_address_prefix  = azurerm_network_interface.main.private_ip_address
-  resource_group_name         = azurerm_resource_group.private.name
+  resource_group_name         = module.private_vnet.vnet_rg_name
   network_security_group_name = azurerm_network_security_group.private_dmz.name
 }
 
@@ -107,12 +107,12 @@ resource "azurerm_network_security_rule" "allow_https_from_vpn_to_Internet" {
   destination_port_range      = "443"
   source_address_prefix       = azurerm_network_interface.main.private_ip_address
   destination_address_prefix  = "Internet"
-  resource_group_name         = azurerm_resource_group.private.name
+  resource_group_name         = module.private_vnet.vnet_rg_name
   network_security_group_name = azurerm_network_security_group.private_dmz.name
 }
 
 resource "azurerm_linux_virtual_machine" "vpn" {
-  name                = "${azurerm_virtual_network.private.name}-vpn"
+  name                = "${module.private_vnet.vnet_name}-vpn"
   resource_group_name = azurerm_resource_group.vpn.name
   location            = azurerm_resource_group.vpn.location
   size                = "Standard_B2s"
