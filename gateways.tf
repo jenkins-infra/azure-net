@@ -88,7 +88,7 @@ module "ci_jenkins_io_outbound_sponsorship" {
     module.public_sponsorship_vnet.subnets["public-jenkins-sponsorship-vnet-ci_jenkins_io_kubernetes"],
   ]
 
-  outbound_ip_count = 2
+  outbound_ip_count = 4
 }
 
 module "privatek8s_outbound" {
