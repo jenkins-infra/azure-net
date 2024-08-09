@@ -1,4 +1,7 @@
-properties([pipelineTriggers([cron('@daily')])])
+if (env.BRANCH_IS_PRIMARY) {
+    // Only trigger a daily check on the principal branch
+    properties([pipelineTriggers([cron('@daily')])])
+}
 
 terraform(
   stagingCredentials: [
