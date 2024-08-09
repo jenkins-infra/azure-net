@@ -1,3 +1,5 @@
+properties([pipelineTriggers([cron('@daily')])])
+
 terraform(
   stagingCredentials: [
     azureServicePrincipal(
