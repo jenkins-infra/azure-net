@@ -189,6 +189,19 @@ module "public_sponsorship_vnet" {
       delegations       = {}
     },
     {
+      name              = "public-jenkins-sponsorship-vnet-ci_jenkins_io_aci"
+      address_prefixes  = ["10.200.3.0/24"] # 10.200.3.1 - 10.200.3.254
+      service_endpoints = []
+      delegations = {
+        "aci" = {
+          service_delegations = [{
+            name    = "Microsoft.ContainerInstance/containerGroups"
+            actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
+          }]
+        }
+      }
+    },
+    {
       name              = "public-jenkins-sponsorship-vnet-ci_jenkins_io_controller"
       address_prefixes  = ["10.200.1.0/24"] # 10.200.1.1 - 10.200.1.254
       service_endpoints = []

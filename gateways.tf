@@ -86,6 +86,7 @@ module "ci_jenkins_io_outbound_sponsorship" {
     module.public_sponsorship_vnet.subnets["public-jenkins-sponsorship-vnet-ci_jenkins_io_agents"],
     module.public_sponsorship_vnet.subnets["public-jenkins-sponsorship-vnet-ci_jenkins_io_controller"],
     module.public_sponsorship_vnet.subnets["public-jenkins-sponsorship-vnet-ci_jenkins_io_kubernetes"],
+    module.public_sponsorship_vnet.subnets["public-jenkins-sponsorship-vnet-ci_jenkins_io_aci"],
   ]
 
   outbound_ip_count = 4
