@@ -163,7 +163,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
     "plugin-site-issues"  = "Plugins website API content origin for Fastly CDN"
     "plugins.origin"      = "Plugins website content origin for Fastly CDN"
     "rating"              = "Jenkins releases rating service"
-    "repo.azure"          = "artifact-caching-proxy on Azure"
     "reports"             = "Public reports about Jenkins services and components consumed by RPU, plugins website and others"
     "uplink"              = "Jenkins telemetry service"
     "weekly.ci"           = "Jenkins Weekly demo controller"
