@@ -120,7 +120,7 @@ resource "azurerm_dns_a_record" "ldap_jenkins_io" {
   })
 }
 
-# A record for the legacy Update Center in AWS CloudBees account
+# Records for the legacy Update Center in AWS CloudBees account
 resource "azurerm_dns_a_record" "aws_updates_jenkins_io" {
   name                = "aws.updates"
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
@@ -130,6 +130,21 @@ resource "azurerm_dns_a_record" "aws_updates_jenkins_io" {
 
   tags = merge(local.default_tags, {
     purpose = "Jenkins AWS-hosted Update Center"
+  })
+}
+import {
+  to = azurerm_dns_cname_record.updates_jenkins_io
+  id = "/subscriptions/dff2ec18-6a8e-405c-8e45-b7df7465acf0/resourceGroups/proddns_jenkinsio/providers/Microsoft.Network/dnsZones/jenkins.io/CNAME/updates"
+}
+resource "azurerm_dns_cname_record" "updates_jenkins_io" {
+  name                = "updates"
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 60
+  record              = "azure.updates.jenkins.io"
+
+  tags = merge(local.default_tags, {
+    purpose = "Jenkins Update Center"
   })
 }
 
