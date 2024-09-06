@@ -141,7 +141,7 @@ resource "azurerm_dns_cname_record" "updates_jenkins_io" {
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 60
-  record              = "azure.updates.jenkins.io"
+  record              = "aws.updates.jenkins.io"
 
   tags = merge(local.default_tags, {
     purpose = "Jenkins Update Center"
