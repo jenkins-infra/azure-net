@@ -120,6 +120,19 @@ resource "azurerm_dns_a_record" "ldap_jenkins_io" {
   })
 }
 
+# A record for the legacy Update Center in AWS CloudBees account
+resource "azurerm_dns_a_record" "aws_updates_jenkins_io" {
+  name                = "aws.updates"
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 60
+  records             = ["52.202.51.185"]
+
+  tags = merge(local.default_tags, {
+    purpose = "Jenkins AWS-hosted Update Center"
+  })
+}
+
 ## jenkinsistheway.io DNS zone records
 # Apex records for the jenkinsistheway.io redirector hosted on publick8s redirecting to stories.jenkins.io
 resource "azurerm_dns_a_record" "jenkinsistheway_io" {
@@ -147,10 +160,19 @@ resource "azurerm_dns_aaaa_record" "jenkinsistheway_io_ipv6" {
 
 ### CNAME records
 # CNAME records targeting the public-nginx on publick8s cluster
+import {
+  to = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["azure.updates"]
+  id = "/subscriptions/dff2ec18-6a8e-405c-8e45-b7df7465acf0/resourceGroups/proddns_jenkinsio/providers/Microsoft.Network/dnsZones/jenkins.io/CNAME/azure.updates"
+}
+import {
+  to = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["mirrors.updates"]
+  id = "/subscriptions/dff2ec18-6a8e-405c-8e45-b7df7465acf0/resourceGroups/proddns_jenkinsio/providers/Microsoft.Network/dnsZones/jenkins.io/CNAME/mirrors.updates"
+}
 resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
   # Map of records and corresponding purposes
   for_each = {
     "accounts"            = "accountapp for Jenkins users"
+    "azure.updates"       = "Update Center hosted on Azure (Apache redirections service)"
     "contributors.origin" = "Jenkins Contributors Spotlight website content origin for Fastly CDN"
     "docs.origin"         = "Versioned docs of jenkins.io content origin for Fastly CDN"
     "fallback.get"        = "Fallback address for mirrorbits" # Note: had a TTL of 10 minutes before, not 1 hour
@@ -158,6 +180,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
     "incrementals"        = "incrementals publisher to incrementals Maven repository"
     "javadoc"             = "Jenkins Javadoc"
     "mirrors"             = "Jenkins binary distribution via mirrorbits"
+    "mirrors.updates"     = "Update Center hosted on Azure (Mirrorbits redirections service)"
     "new.stats"           = "New Jenkins Statistics website"
     "plugin-health"       = "Plugin Health Scoring application"
     "plugin-site-issues"  = "Plugins website API content origin for Fastly CDN"
@@ -181,12 +204,33 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
   })
 }
 # CNAME records for the legacy domain jenkins-ci.org, pointing to their modern counterpart
-resource "azurerm_dns_cname_record" "jenkinsciorg_target_public_publick8s" {
+moved {
+  from = azurerm_dns_cname_record.jenkinsciorg_target_public_publick8s["accounts"]
+  to   = azurerm_dns_cname_record.jenkinsciorg_target_jenkinsio["accounts"]
+}
+moved {
+  from = azurerm_dns_cname_record.jenkinsciorg_target_public_publick8s["javadoc"]
+  to   = azurerm_dns_cname_record.jenkinsciorg_target_jenkinsio["javadoc"]
+}
+moved {
+  from = azurerm_dns_cname_record.jenkinsciorg_target_public_publick8s["mirrors"]
+  to   = azurerm_dns_cname_record.jenkinsciorg_target_jenkinsio["mirrors"]
+}
+moved {
+  from = azurerm_dns_cname_record.jenkinsciorg_target_public_publick8s["wiki"]
+  to   = azurerm_dns_cname_record.jenkinsciorg_target_jenkinsio["wiki"]
+}
+import {
+  to = azurerm_dns_cname_record.jenkinsciorg_target_jenkinsio["updates"]
+  id = "/subscriptions/dff2ec18-6a8e-405c-8e45-b7df7465acf0/resourceGroups/proddns_jenkinsci/providers/Microsoft.Network/dnsZones/jenkins-ci.org/CNAME/updates"
+}
+resource "azurerm_dns_cname_record" "jenkinsciorg_target_jenkinsio" {
   # Map of records and corresponding purposes. Some records only exists in jenkins.io as jenkins-ci.org is only legacy
   for_each = {
     "accounts" = "accountapp for Jenkins users"
     "javadoc"  = "Jenkins Javadoc"
     "mirrors"  = "Jenkins binary distribution via mirrorbits"
+    "updates"  = "Jenkins Update Center"
     "wiki"     = "Static Wiki Confluence export"
   }
 
