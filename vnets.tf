@@ -196,7 +196,7 @@ module "public_sponsorship_vnet" {
         "aci" = {
           service_delegations = [{
             name    = "Microsoft.ContainerInstance/containerGroups"
-            actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
+            actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
           }]
         }
       }
