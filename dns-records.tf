@@ -49,64 +49,6 @@ resource "azurerm_dns_aaaa_record" "jenkinsciorg" {
   })
 }
 
-# CAA records to restrict Certificate Authorities
-resource "azurerm_dns_caa_record" "jenkins_caa" {
-  for_each = {
-    "${data.azurerm_dns_zone.jenkinsio.name}"    = "${data.azurerm_dns_zone.jenkinsio.resource_group_name}",
-    "${data.azurerm_dns_zone.jenkinsciorg.name}" = "${data.azurerm_dns_zone.jenkinsciorg.resource_group_name}",
-  }
-  name                = "@"
-  zone_name           = each.key
-  resource_group_name = each.value
-  ttl                 = 60
-
-  record {
-    flags = 0
-    tag   = "issue"
-    value = "letsencrypt.org"
-  }
-
-  record {
-    flags = 0
-    tag   = "issue"
-    value = "godaddy.com"
-  }
-
-  record {
-    flags = 0
-    tag   = "issue"
-    value = "amazon.com"
-  }
-
-  record {
-    flags = 0
-    tag   = "issue"
-    value = "globalsign.com"
-  }
-
-  record {
-    flags = 0
-    tag   = "issue"
-    value = "digicert.com; cansignhttpexchanges=yes"
-  }
-
-  record {
-    flags = 0
-    tag   = "issue"
-    value = "sectigo.com"
-  }
-
-  record {
-    flags = 0
-    tag   = "issue"
-    value = "pki.goog; cansignhttpexchanges=yes"
-  }
-
-  tags = merge(local.default_tags, {
-    purpose = "Jenkins user authentication service"
-  })
-}
-
 # A record for ldap.jenkins.io pointing to its own public LB IP from publick8s cluster
 resource "azurerm_dns_a_record" "ldap_jenkins_io" {
   name                = "ldap"
@@ -131,10 +73,6 @@ resource "azurerm_dns_a_record" "aws_updates_jenkins_io" {
   tags = merge(local.default_tags, {
     purpose = "Jenkins AWS-hosted Update Center"
   })
-}
-import {
-  to = azurerm_dns_cname_record.updates_jenkins_io
-  id = "/subscriptions/dff2ec18-6a8e-405c-8e45-b7df7465acf0/resourceGroups/proddns_jenkinsio/providers/Microsoft.Network/dnsZones/jenkins.io/CNAME/updates"
 }
 resource "azurerm_dns_cname_record" "updates_jenkins_io" {
   name                = "updates"
@@ -175,14 +113,6 @@ resource "azurerm_dns_aaaa_record" "jenkinsistheway_io_ipv6" {
 
 ### CNAME records
 # CNAME records targeting the public-nginx on publick8s cluster
-import {
-  to = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["azure.updates"]
-  id = "/subscriptions/dff2ec18-6a8e-405c-8e45-b7df7465acf0/resourceGroups/proddns_jenkinsio/providers/Microsoft.Network/dnsZones/jenkins.io/CNAME/azure.updates"
-}
-import {
-  to = azurerm_dns_cname_record.jenkinsio_target_public_publick8s["mirrors.updates"]
-  id = "/subscriptions/dff2ec18-6a8e-405c-8e45-b7df7465acf0/resourceGroups/proddns_jenkinsio/providers/Microsoft.Network/dnsZones/jenkins.io/CNAME/mirrors.updates"
-}
 resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
   # Map of records and corresponding purposes
   for_each = {
@@ -219,26 +149,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
   })
 }
 # CNAME records for the legacy domain jenkins-ci.org, pointing to their modern counterpart
-moved {
-  from = azurerm_dns_cname_record.jenkinsciorg_target_public_publick8s["accounts"]
-  to   = azurerm_dns_cname_record.jenkinsciorg_target_jenkinsio["accounts"]
-}
-moved {
-  from = azurerm_dns_cname_record.jenkinsciorg_target_public_publick8s["javadoc"]
-  to   = azurerm_dns_cname_record.jenkinsciorg_target_jenkinsio["javadoc"]
-}
-moved {
-  from = azurerm_dns_cname_record.jenkinsciorg_target_public_publick8s["mirrors"]
-  to   = azurerm_dns_cname_record.jenkinsciorg_target_jenkinsio["mirrors"]
-}
-moved {
-  from = azurerm_dns_cname_record.jenkinsciorg_target_public_publick8s["wiki"]
-  to   = azurerm_dns_cname_record.jenkinsciorg_target_jenkinsio["wiki"]
-}
-import {
-  to = azurerm_dns_cname_record.jenkinsciorg_target_jenkinsio["updates"]
-  id = "/subscriptions/dff2ec18-6a8e-405c-8e45-b7df7465acf0/resourceGroups/proddns_jenkinsci/providers/Microsoft.Network/dnsZones/jenkins-ci.org/CNAME/updates"
-}
 resource "azurerm_dns_cname_record" "jenkinsciorg_target_jenkinsio" {
   # Map of records and corresponding purposes. Some records only exists in jenkins.io as jenkins-ci.org is only legacy
   for_each = {
@@ -429,4 +339,63 @@ resource "azurerm_dns_txt_record" "apex_jenkinsciorg" {
   }
 
   tags = local.default_tags
+}
+
+### CAA Records
+# CAA records to restrict Certificate Authorities
+resource "azurerm_dns_caa_record" "jenkins_caa" {
+  for_each = {
+    "${data.azurerm_dns_zone.jenkinsio.name}"    = "${data.azurerm_dns_zone.jenkinsio.resource_group_name}",
+    "${data.azurerm_dns_zone.jenkinsciorg.name}" = "${data.azurerm_dns_zone.jenkinsciorg.resource_group_name}",
+  }
+  name                = "@"
+  zone_name           = each.key
+  resource_group_name = each.value
+  ttl                 = 60
+
+  record {
+    flags = 0
+    tag   = "issue"
+    value = "letsencrypt.org"
+  }
+
+  record {
+    flags = 0
+    tag   = "issue"
+    value = "godaddy.com"
+  }
+
+  record {
+    flags = 0
+    tag   = "issue"
+    value = "amazon.com"
+  }
+
+  record {
+    flags = 0
+    tag   = "issue"
+    value = "globalsign.com"
+  }
+
+  record {
+    flags = 0
+    tag   = "issue"
+    value = "digicert.com; cansignhttpexchanges=yes"
+  }
+
+  record {
+    flags = 0
+    tag   = "issue"
+    value = "sectigo.com"
+  }
+
+  record {
+    flags = 0
+    tag   = "issue"
+    value = "pki.goog; cansignhttpexchanges=yes"
+  }
+
+  tags = merge(local.default_tags, {
+    purpose = "Jenkins user authentication service"
+  })
 }
