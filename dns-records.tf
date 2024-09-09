@@ -126,7 +126,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
     "javadoc"             = "Jenkins Javadoc"
     "mirrors"             = "Jenkins binary distribution via mirrorbits"
     "mirrors.updates"     = "Update Center hosted on Azure (Mirrorbits redirections service)"
-    "new.stats"           = "New Jenkins Statistics website"
+    "stats"               = "New Jenkins Statistics website"
     "plugin-health"       = "Plugin Health Scoring application"
     "plugin-site-issues"  = "Plugins website API content origin for Fastly CDN"
     "plugins.origin"      = "Plugins website content origin for Fastly CDN"
@@ -284,7 +284,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_fastly" {
 resource "azurerm_dns_cname_record" "jenkinsio_customs" {
   # Map of records and corresponding purposes
   for_each = {
-    "stats" = {
+    "old.stats" = {
       "target"      = "jenkins-infra.github.io"
       "description" = "Website to download Jenkins packages",
     },
