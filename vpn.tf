@@ -67,6 +67,8 @@ resource "azurerm_network_security_rule" "allow_ssh_from_admins_to_vpn" {
   network_security_group_name = azurerm_network_security_group.private_dmz.name
 }
 
+## Do not tag internet ingress as a security issue (we want VPN to be available through internet)
+#trivy:ignore:avd-azu-0047
 resource "azurerm_network_security_rule" "allow_openvpn_from_internet_to_vpn" {
   name                        = "allow-openvpn-from-internet-to-vpn"
   priority                    = 200
@@ -97,6 +99,8 @@ resource "azurerm_network_security_rule" "allow_puppet_from_vpn_to_puppetmasters
   network_security_group_name = azurerm_network_security_group.private_dmz.name
 }
 
+## Do not tag internet egress as a security issue
+#trivy:ignore:avd-azu-0051
 resource "azurerm_network_security_rule" "allow_https_from_vpn_to_Internet" {
   name                        = "allow-https-from-vpn-to-Internet"
   priority                    = 2200
