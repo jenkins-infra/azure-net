@@ -63,23 +63,29 @@ module "public_vnet" {
         "10.245.0.0/24",           # 10.245.0.1 - 10.245.0.254
         "fd00:db8:deca:deed::/64", # smaller size as we're using kubenet (required by dual-stack AKS cluster), which allocate one IP per node instead of one IP per pod (in case of Azure CNI)
       ]
-      service_endpoints = ["Microsoft.Storage"]
-      delegations       = {}
+      service_endpoints                             = ["Microsoft.Storage"]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = false
+      private_endpoint_network_policies             = "Enabled"
     },
     {
       # Dedicated subnet for machine to machine private communications
-      name              = "public-vnet-data-tier"
-      address_prefixes  = ["10.245.1.0/24"] # 10.245.1.1 - 10.245.1.254
-      service_endpoints = []
-      delegations       = {}
+      name                                          = "public-vnet-data-tier"
+      address_prefixes                              = ["10.245.1.0/24"] # 10.245.1.1 - 10.245.1.254
+      service_endpoints                             = []
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = false
+      private_endpoint_network_policies             = "Enabled"
     }
     ,
     {
       # Dedicated subnets for ci.jenkins.io (controller and agents)
-      name              = "public-vnet-ci_jenkins_io_agents"
-      address_prefixes  = ["10.245.2.0/23"] # 10.245.2.1 - 10.245.3.254
-      service_endpoints = []
-      delegations       = {}
+      name                                          = "public-vnet-ci_jenkins_io_agents"
+      address_prefixes                              = ["10.245.2.0/23"] # 10.245.2.1 - 10.245.3.254
+      service_endpoints                             = []
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
     }
     ,
     {
@@ -89,8 +95,10 @@ module "public_vnet" {
         "10.245.4.0/24", # 10.245.4.1 - 10.245.4.254
         "fd00:db8:deca::/64",
       ]
-      service_endpoints = []
-      delegations       = {}
+      service_endpoints                             = []
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
     }
   ]
 
@@ -111,52 +119,64 @@ module "private_vnet" {
   subnets = [
     {
       # Dedicated subnet for external access (such as VPN external NIC)
-      name              = "private-vnet-dmz"
-      address_prefixes  = ["10.248.0.0/28"]
-      service_endpoints = []
-      delegations       = {}
+      name                                          = "private-vnet-dmz"
+      address_prefixes                              = ["10.248.0.0/28"]
+      service_endpoints                             = []
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
     },
     {
       # Dedicated subnet for machine to machine private communications
-      name              = "private-vnet-data-tier"
-      address_prefixes  = ["10.248.1.0/24"] # 10.248.1.0 - 10.248.1.255
-      service_endpoints = []
-      delegations       = {}
+      name                                          = "private-vnet-data-tier"
+      address_prefixes                              = ["10.248.1.0/24"] # 10.248.1.0 - 10.248.1.255
+      service_endpoints                             = []
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
     },
     {
       # Dedicated subnet for the "privatek8s" AKS cluster resources
       ## Important: the "terraform-production" Enterprise Application used by this repo pipeline needs to be able to manage this virtual network.
       ## See the corresponding role assignment for this vnet added in the (private) terraform-state repo:
       ## https://github.com/jenkins-infra/terraform-states/blob/17df75c38040c9b1087bade3654391bc5db45ffd/azure/main.tf#L59
-      name              = "privatek8s-tier"
-      address_prefixes  = ["10.249.0.0/16"]
-      service_endpoints = ["Microsoft.KeyVault", "Microsoft.Storage"]
-      delegations       = {}
+      name                                          = "privatek8s-tier"
+      address_prefixes                              = ["10.249.0.0/16"]
+      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
     },
     {
       # Dedicated subnet for the release nodes of the "privatek8s" AKS cluster resources
       ## Important: the "terraform-production" Enterprise Application used by this repo pipeline needs to be able to manage this virtual network.
       ## See the corresponding role assignment for this vnet added in the (private) terraform-state repo:
       ## https://github.com/jenkins-infra/terraform-states/blob/17df75c38040c9b1087bade3654391bc5db45ffd/azure/main.tf#L59
-      name              = "privatek8s-release-tier"
-      address_prefixes  = ["10.250.0.0/25"] # from 10.250.0.0 to 10.250.0.127
-      service_endpoints = ["Microsoft.KeyVault", "Microsoft.Storage"]
-      delegations       = {}
+      name                                          = "privatek8s-release-tier"
+      address_prefixes                              = ["10.250.0.0/25"] # from 10.250.0.0 to 10.250.0.127
+      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
     },
     {
       # Dedicated subnet for the release nodes of the "privatek8s" for the controller infraci AKS cluster resources
-      name              = "privatek8s-infraci-ctrl-tier"
-      address_prefixes  = ["10.250.0.128/26"] # from 10.250.0.128 to 10.250.0.191
-      service_endpoints = ["Microsoft.KeyVault", "Microsoft.Storage"]
-      delegations       = {}
+      name                                          = "privatek8s-infraci-ctrl-tier"
+      address_prefixes                              = ["10.250.0.128/26"] # from 10.250.0.128 to 10.250.0.191
+      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
     }
     ,
     {
       # Dedicated subnet for the private nodes of the "privatek8s" for the controller releaseci AKS cluster resources
-      name              = "privatek8s-releaseci-ctrl-tier"
-      address_prefixes  = ["10.250.0.192/26"] # from 10.250.0.192 to 10.250.0.255
-      service_endpoints = ["Microsoft.KeyVault", "Microsoft.Storage"]
-      delegations       = {}
+      name                                          = "privatek8s-releaseci-ctrl-tier"
+      address_prefixes                              = ["10.250.0.192/26"] # from 10.250.0.192 to 10.250.0.255
+      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
     }
   ]
 
@@ -183,15 +203,19 @@ module "public_sponsorship_vnet" {
   vnet_address_space = ["10.200.0.0/14"]
   subnets = [
     {
-      name              = "public-jenkins-sponsorship-vnet-ci_jenkins_io_agents"
-      address_prefixes  = ["10.200.2.0/24"] # 10.200.2.1 - 10.200.2.254
-      service_endpoints = []
-      delegations       = {}
+      name                                          = "public-jenkins-sponsorship-vnet-ci_jenkins_io_agents"
+      address_prefixes                              = ["10.200.2.0/24"] # 10.200.2.1 - 10.200.2.254
+      service_endpoints                             = []
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = false
+      private_endpoint_network_policies             = "Disabled"
     },
     {
-      name              = "public-jenkins-sponsorship-vnet-ci_jenkins_io_aci"
-      address_prefixes  = ["10.200.3.0/24"] # 10.200.3.1 - 10.200.3.254
-      service_endpoints = []
+      name                                          = "public-jenkins-sponsorship-vnet-ci_jenkins_io_aci"
+      address_prefixes                              = ["10.200.3.0/24"] # 10.200.3.1 - 10.200.3.254
+      service_endpoints                             = []
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
       delegations = {
         "aci" = {
           service_delegations = [{
@@ -202,16 +226,20 @@ module "public_sponsorship_vnet" {
       }
     },
     {
-      name              = "public-jenkins-sponsorship-vnet-ci_jenkins_io_controller"
-      address_prefixes  = ["10.200.1.0/24"] # 10.200.1.1 - 10.200.1.254
-      service_endpoints = []
-      delegations       = {}
+      name                                          = "public-jenkins-sponsorship-vnet-ci_jenkins_io_controller"
+      address_prefixes                              = ["10.200.1.0/24"] # 10.200.1.1 - 10.200.1.254
+      service_endpoints                             = []
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Disabled"
     },
     {
-      name              = "public-jenkins-sponsorship-vnet-ci_jenkins_io_kubernetes"
-      address_prefixes  = ["10.201.0.0/24"] # 10.201.0.0 - 10.201.0.254
-      service_endpoints = []
-      delegations       = {}
+      name                                          = "public-jenkins-sponsorship-vnet-ci_jenkins_io_kubernetes"
+      address_prefixes                              = ["10.201.0.0/24"] # 10.201.0.0 - 10.201.0.254
+      service_endpoints                             = []
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = false
+      private_endpoint_network_policies             = "Enabled"
     },
   ]
 
@@ -231,22 +259,28 @@ module "trusted_ci_jenkins_io_vnet" {
   vnet_address_space = ["10.252.0.0/21"] # 10.252.0.1 - 10.252.7.254
   subnets = [
     {
-      name              = "trusted-ci-jenkins-io-vnet-controller"
-      address_prefixes  = ["10.252.0.0/24"] # 10.252.0.1 - 10.252.0.254
-      service_endpoints = []
-      delegations       = {}
+      name                                          = "trusted-ci-jenkins-io-vnet-controller"
+      address_prefixes                              = ["10.252.0.0/24"] # 10.252.0.1 - 10.252.0.254
+      service_endpoints                             = []
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
     },
     {
-      name              = "trusted-ci-jenkins-io-vnet-ephemeral-agents"
-      address_prefixes  = ["10.252.1.0/24"] # 10.252.1.1 - 10.252.1.254
-      service_endpoints = ["Microsoft.Storage"]
-      delegations       = {}
+      name                                          = "trusted-ci-jenkins-io-vnet-ephemeral-agents"
+      address_prefixes                              = ["10.252.1.0/24"] # 10.252.1.1 - 10.252.1.254
+      service_endpoints                             = ["Microsoft.Storage"]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
     },
     {
-      name              = "trusted-ci-jenkins-io-vnet-permanent-agents"
-      address_prefixes  = ["10.252.2.0/24"] # 10.252.2.1 - 10.252.2.254
-      service_endpoints = ["Microsoft.Storage"]
-      delegations       = {}
+      name                                          = "trusted-ci-jenkins-io-vnet-permanent-agents"
+      address_prefixes                              = ["10.252.2.0/24"] # 10.252.2.1 - 10.252.2.254
+      service_endpoints                             = ["Microsoft.Storage"]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Disabled"
     },
   ]
 
@@ -269,10 +303,12 @@ module "trusted_ci_jenkins_io_sponsorship_vnet" {
   vnet_address_space = ["10.204.0.0/24"] # 10.204.0.1 - 10.204.0.254
   subnets = [
     {
-      name              = "trusted-ci-jenkins-io-sponsorship-vnet-ephemeral-agents"
-      address_prefixes  = ["10.204.0.0/24"] # 10.204.0.1 - 10.204.0.254
-      service_endpoints = ["Microsoft.Storage"]
-      delegations       = {}
+      name                                          = "trusted-ci-jenkins-io-sponsorship-vnet-ephemeral-agents"
+      address_prefixes                              = ["10.204.0.0/24"] # 10.204.0.1 - 10.204.0.254
+      service_endpoints                             = ["Microsoft.Storage"]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
     },
   ]
 
@@ -291,16 +327,20 @@ module "cert_ci_jenkins_io_vnet" {
 
   subnets = [
     {
-      name              = "cert-ci-jenkins-io-vnet-controller"
-      address_prefixes  = ["10.252.8.0/24"] # 10.252.8.1 - 10.252.8.254
-      service_endpoints = []
-      delegations       = {}
+      name                                          = "cert-ci-jenkins-io-vnet-controller"
+      address_prefixes                              = ["10.252.8.0/24"] # 10.252.8.1 - 10.252.8.254
+      service_endpoints                             = []
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
     },
     {
-      name              = "cert-ci-jenkins-io-vnet-ephemeral-agents"
-      address_prefixes  = ["10.252.9.0/24"] # 10.252.9.1 - 10.252.9.254
-      service_endpoints = []
-      delegations       = {}
+      name                                          = "cert-ci-jenkins-io-vnet-ephemeral-agents"
+      address_prefixes                              = ["10.252.9.0/24"] # 10.252.9.1 - 10.252.9.254
+      service_endpoints                             = []
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
     },
   ]
 
@@ -324,10 +364,12 @@ module "cert_ci_jenkins_io_sponsorship_vnet" {
 
   subnets = [
     {
-      name              = "cert-ci-jenkins-io-sponsorship-vnet-ephemeral-agents"
-      address_prefixes  = ["10.205.0.0/24"] # 10.205.0.1 - 10.205.0.254
-      service_endpoints = []
-      delegations       = {}
+      name                                          = "cert-ci-jenkins-io-sponsorship-vnet-ephemeral-agents"
+      address_prefixes                              = ["10.205.0.0/24"] # 10.205.0.1 - 10.205.0.254
+      service_endpoints                             = []
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
     },
   ]
 
@@ -350,22 +392,28 @@ module "infra_ci_jenkins_io_sponsorship_vnet" {
 
   subnets = [
     {
-      name              = "infra-ci-jenkins-io-sponsorship-vnet-ephemeral-agents"
-      address_prefixes  = ["10.206.0.0/24"] # 10.206.0.1 - 10.206.0.254
-      service_endpoints = ["Microsoft.KeyVault", "Microsoft.Storage"]
-      delegations       = {}
+      name                                          = "infra-ci-jenkins-io-sponsorship-vnet-ephemeral-agents"
+      address_prefixes                              = ["10.206.0.0/24"] # 10.206.0.1 - 10.206.0.254
+      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
     },
     {
-      name              = "infra-ci-jenkins-io-sponsorship-vnet-packer-builds"
-      address_prefixes  = ["10.206.1.0/24"] # 10.206.1.1 - 10.206.1.254
-      service_endpoints = ["Microsoft.KeyVault", "Microsoft.Storage"]
-      delegations       = {}
+      name                                          = "infra-ci-jenkins-io-sponsorship-vnet-packer-builds"
+      address_prefixes                              = ["10.206.1.0/24"] # 10.206.1.1 - 10.206.1.254
+      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
     },
     {
-      name              = "infra-ci-jenkins-io-sponsorship-vnet-kubernetes-agents"
-      address_prefixes  = ["10.206.2.0/24"] # 10.206.2.0 - 10.206.2.254
-      service_endpoints = ["Microsoft.KeyVault", "Microsoft.Storage"]
-      delegations       = {}
+      name                                          = "infra-ci-jenkins-io-sponsorship-vnet-kubernetes-agents"
+      address_prefixes                              = ["10.206.2.0/24"] # 10.206.2.0 - 10.206.2.254
+      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
     },
   ]
 
@@ -390,9 +438,11 @@ module "public_db_vnet" {
     # This subnet is reserved as "delegated" for the pgsql server on the public-db network
     # Ref. https://docs.microsoft.com/en-us/azure/postgresql/flexible-server/concepts-networking
     {
-      name              = "public-db-vnet-postgres-tier",
-      address_prefixes  = ["10.253.0.0/24"], # 10.253.0.1 - 10.253.0.254,
-      service_endpoints = [],
+      name                                          = "public-db-vnet-postgres-tier",
+      address_prefixes                              = ["10.253.0.0/24"], # 10.253.0.1 - 10.253.0.254,
+      service_endpoints                             = [],
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
       delegations = {
         "pgsql" = {
           service_delegations = [{
@@ -407,9 +457,11 @@ module "public_db_vnet" {
     # This subnet is reserved as "delegated" for the mysql server on the public-db network
     # Ref. https://docs.microsoft.com/en-us/azure/mysql/flexible-server/concepts-networking
     {
-      name              = "public-db-vnet-mysql-tier",
-      address_prefixes  = ["10.253.1.0/24"] # 10.253.1.1 - 10.253.1.254
-      service_endpoints = [],
+      name                                          = "public-db-vnet-mysql-tier",
+      address_prefixes                              = ["10.253.1.0/24"] # 10.253.1.1 - 10.253.1.254
+      service_endpoints                             = [],
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled",
       delegations = {
         "mysql" = {
           service_delegations = [{
