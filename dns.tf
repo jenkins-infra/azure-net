@@ -70,7 +70,7 @@ resource "azuread_application" "letsencrypt_dns_challenges" {
   for_each = { for key, value in local.lets_encrypt_dns_challenged_domains : key => value if value != "" }
 
   display_name = "letsencrypt-${each.key}"
-  owners       = [data.azuread_service_principal.terraform-azure-net-production.id]
+  owners       = [data.azuread_service_principal.terraform-azure-net-production.object_id]
   tags         = [for key, value in local.default_tags : "${key}:${value}"]
 
   required_resource_access {
@@ -91,7 +91,7 @@ resource "azuread_service_principal" "child_zone_service_principals" {
   for_each = { for key, value in local.lets_encrypt_dns_challenged_domains : key => value if value != "" }
 
   app_role_assignment_required = false
-  owners                       = [data.azuread_service_principal.terraform-azure-net-production.id]
+  owners                       = [data.azuread_service_principal.terraform-azure-net-production.object_id]
 
   client_id = azuread_application.letsencrypt_dns_challenges[each.key].client_id
 }
@@ -109,5 +109,5 @@ resource "azurerm_role_assignment" "child_zone_service_principal_assignements" {
 
   scope                = azurerm_dns_zone.child_zones[each.key].id
   role_definition_name = "DNS Zone Contributor" # Predefined standard role in Azure
-  principal_id         = azuread_service_principal.child_zone_service_principals[each.key].id
+  principal_id         = azuread_service_principal.child_zone_service_principals[each.key].object_id
 }
