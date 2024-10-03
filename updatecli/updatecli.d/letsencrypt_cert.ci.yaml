@@ -56,7 +56,7 @@ actions:
     kind: github/pullrequest
     scmid: default
     spec:
-      title: Generate a new Azure Service Principal password on `cert.ci.jenkins.io - Let's Encrypt`
+      title: Generate a new Azure Service Principal password on `cert.ci.jenkins.io - Let's Encrypt` expired on {{ source "currentExpiryCert" }}
       description: "Generate a new password for the Azure Service Principal `cert.ci.jenkins.io - Let's Encrypt`. Set the new password value in the following encrypted file: <https://github.com/jenkins-infra/jenkins-infra/blob/d76e72a6c1ee06a0d321ed4d04c5d3e1b81d061d/hieradata/clients/controller.cert.ci.jenkins.io.yaml#L27> (open a PR: https://github.com/jenkins-infra/jenkins-infra/edit/production/hieradata/clients/controller.cert.ci.jenkins.io.yaml)."
       labels:
         - terraform
