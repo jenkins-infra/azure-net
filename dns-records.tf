@@ -49,6 +49,23 @@ resource "azurerm_dns_aaaa_record" "jenkinsciorg" {
   })
 }
 
+# Records for lists.jenkins-ci.org (hosted at OSUOSL)
+import {
+  id = "/subscriptions/dff2ec18-6a8e-405c-8e45-b7df7465acf0/resourceGroups/proddns_jenkinsci/providers/Microsoft.Network/dnsZones/jenkins-ci.org/A/lists"
+  to = azurerm_dns_a_record.listsjenkinsciorg
+}
+resource "azurerm_dns_a_record" "listsjenkinsciorg" {
+  name                = "lists"
+  zone_name           = data.azurerm_dns_zone.jenkinsciorg.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsci.name
+  ttl                 = 60
+  records             = ["140.211.166.34"]
+
+  tags = merge(local.default_tags, {
+    purpose = "Legacy Jenkins Lists hosted on OSUOSL"
+  })
+}
+
 # A record for ldap.jenkins.io pointing to its own public LB IP from publick8s cluster
 resource "azurerm_dns_a_record" "ldap_jenkins_io" {
   name                = "ldap"
