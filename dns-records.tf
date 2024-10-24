@@ -49,17 +49,39 @@ resource "azurerm_dns_aaaa_record" "jenkinsciorg" {
   })
 }
 
-# Records for lists.jenkins-ci.org (hosted at OSUOSL)
-import {
-  id = "/subscriptions/dff2ec18-6a8e-405c-8e45-b7df7465acf0/resourceGroups/proddns_jenkinsci/providers/Microsoft.Network/dnsZones/jenkins-ci.org/A/lists"
-  to = azurerm_dns_a_record.listsjenkinsciorg
-}
+## Records for lists.jenkins-ci.org (hosted at OSUOSL)
+# Ref. https://github.com/jenkins-infra/helpdesk/issues/4366
 resource "azurerm_dns_a_record" "listsjenkinsciorg" {
   name                = "lists"
   zone_name           = data.azurerm_dns_zone.jenkinsciorg.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsci.name
   ttl                 = 60
-  records             = ["140.211.166.34"]
+  records             = ["140.211.9.53"]
+
+  tags = merge(local.default_tags, {
+    purpose = "Legacy Jenkins Lists hosted on OSUOSL"
+  })
+}
+resource "azurerm_dns_aaaa_record" "listsjenkinsciorg" {
+  name                = "lists"
+  zone_name           = data.azurerm_dns_zone.jenkinsciorg.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsci.name
+  ttl                 = 60
+  records             = ["2605:bc80:3010:104::8cd3:935"]
+
+  tags = merge(local.default_tags, {
+    purpose = "Legacy Jenkins Lists hosted on OSUOSL"
+  })
+}
+resource "azurerm_dns_txt_record" "listsjenkinsciorg" {
+  name                = "lists"
+  zone_name           = data.azurerm_dns_zone.jenkinsciorg.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsci.name
+  ttl                 = 60
+
+  record {
+    value = "v=spf1 mx include:_spf.osuosl.org ~all"
+  }
 
   tags = merge(local.default_tags, {
     purpose = "Legacy Jenkins Lists hosted on OSUOSL"
