@@ -4,7 +4,11 @@ resource "azurerm_resource_group" "vpn" {
   tags     = local.default_tags
 }
 
-resource "azurerm_public_ip" "public" {
+moved {
+  from = azurerm_public_ip.public
+  to   = azurerm_public_ip.vpn_public
+}
+resource "azurerm_public_ip" "vpn_public" {
   name                = "${azurerm_resource_group.vpn.name}-public-ip"
   resource_group_name = azurerm_resource_group.vpn.name
   location            = azurerm_resource_group.vpn.location
@@ -18,7 +22,7 @@ resource "azurerm_dns_a_record" "vpn" {
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 300
-  records             = [azurerm_public_ip.public.ip_address]
+  records             = [azurerm_public_ip.vpn_public.ip_address]
   tags                = local.default_tags
 }
 
@@ -31,7 +35,7 @@ resource "azurerm_network_interface" "main" {
     name                          = "main"
     subnet_id                     = module.private_vnet.subnets["private-vnet-dmz"]
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.public.id
+    public_ip_address_id          = azurerm_public_ip.vpn_public.id
   }
 
   tags = local.default_tags
@@ -154,8 +158,4 @@ resource "azurerm_linux_virtual_machine" "vpn" {
   }
 
   tags = local.default_tags
-}
-
-output "vpn_public_ip_address" {
-  value = azurerm_public_ip.public.ip_address
 }
