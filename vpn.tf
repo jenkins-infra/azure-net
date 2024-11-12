@@ -4,10 +4,6 @@ resource "azurerm_resource_group" "vpn" {
   tags     = local.default_tags
 }
 
-moved {
-  from = azurerm_public_ip.public
-  to   = azurerm_public_ip.vpn_public
-}
 resource "azurerm_public_ip" "vpn_public" {
   name                = "${azurerm_resource_group.vpn.name}-public-ip"
   resource_group_name = azurerm_resource_group.vpn.name
