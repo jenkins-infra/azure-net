@@ -159,7 +159,3 @@ resource "azurerm_linux_virtual_machine" "vpn" {
 
   tags = local.default_tags
 }
-
-output "vpn_public_ip_address" {
-  value = azurerm_public_ip.public.ip_address
-}
