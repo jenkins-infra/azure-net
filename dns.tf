@@ -42,6 +42,23 @@ resource "azurerm_dns_ns_record" "do_jenkins_io" {
   tags = local.default_tags
 }
 
+# NS records pointing to AWS Route53 name servers to delegate aws.ci.jenkins.io to them$
+resource "azurerm_dns_ns_record" "aws_ci_jenkins_io" {
+  name                = "aws.ci"
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 60
+
+  records = [
+    "ns-103.awsdns-12.com",
+    "ns-1131.awsdns-13.org",
+    "ns-1760.awsdns-28.co.uk",
+    "ns-573.awsdns-07.net",
+  ]
+
+  tags = local.default_tags
+}
+
 resource "azurerm_dns_zone" "child_zones" {
   for_each = local.lets_encrypt_dns_challenged_domains
 
