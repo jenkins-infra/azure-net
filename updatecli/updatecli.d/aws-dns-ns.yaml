@@ -31,7 +31,7 @@ targets:
     name: Update NS records for aws.ci.jenkins.io
     kind: hcl
     spec:
-      file: ./dns.tf
+      file: dns.tf
       path: locals.aws_route53_nameservers_awscijenkinsio
     scmid: default
 
@@ -39,7 +39,7 @@ actions:
   default:
     kind: github/pullrequest
     scmid: default
-    title: feat(dns) Update NS records for aws.ci.jenkins.io to `{{ source "getAwsCiJenkinsIoNameServers" }}`
+    title: "feat(dns) Update NS records for aws.ci.jenkins.io"
     spec:
       description: |
         A new set of Name Servers for the AWS Route 53 delegated zone for `aws.ci.jenkins.io` were detected in <https://reports.jenkins.io/jenkins-infra-data-reports/aws-sponsorship.json>.
