@@ -45,7 +45,7 @@ resource "azurerm_dns_ns_record" "do_jenkins_io" {
 # NS records pointing to AWS Route53 name servers to delegate aws.ci.jenkins.io to them
 locals {
   # Tracked by updatecli, easier to use a string split as a list by Terraform
-  aws_route53_nameservers_awscijenkinsio = "ns-103.awsdns-12.com ns-1131.awsdns-13.org ns-1760.awsdns-28.co.uk ns-573.awsdns-07.net"
+  aws_route53_nameservers_awscijenkinsio = "ns-1378.awsdns-44.org ns-1925.awsdns-48.co.uk ns-508.awsdns-63.com ns-592.awsdns-10.net"
 }
 resource "azurerm_dns_ns_record" "aws_ci_jenkins_io" {
   name                = "aws.ci"
