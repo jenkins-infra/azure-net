@@ -15,7 +15,7 @@ locals {
 
   lets_encrypt_dns_challenged_domains = {
     "trusted.ci.jenkins.io" = "2025-03-23T00:00:00Z"
-    "cert.ci.jenkins.io"    = "2025-01-01T00:00:00Z"
+    "cert.ci.jenkins.io"    = "2025-03-23T00:00:00Z"
     # TODO: add support for workload identities by providing an empty expiration date
     # "<something>.jenkins.io" = ""
   }
