@@ -358,6 +358,36 @@ resource "azurerm_dns_txt_record" "jenkinsci-transfer-github-verification" {
 
   tags = local.default_tags
 }
+import {
+  id = "/subscriptions/dff2ec18-6a8e-405c-8e45-b7df7465acf0/resourceGroups/proddns_jenkinsio/providers/Microsoft.Network/dnsZones/jenkins.io/TXT/@"
+  to = azurerm_dns_txt_record.apex_jenkinsio
+}
+resource "azurerm_dns_txt_record" "apex_jenkinsio" {
+  name                = "@"
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 60
+  record {
+    # Used for Libera Chat - https://www.jenkins.io/blog/2021/06/17/libera-chat/
+    value = "libera-MjLnxZ2KPqJJnJr6X4WFovAe"
+  }
+  record {
+    # Used for Code Signing Certificate generation - https://github.com/jenkins-infra/helpdesk/issues/3083
+    value = "_globalsign-domain-verification=b1pmSjP4FyG8hkZunkD3Aoz8tK0FWCje80-YwtLeDU"
+  }
+  record {
+    # Used to access Google Console Search until https://github.com/jenkins-infra/helpdesk/issues/3530 is done
+    value = "google-site-verification=4Z81CA6VzprPWEbGFtNbJwWoZBTGmTp3dk7N0hbt87U"
+  }
+  record {
+    value = "v=spf1 include:mailgun.org ~all"
+  }
+  record {
+    value = "v=spf1 include:sendgrid.net -all"
+  }
+
+  tags = local.default_tags
+}
 
 resource "azurerm_dns_txt_record" "apex_jenkinsciorg" {
   name                = "@"
