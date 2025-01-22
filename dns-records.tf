@@ -358,10 +358,6 @@ resource "azurerm_dns_txt_record" "jenkinsci-transfer-github-verification" {
 
   tags = local.default_tags
 }
-import {
-  id = "/subscriptions/dff2ec18-6a8e-405c-8e45-b7df7465acf0/resourceGroups/proddns_jenkinsio/providers/Microsoft.Network/dnsZones/jenkins.io/TXT/@"
-  to = azurerm_dns_txt_record.apex_jenkinsio
-}
 resource "azurerm_dns_txt_record" "apex_jenkinsio" {
   name                = "@"
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
@@ -380,10 +376,7 @@ resource "azurerm_dns_txt_record" "apex_jenkinsio" {
     value = "google-site-verification=4Z81CA6VzprPWEbGFtNbJwWoZBTGmTp3dk7N0hbt87U"
   }
   record {
-    value = "v=spf1 include:mailgun.org ~all"
-  }
-  record {
-    value = "v=spf1 include:sendgrid.net -all"
+    value = "v=spf1 include:mailgun.org include:sendgrid.net -all"
   }
 
   tags = local.default_tags
