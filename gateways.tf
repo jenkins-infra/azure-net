@@ -60,6 +60,38 @@ module "trusted_outbound_sponsorship" {
   outbound_ip_count = 3
 }
 
+module "ci_jenkins_io_outbound" {
+  source = "./.shared-tools/terraform/modules/azure-nat-gateway"
+
+  name                = "ci-jenkins-io-outbound"
+  resource_group_name = module.public_vnet.vnet_rg_name
+  vnet_name           = module.public_vnet.vnet_name
+  subnet_ids = [
+    module.public_vnet.subnets["public-vnet-ci_jenkins_io_controller"],
+    module.public_vnet.subnets["public-vnet-ci_jenkins_io_agents"],
+  ]
+}
+
+module "ci_jenkins_io_outbound_sponsorship" {
+  source = "./.shared-tools/terraform/modules/azure-nat-gateway"
+
+  providers = {
+    azurerm = azurerm.jenkins-sponsorship
+  }
+
+  name                = "ci-jenkins-io-outbound-sponsorship"
+  resource_group_name = module.public_sponsorship_vnet.vnet_rg_name
+  vnet_name           = module.public_sponsorship_vnet.vnet_name
+  subnet_ids = [
+    module.public_sponsorship_vnet.subnets["public-jenkins-sponsorship-vnet-ci_jenkins_io_agents"],
+    module.public_sponsorship_vnet.subnets["public-jenkins-sponsorship-vnet-ci_jenkins_io_controller"],
+    module.public_sponsorship_vnet.subnets["public-jenkins-sponsorship-vnet-ci_jenkins_io_kubernetes"],
+    module.public_sponsorship_vnet.subnets["public-jenkins-sponsorship-vnet-ci_jenkins_io_aci"],
+  ]
+
+  outbound_ip_count = 4
+}
+
 module "privatek8s_outbound" {
   source = "./.shared-tools/terraform/modules/azure-nat-gateway"
 
