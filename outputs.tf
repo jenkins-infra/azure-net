@@ -7,7 +7,7 @@ resource "local_file" "jenkins_infra_data_report" {
       "outbound_ips" = concat(split(",", module.trusted_outbound.public_ip_list), split(",", module.trusted_outbound_sponsorship.public_ip_list)),
     },
     "ci.jenkins.io" = {
-      "outbound_ips" = concat(split(",", module.ci_jenkins_io_outbound.public_ip_list), split(",", module.ci_jenkins_io_outbound_sponsorship.public_ip_list)),
+      "outbound_ips" = split(",", module.ci_jenkins_io_outbound_sponsorship.public_ip_list),
     },
     "infra.ci.jenkins.io" = {
       "outbound_ips" = concat(split(",", module.infra_ci_outbound_sponsorship.public_ip_list), split(",", module.privatek8s_outbound.public_ip_list)),

@@ -76,36 +76,12 @@ module "public_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = false
       private_endpoint_network_policies             = "Enabled"
-    }
-    ,
-    {
-      # Dedicated subnets for ci.jenkins.io (controller and agents)
-      name                                          = "public-vnet-ci_jenkins_io_agents"
-      address_prefixes                              = ["10.245.2.0/23"] # 10.245.2.1 - 10.245.3.254
-      service_endpoints                             = []
-      delegations                                   = {}
-      private_link_service_network_policies_enabled = true
-      private_endpoint_network_policies             = "Enabled"
-    }
-    ,
-    {
-      # Dedicated subnets for ci.jenkins.io (controller and agents)
-      name = "public-vnet-ci_jenkins_io_controller"
-      address_prefixes = [
-        "10.245.4.0/24", # 10.245.4.1 - 10.245.4.254
-        "fd00:db8:deca::/64",
-      ]
-      service_endpoints                             = []
-      delegations                                   = {}
-      private_link_service_network_policies_enabled = true
-      private_endpoint_network_policies             = "Enabled"
-    }
+    },
   ]
 
   peered_vnets = {
-    "${module.private_vnet.vnet_name}"            = module.private_vnet.vnet_id,
-    "${module.public_db_vnet.vnet_name}"          = module.public_db_vnet.vnet_id,
-    "${module.public_sponsorship_vnet.vnet_name}" = module.public_sponsorship_vnet.vnet_id,
+    "${module.private_vnet.vnet_name}"   = module.private_vnet.vnet_id,
+    "${module.public_db_vnet.vnet_name}" = module.public_db_vnet.vnet_id,
   }
 }
 
@@ -183,7 +159,6 @@ module "private_vnet" {
   peered_vnets = {
     "${module.public_vnet.vnet_name}"                          = module.public_vnet.vnet_id,
     "${module.public_db_vnet.vnet_name}"                       = module.public_db_vnet.vnet_id,
-    "${module.public_sponsorship_vnet.vnet_name}"              = module.public_sponsorship_vnet.vnet_id,
     "${module.cert_ci_jenkins_io_vnet.vnet_name}"              = module.cert_ci_jenkins_io_vnet.vnet_id
     "${module.trusted_ci_jenkins_io_vnet.vnet_name}"           = module.trusted_ci_jenkins_io_vnet.vnet_id
     "${module.infra_ci_jenkins_io_sponsorship_vnet.vnet_name}" = module.infra_ci_jenkins_io_sponsorship_vnet.vnet_id
@@ -211,21 +186,6 @@ module "public_sponsorship_vnet" {
       private_endpoint_network_policies             = "Disabled"
     },
     {
-      name                                          = "public-jenkins-sponsorship-vnet-ci_jenkins_io_aci"
-      address_prefixes                              = ["10.200.3.0/24"] # 10.200.3.1 - 10.200.3.254
-      service_endpoints                             = []
-      private_link_service_network_policies_enabled = true
-      private_endpoint_network_policies             = "Enabled"
-      delegations = {
-        "aci" = {
-          service_delegations = [{
-            name    = "Microsoft.ContainerInstance/containerGroups"
-            actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
-          }]
-        }
-      }
-    },
-    {
       name                                          = "public-jenkins-sponsorship-vnet-ci_jenkins_io_controller"
       address_prefixes                              = ["10.200.1.0/24"] # 10.200.1.1 - 10.200.1.254
       service_endpoints                             = []
@@ -244,8 +204,9 @@ module "public_sponsorship_vnet" {
   ]
 
   peered_vnets = {
-    "${module.private_vnet.vnet_name}"                         = module.private_vnet.vnet_id,
-    "${module.public_vnet.vnet_name}"                          = module.public_vnet.vnet_id,
+    # Accesses through VPN and privatek8s cluster
+    "${module.private_vnet.vnet_name}" = module.private_vnet.vnet_id,
+    # Accesses through the infra.ci agents private vnet
     "${module.infra_ci_jenkins_io_sponsorship_vnet.vnet_name}" = module.infra_ci_jenkins_io_sponsorship_vnet.vnet_id,
   }
 }
