@@ -2,23 +2,23 @@
 # Networks in Azure according to IEP-002:
 #   <https://github.com/jenkins-infra/iep/tree/master/iep-002>
 #
-#                                                  ┌────────────────┐                              ┌───────────────────────────┐
-#                ┌───────────────────────┐         │                │                              │                           │
-#                │                       │         │                │                              │                           │
-#      ┌─────────►   Public VPN Gateway  ◄─────────►  Public VNet   ◄─────────────────────────────►│  Public-Sponsored Vnet    │
-#      │         │                       │         │                │          VNet peering        │                           │
-#      │         └───────────────────────┘         │   IPv4 + IPv6  │◄───────────────────┐         │                           │
-#      │                                           └─▲──────────▲───┘     Vnet peering   │         └───────────────────────────┘
-#      │                                             │          │                        │
-#                                                    │          │                        │
-#  The Internet ─────────────────────────────────────┘    VNet peering             ┌─────▼──────────────┐
-#                                                               │                  │                    │
-#      │                                                        │                  │                    │
-#      │                                           ┌────────────▼───┐              │   Public DB        │
-#      │         ┌───────────────────────┐         │                │◄────────────►│                    │        ┌──────────────────────────┐
-#      │         │                       │         │                │ Vnet peering │                    │        │                          │
-#      ├─────────►  Private VPN Gateway  ◄─────────►  Private VNet  │              └────────────────────┘        │                          │
-#      │         │                       │         │                │                                            │   InfraCi-sponsoredvnet  │
+#                                                  ┌────────────────┐   Vnet peering
+#                ┌───────────────────────┐         │                │◄───────────────────┐
+#                │                       │         │                │              ┌─────▼──────────────┐
+#      ┌─────────►   Public VPN Gateway  ◄─────────│  Public VNet   │              │                    │
+#      │         │                       │         │                │              │                    │        ┌───────────────────────────┐
+#      │         └───────────────────────┘         │   IPv4 + IPv6  │              │   Public DB        │        │                           │
+#      │                                           └────────────────┘            ┌►│                    │        │                           │
+#      │                                             │          │                │ │                    │    ┌───►  Public-Sponsored Vnet    │
+#                                                    │          │                │ └────────────────────┘    │   │                           │
+#  The Internet ─────────────────────────────────────┘    VNet peering           │                           │   │                           │
+#                                                               │                │                           │   └───────────────────────────┘
+#      │                                                        │                │                           │
+#      │                                           ┌────────────▼───┐            │                           │
+#      │         ┌───────────────────────┐         │                │◄───────────┘                           │   ┌──────────────────────────┐
+#      │         │                       │         │                │ Vnet peering                           │   │                          │
+#      ├─────────►  Private VPN Gateway  ◄─────────►  Private VNet  │                    VNet peering        │   │                          │
+#      │         │                       │         │                │◄───────────────────────────────────────┘   │   InfraCi-sponsoredvnet  │
 #      │         └───────────────────────┘ ┌──────►│                │◄──────────────────────────────────────────►│                          │
 #      │                                   │       └───────▲────────┘              Vnet peering                  │                          │
 #      │                                   │               │Vnet Peering                                         └──────────────────────────┘
@@ -42,7 +42,6 @@
 #                │                       │                  │                                     │                           │
 #                └───────────────────────┤                  │                                     └───────────────────────────┘
 #                                        └──────────────────┘
-#
 # See also https://github.com/jenkins-infra/azure/blob/legacy-tf/plans/vnets.tf
 
 module "public_vnet" {
@@ -158,6 +157,7 @@ module "private_vnet" {
 
   peered_vnets = {
     "${module.public_vnet.vnet_name}"                          = module.public_vnet.vnet_id,
+    "${module.public_sponsorship_vnet.vnet_name}"              = module.public_sponsorship_vnet.vnet_id,
     "${module.public_db_vnet.vnet_name}"                       = module.public_db_vnet.vnet_id,
     "${module.cert_ci_jenkins_io_vnet.vnet_name}"              = module.cert_ci_jenkins_io_vnet.vnet_id
     "${module.trusted_ci_jenkins_io_vnet.vnet_name}"           = module.trusted_ci_jenkins_io_vnet.vnet_id
