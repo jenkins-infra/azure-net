@@ -2,13 +2,13 @@
 # Networks in Azure according to IEP-002:
 #   <https://github.com/jenkins-infra/iep/tree/master/iep-002>
 #
-#                                                  ┌────────────────┐
-#                ┌───────────────────────┐         │                │
-#                │                       │         │                │
-#      ┌─────────►   Public VPN Gateway  ◄─────────►  Public VNet   │
-#      │         │                       │         │                │
-#      │         └───────────────────────┘         │   IPv4 + IPv6  │◄───────────────────┐
-#      │                                           └─▲──────────▲───┘     Vnet peering   │
+#                                                  ┌────────────────┐                              ┌───────────────────────────┐
+#                ┌───────────────────────┐         │                │                              │                           │
+#                │                       │         │                │                              │                           │
+#      ┌─────────►   Public VPN Gateway  ◄─────────►  Public VNet   ◄─────────────────────────────►│  Public-Sponsored Vnet    │
+#      │         │                       │         │                │          VNet peering        │                           │
+#      │         └───────────────────────┘         │   IPv4 + IPv6  │◄───────────────────┐         │                           │
+#      │                                           └─▲──────────▲───┘     Vnet peering   │         └───────────────────────────┘
 #      │                                             │          │                        │
 #                                                    │          │                        │
 #  The Internet ─────────────────────────────────────┘    VNet peering             ┌─────▼──────────────┐
@@ -76,7 +76,7 @@ module "public_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = false
       private_endpoint_network_policies             = "Enabled"
-    }
+    },
   ]
 
   peered_vnets = {
@@ -162,6 +162,52 @@ module "private_vnet" {
     "${module.cert_ci_jenkins_io_vnet.vnet_name}"              = module.cert_ci_jenkins_io_vnet.vnet_id
     "${module.trusted_ci_jenkins_io_vnet.vnet_name}"           = module.trusted_ci_jenkins_io_vnet.vnet_id
     "${module.infra_ci_jenkins_io_sponsorship_vnet.vnet_name}" = module.infra_ci_jenkins_io_sponsorship_vnet.vnet_id
+  }
+}
+
+module "public_sponsorship_vnet" {
+  source = "./.shared-tools/terraform/modules/azure-full-vnet"
+
+  providers = {
+    azurerm = azurerm.jenkins-sponsorship
+  }
+
+  base_name          = "public-jenkins-sponsorship"
+  tags               = local.default_tags
+  location           = var.location
+  vnet_address_space = ["10.200.0.0/14"]
+  subnets = [
+    {
+      name                                          = "public-jenkins-sponsorship-vnet-ci_jenkins_io_agents"
+      address_prefixes                              = ["10.200.2.0/24"] # 10.200.2.1 - 10.200.2.254
+      service_endpoints                             = []
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = false
+      private_endpoint_network_policies             = "Disabled"
+    },
+    {
+      name                                          = "public-jenkins-sponsorship-vnet-ci_jenkins_io_controller"
+      address_prefixes                              = ["10.200.1.0/24"] # 10.200.1.1 - 10.200.1.254
+      service_endpoints                             = []
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Disabled"
+    },
+    {
+      name                                          = "public-jenkins-sponsorship-vnet-ci_jenkins_io_kubernetes"
+      address_prefixes                              = ["10.201.0.0/24"] # 10.201.0.0 - 10.201.0.254
+      service_endpoints                             = []
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = false
+      private_endpoint_network_policies             = "Enabled"
+    },
+  ]
+
+  peered_vnets = {
+    # Accesses through VPN and privatek8s cluster
+    "${module.private_vnet.vnet_name}" = module.private_vnet.vnet_id,
+    # Accesses through the infra.ci agents private vnet
+    "${module.infra_ci_jenkins_io_sponsorship_vnet.vnet_name}" = module.infra_ci_jenkins_io_sponsorship_vnet.vnet_id,
   }
 }
 
@@ -333,8 +379,9 @@ module "infra_ci_jenkins_io_sponsorship_vnet" {
   ]
 
   peered_vnets = {
-    "${module.private_vnet.vnet_name}"   = module.private_vnet.vnet_id
-    "${module.public_db_vnet.vnet_name}" = module.public_db_vnet.vnet_id,
+    "${module.public_sponsorship_vnet.vnet_name}" = module.public_sponsorship_vnet.vnet_id
+    "${module.private_vnet.vnet_name}"            = module.private_vnet.vnet_id
+    "${module.public_db_vnet.vnet_name}"          = module.public_db_vnet.vnet_id,
   }
 }
 
