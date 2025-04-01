@@ -61,7 +61,8 @@ module "trusted_outbound_sponsorship" {
 }
 
 module "ci_jenkins_io_outbound_sponsorship" {
-  source = "./.shared-tools/terraform/modules/azure-nat-gateway"
+  depends_on = [module.public_sponsorship_vnet]
+  source     = "./.shared-tools/terraform/modules/azure-nat-gateway"
 
   providers = {
     azurerm = azurerm.jenkins-sponsorship
