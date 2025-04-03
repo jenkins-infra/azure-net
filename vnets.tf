@@ -175,7 +175,7 @@ module "public_sponsorship_vnet" {
   base_name          = "public-jenkins-sponsorship"
   tags               = local.default_tags
   location           = var.location
-  vnet_address_space = ["10.200.0.0/14"]
+  vnet_address_space = ["10.200.0.0/14", "fd00:db8:decb::/48"]
   subnets = [
     {
       name                                          = "public-jenkins-sponsorship-vnet-ci_jenkins_io_agents"
@@ -186,8 +186,11 @@ module "public_sponsorship_vnet" {
       private_endpoint_network_policies             = "Disabled"
     },
     {
-      name                                          = "public-jenkins-sponsorship-vnet-ci_jenkins_io_controller"
-      address_prefixes                              = ["10.200.1.0/24"] # 10.200.1.1 - 10.200.1.254
+      name = "public-jenkins-sponsorship-vnet-ci_jenkins_io_controller"
+      address_prefixes = [
+        "10.200.1.0/24",           # 10.200.1.1 - 10.200.1.254
+        "fd00:db8:decb:deed::/64", # smaller size
+      ],
       service_endpoints                             = ["Microsoft.Storage"]
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
