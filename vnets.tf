@@ -180,7 +180,7 @@ module "public_sponsorship_vnet" {
     {
       name                                          = "public-jenkins-sponsorship-vnet-ci_jenkins_io_agents"
       address_prefixes                              = ["10.200.2.0/24"] # 10.200.2.1 - 10.200.2.254
-      service_endpoints                             = []
+      service_endpoints                             = ["Microsoft.Storage"]
       delegations                                   = {}
       private_link_service_network_policies_enabled = false
       private_endpoint_network_policies             = "Disabled"
@@ -188,7 +188,7 @@ module "public_sponsorship_vnet" {
     {
       name                                          = "public-jenkins-sponsorship-vnet-ci_jenkins_io_controller"
       address_prefixes                              = ["10.200.1.0/24"] # 10.200.1.1 - 10.200.1.254
-      service_endpoints                             = []
+      service_endpoints                             = ["Microsoft.Storage"]
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Disabled"
@@ -196,7 +196,7 @@ module "public_sponsorship_vnet" {
     {
       name                                          = "public-jenkins-sponsorship-vnet-ci_jenkins_io_kubernetes"
       address_prefixes                              = ["10.201.0.0/24"] # 10.201.0.0 - 10.201.0.254
-      service_endpoints                             = []
+      service_endpoints                             = ["Microsoft.Storage"]
       delegations                                   = {}
       private_link_service_network_policies_enabled = false
       private_endpoint_network_policies             = "Enabled"
