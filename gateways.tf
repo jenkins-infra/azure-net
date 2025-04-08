@@ -95,27 +95,6 @@ module "privatek8s_outbound" {
   ]
 }
 
-module "privatek8s_outbound_sponsorship" {
-  depends_on = [module.private_sponsorship_vnet]
-  source     = "./.shared-tools/terraform/modules/azure-nat-gateway"
-
-  providers = {
-    azurerm = azurerm.jenkins-sponsorship
-  }
-
-  name                = "privatek8s-outbound-sponsorship"
-  resource_group_name = module.private_sponsorship_vnet.vnet_rg_name
-  vnet_name           = module.private_sponsorship_vnet.vnet_name
-  subnet_ids = [
-    module.private_sponsorship_vnet.subnets["privatek8s-sponsorship-tier"],
-    module.private_sponsorship_vnet.subnets["privatek8s-sponsorship-release-tier"],
-    module.private_sponsorship_vnet.subnets["privatek8s-sponsorship-infraci-ctrl-tier"],
-    module.private_sponsorship_vnet.subnets["privatek8s-sponsorship-releaseci-ctrl-tier"],
-  ]
-
-  outbound_ip_count = 2
-}
-
 module "infra_ci_outbound_sponsorship" {
   source = "./.shared-tools/terraform/modules/azure-nat-gateway"
 
