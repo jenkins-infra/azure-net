@@ -50,7 +50,7 @@ module "public_vnet" {
   base_name          = "public"
   tags               = local.default_tags
   location           = var.location
-  vnet_address_space = ["10.244.0.0/14", "fd00:db8:deca::/48"] # from 10.244.0.1 - to 10.247.255.255
+  vnet_address_space = ["10.244.0.0/14", "fd00:db8:deca::/48"]
   subnets = [
     {
       # Dedicated subnet for the  "publick8s" AKS cluster resources
@@ -162,67 +162,6 @@ module "private_vnet" {
     "${module.cert_ci_jenkins_io_vnet.vnet_name}"              = module.cert_ci_jenkins_io_vnet.vnet_id
     "${module.trusted_ci_jenkins_io_vnet.vnet_name}"           = module.trusted_ci_jenkins_io_vnet.vnet_id
     "${module.infra_ci_jenkins_io_sponsorship_vnet.vnet_name}" = module.infra_ci_jenkins_io_sponsorship_vnet.vnet_id
-  }
-}
-
-module "private_sponsorship_vnet" {
-  source = "./.shared-tools/terraform/modules/azure-full-vnet"
-
-  base_name          = "private-sponsorship"
-  tags               = local.default_tags
-  location           = var.location
-  vnet_address_space = ["10.240.0.0/14"] # 10.240.0.1 - 10.251.255.254
-  subnets = [
-    {
-      ### TODO add the correct code in https://github.com/jenkins-infra/terraform-states/blob/17df75c38040c9b1087bade3654391bc5db45ffd/azure/main.tf#L59
-      # Dedicated subnet for the "privatek8s" AKS cluster resources on sponsorship account
-      ## Important: the "terraform-production" Enterprise Application used by this repo pipeline needs to be able to manage this virtual network.
-      ## See the corresponding role assignment for this vnet added in the (private) terraform-state repo:
-      ## https://github.com/jenkins-infra/terraform-states/blob/17df75c38040c9b1087bade3654391bc5db45ffd/azure/main.tf#L59
-      name                                          = "privatek8s-sponsorship-tier"
-      address_prefixes                              = ["10.241.0.0/16"]
-      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
-      delegations                                   = {}
-      private_link_service_network_policies_enabled = true
-      private_endpoint_network_policies             = "Enabled"
-    },
-    {
-      ### TODO add the correct code in https://github.com/jenkins-infra/terraform-states/blob/17df75c38040c9b1087bade3654391bc5db45ffd/azure/main.tf#L59
-      # Dedicated subnet for the release nodes of the "privatek8s" AKS cluster resources on sponsorship account
-      ## Important: the "terraform-production" Enterprise Application used by this repo pipeline needs to be able to manage this virtual network.
-      ## See the corresponding role assignment for this vnet added in the (private) terraform-state repo:
-      ## https://github.com/jenkins-infra/terraform-states/blob/17df75c38040c9b1087bade3654391bc5db45ffd/azure/main.tf#L59
-      name                                          = "privatek8s-sponsorship-release-tier"
-      address_prefixes                              = ["10.242.0.0/25"] # from 10.242.0.0 to 10.242.0.127
-      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
-      delegations                                   = {}
-      private_link_service_network_policies_enabled = true
-      private_endpoint_network_policies             = "Enabled"
-    },
-    {
-      # Dedicated subnet for the release nodes of the "privatek8s" for the controller infraci AKS cluster resources on sponsorship account
-      name                                          = "privatek8s-sponsorship-infraci-ctrl-tier"
-      address_prefixes                              = ["10.242.0.128/26"] # from 10.242.0.128 to 10.242.0.191
-      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
-      delegations                                   = {}
-      private_link_service_network_policies_enabled = true
-      private_endpoint_network_policies             = "Enabled"
-    }
-    ,
-    {
-      # Dedicated subnet for the private nodes of the "privatek8s" for the controller releaseci AKS cluster resources on sponsorship account
-      name                                          = "privatek8s-sponsorship-releaseci-ctrl-tier"
-      address_prefixes                              = ["10.242.0.192/26"] # from 10.242.0.192 to 10.242.0.255
-      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
-      delegations                                   = {}
-      private_link_service_network_policies_enabled = true
-      private_endpoint_network_policies             = "Enabled"
-    }
-  ]
-
-  # only peer with privatek8s
-  peered_vnets = {
-    "${module.private_vnet.vnet_name}" = module.private_vnet.vnet_id,
   }
 }
 
