@@ -168,13 +168,16 @@ module "private_vnet" {
 module "private_sponsorship_vnet" {
   source = "./.shared-tools/terraform/modules/azure-full-vnet"
 
+  providers = {
+    azurerm = azurerm.jenkins-sponsorship
+  }
+
   base_name          = "private-sponsorship"
   tags               = local.default_tags
   location           = var.location
   vnet_address_space = ["10.240.0.0/14"] # 10.240.0.1 - 10.251.255.254
   subnets = [
     {
-      ### TODO add the correct code in https://github.com/jenkins-infra/terraform-states/blob/17df75c38040c9b1087bade3654391bc5db45ffd/azure/main.tf#L59
       # Dedicated subnet for the "privatek8s" AKS cluster resources on sponsorship account
       ## Important: the "terraform-production" Enterprise Application used by this repo pipeline needs to be able to manage this virtual network.
       ## See the corresponding role assignment for this vnet added in the (private) terraform-state repo:
@@ -187,7 +190,6 @@ module "private_sponsorship_vnet" {
       private_endpoint_network_policies             = "Enabled"
     },
     {
-      ### TODO add the correct code in https://github.com/jenkins-infra/terraform-states/blob/17df75c38040c9b1087bade3654391bc5db45ffd/azure/main.tf#L59
       # Dedicated subnet for the release nodes of the "privatek8s" AKS cluster resources on sponsorship account
       ## Important: the "terraform-production" Enterprise Application used by this repo pipeline needs to be able to manage this virtual network.
       ## See the corresponding role assignment for this vnet added in the (private) terraform-state repo:
