@@ -168,7 +168,7 @@ module "private_vnet" {
 module "private_sponsorship_vnet" {
   source = "./.shared-tools/terraform/modules/azure-full-vnet"
 
-  base_name          = "private_sponsorship"
+  base_name          = "private-sponsorship"
   tags               = local.default_tags
   location           = var.location
   vnet_address_space = ["10.240.0.0/14"] # 10.240.0.1 - 10.251.255.254
