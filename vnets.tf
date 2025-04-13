@@ -162,6 +162,7 @@ module "private_vnet" {
     "${module.cert_ci_jenkins_io_vnet.vnet_name}"              = module.cert_ci_jenkins_io_vnet.vnet_id
     "${module.trusted_ci_jenkins_io_vnet.vnet_name}"           = module.trusted_ci_jenkins_io_vnet.vnet_id
     "${module.infra_ci_jenkins_io_sponsorship_vnet.vnet_name}" = module.infra_ci_jenkins_io_sponsorship_vnet.vnet_id
+    "${module.private_sponsorship_vnet.vnet_name}"             = module.private_sponsorship_vnet.vnet_id
   }
 }
 
