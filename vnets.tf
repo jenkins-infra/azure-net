@@ -223,9 +223,11 @@ module "private_sponsorship_vnet" {
     }
   ]
 
-  # only peer with privatek8s
   peered_vnets = {
+    # Accesses through VPN and privatek8s cluster
     "${module.private_vnet.vnet_name}" = module.private_vnet.vnet_id,
+    # Accesses through the infra.ci agents private vnet
+    "${module.infra_ci_jenkins_io_sponsorship_vnet.vnet_name}" = module.infra_ci_jenkins_io_sponsorship_vnet.vnet_id,
   }
 }
 
