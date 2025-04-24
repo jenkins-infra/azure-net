@@ -181,8 +181,7 @@ module "private_sponsorship_vnet" {
     {
       # Dedicated subnet for the "privatek8s" AKS cluster resources on sponsorship account
       ## Important: the "terraform-production" Enterprise Application used by this repo pipeline needs to be able to manage this virtual network.
-      ## See the corresponding role assignment for this vnet added in the (private) terraform-state repo:
-      ## https://github.com/jenkins-infra/terraform-states/blob/17df75c38040c9b1087bade3654391bc5db45ffd/azure/main.tf#L59
+      ## Ref. https://github.com/jenkins-infra/terraform-states/blob/e5164afee643d7423a6f90f2bc260b89fc36d9e3/azure/main.tf#L114-L129
       name                                          = "privatek8s-sponsorship-tier"
       address_prefixes                              = ["10.241.0.0/16"]
       service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
