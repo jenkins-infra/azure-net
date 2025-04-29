@@ -243,6 +243,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_privatek8s" {
   # Map of records and corresponding purposes
   for_each = {
     "webhook-github-comment-ops" = "github-comment-ops GitHub App"
+    "infra-webhooks.ci"          = "infra.ci.jenkins.io webhooks from GitHub"
   }
 
   name                = each.key
@@ -261,6 +262,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_private_privatek8s" {
   # Map of records and corresponding purposes
   for_each = {
     "release.ci" = "release.ci.jenkins.io, only accessible via the private VPN"
+    "infra.ci"   = "infra.ci.jenkins.io, only accessible via the private VPN"
   }
 
   name                = each.key
