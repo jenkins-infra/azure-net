@@ -80,21 +80,6 @@ module "ci_jenkins_io_outbound_sponsorship" {
   outbound_ip_count = 2
 }
 
-module "privatek8s_outbound" {
-  source = "./.shared-tools/terraform/modules/azure-nat-gateway"
-
-  name                = "privatek8s-outbound"
-  resource_group_name = module.private_vnet.vnet_rg_name
-  vnet_name           = module.private_vnet.vnet_name
-  subnet_ids = [
-    module.private_vnet.subnets["privatek8s-tier"],
-    module.private_vnet.subnets["privatek8s-release-tier"],
-    module.private_vnet.subnets["private-vnet-data-tier"],
-    module.private_vnet.subnets["privatek8s-infraci-ctrl-tier"],
-    module.private_vnet.subnets["privatek8s-releaseci-ctrl-tier"],
-  ]
-}
-
 module "privatek8s_outbound_sponsorship" {
   depends_on = [module.private_sponsorship_vnet]
   source     = "./.shared-tools/terraform/modules/azure-nat-gateway"
