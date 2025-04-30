@@ -238,7 +238,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_private_publick8s" {
   })
 }
 
-# CNAME records targeting the public-nginx on privatek8s cluster
+# CNAME records targeting the public-nginx on privatek8s-sponsorship cluster
 resource "azurerm_dns_cname_record" "jenkinsio_target_public_privatek8s" {
   # Map of records and corresponding purposes
   for_each = {
@@ -250,14 +250,14 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_privatek8s" {
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 300
-  record              = "public.privatek8s-sponsorship.jenkins.io" # A record defined in https://github.com/jenkins-infra/azure/blob/main/privatek8s.tf
+  record              = "public.privatek8s-sponsorship.jenkins.io" # A record defined in https://github.com/jenkins-infra/azure
 
   tags = merge(local.default_tags, {
     purpose = each.value
   })
 }
 
-# CNAME records targeting the private-nginx on privatek8s cluster
+# CNAME records targeting the private-nginx on privatek8s-sponsorship cluster
 resource "azurerm_dns_cname_record" "jenkinsio_target_private_privatek8s" {
   # Map of records and corresponding purposes
   for_each = {

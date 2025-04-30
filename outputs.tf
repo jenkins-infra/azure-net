@@ -10,11 +10,7 @@ resource "local_file" "jenkins_infra_data_report" {
       "outbound_ips" = split(",", module.ci_jenkins_io_outbound_sponsorship.public_ip_list),
     },
     "infra.ci.jenkins.io" = {
-      "outbound_ips" = concat(split(",", module.infra_ci_outbound_sponsorship.public_ip_list), split(",", module.privatek8s_outbound.public_ip_list)),
-    },
-    "privatek8s.jenkins.io" = {
-      "outbound_ips"      = split(",", module.privatek8s_outbound.public_ip_list),
-      "private_lb_subnet" = "private-vnet-data-tier",
+      "outbound_ips" = concat(split(",", module.infra_ci_outbound_sponsorship.public_ip_list), split(",", module.privatek8s_outbound_sponsorship.public_ip_list)),
     },
     "privatek8s_sponsorship.jenkins.io" = {
       "outbound_ips"      = split(",", module.privatek8s_outbound_sponsorship.public_ip_list),
