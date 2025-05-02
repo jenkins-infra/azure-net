@@ -13,10 +13,6 @@ locals {
     }
   }
 
-  lets_encrypt_dns_challenged_domains = {
-    "trusted.ci.jenkins.io" = "2025-06-17T00:00:00Z"
-  }
-
   public_ips = {
     "publick8s_public_ipv4_address" = "20.7.178.24"          # defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
     "publick8s_public_ipv6_address" = "2603:1030:408:5::15a" # defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
