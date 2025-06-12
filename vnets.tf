@@ -122,6 +122,7 @@ module "private_vnet" {
     "${module.cert_ci_jenkins_io_vnet.vnet_name}"              = module.cert_ci_jenkins_io_vnet.vnet_id
     "${module.trusted_ci_jenkins_io_vnet.vnet_name}"           = module.trusted_ci_jenkins_io_vnet.vnet_id
     "${module.infra_ci_jenkins_io_sponsorship_vnet.vnet_name}" = module.infra_ci_jenkins_io_sponsorship_vnet.vnet_id
+    "${module.infra_ci_jenkins_io_vnet.vnet_name}"             = module.infra_ci_jenkins_io_vnet.vnet_id
     "${module.private_sponsorship_vnet.vnet_name}"             = module.private_sponsorship_vnet.vnet_id
   }
 }
@@ -186,6 +187,7 @@ module "private_sponsorship_vnet" {
     "${module.private_vnet.vnet_name}" = module.private_vnet.vnet_id,
     # Accesses through the infra.ci agents private vnet
     "${module.infra_ci_jenkins_io_sponsorship_vnet.vnet_name}" = module.infra_ci_jenkins_io_sponsorship_vnet.vnet_id,
+    "${module.infra_ci_jenkins_io_vnet.vnet_name}"             = module.infra_ci_jenkins_io_vnet.vnet_id
   }
 }
 
@@ -237,6 +239,7 @@ module "public_sponsorship_vnet" {
     "${module.private_vnet.vnet_name}" = module.private_vnet.vnet_id,
     # Accesses through the infra.ci agents private vnet
     "${module.infra_ci_jenkins_io_sponsorship_vnet.vnet_name}" = module.infra_ci_jenkins_io_sponsorship_vnet.vnet_id,
+    "${module.infra_ci_jenkins_io_vnet.vnet_name}"             = module.infra_ci_jenkins_io_vnet.vnet_id
   }
 }
 
@@ -374,6 +377,49 @@ module "cert_ci_jenkins_io_sponsorship_vnet" {
   }
 }
 
+module "infra_ci_jenkins_io_vnet" {
+  source = "./.shared-tools/terraform/modules/azure-full-vnet"
+
+  base_name          = "infra-ci-jenkins-io"
+  tags               = local.default_tags
+  location           = var.location
+  vnet_address_space = ["10.5.0.0/22"] # 10.5.0.1 - 10.5.3.254
+
+  subnets = [
+    {
+      name                                          = "infra-ci-jenkins-io-vnet-ephemeral-agents"
+      address_prefixes                              = ["10.5.0.0/24"] # 10.5.0.1 - 10.5.0.254
+      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
+    },
+    {
+      name                                          = "infra-ci-jenkins-io-vnet-packer-builds"
+      address_prefixes                              = ["10.5.1.0/24"] # 10.5.1.1 - 10.5.1.254
+      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
+    },
+    {
+      name                                          = "infra-ci-jenkins-io-vnet-kubernetes-agents"
+      address_prefixes                              = ["10.5.2.0/24"] # 10.5.2.0 - 10.5.2.254
+      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
+    },
+  ]
+
+  peered_vnets = {
+    "${module.public_sponsorship_vnet.vnet_name}"  = module.public_sponsorship_vnet.vnet_id
+    "${module.private_vnet.vnet_name}"             = module.private_vnet.vnet_id
+    "${module.public_db_vnet.vnet_name}"           = module.public_db_vnet.vnet_id,
+    "${module.private_sponsorship_vnet.vnet_name}" = module.private_sponsorship_vnet.vnet_id,
+  }
+}
+
 module "infra_ci_jenkins_io_sponsorship_vnet" {
   source = "./.shared-tools/terraform/modules/azure-full-vnet"
 
@@ -475,6 +521,7 @@ module "public_db_vnet" {
   ]
   peered_vnets = {
     "${module.infra_ci_jenkins_io_sponsorship_vnet.vnet_name}" = module.infra_ci_jenkins_io_sponsorship_vnet.vnet_id
+    "${module.infra_ci_jenkins_io_vnet.vnet_name}"             = module.infra_ci_jenkins_io_vnet.vnet_id
     "${module.public_vnet.vnet_name}"                          = module.public_vnet.vnet_id
     "${module.private_vnet.vnet_name}"                         = module.private_vnet.vnet_id
   }
