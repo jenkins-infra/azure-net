@@ -169,8 +169,7 @@ module "private_sponsorship_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
-    }
-    ,
+    },
     {
       # Dedicated subnet for the private nodes of the "privatek8s-sponsorship" for the controller releaseci AKS cluster resources on sponsorship account
       name                                          = "privatek8s-sponsorship-releaseci-ctrl-tier"
@@ -381,6 +380,8 @@ module "infra_ci_jenkins_io_vnet" {
   source = "./.shared-tools/terraform/modules/azure-full-vnet"
 
   base_name          = "infra-ci-jenkins-io"
+  gateway_name       = "infra-ci-jenkins-io-outbound"
+  outbound_ip_count  = 2
   tags               = local.default_tags
   location           = var.location
   vnet_address_space = ["10.5.0.0/22"] # 10.5.0.1 - 10.5.3.254
