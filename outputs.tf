@@ -1,26 +1,26 @@
 resource "local_file" "jenkins_infra_data_report" {
   content = jsonencode({
     "cert.ci.jenkins.io" = {
-      "outbound_ips" = concat(split(",", module.cert_ci_jenkins_io_outbound.public_ip_list), split(",", module.cert_ci_jenkins_io_outbound_sponsorship.public_ip_list)),
+      "outbound_ips" = concat(split(",", module.cert_ci_jenkins_io_vnet.public_ip_list), split(",", module.cert_ci_jenkins_io_sponsorship_vnet.public_ip_list)),
     },
     "trusted.ci.jenkins.io" = {
-      "outbound_ips" = concat(split(",", module.trusted_outbound.public_ip_list), split(",", module.trusted_outbound_sponsorship.public_ip_list)),
+      "outbound_ips" = concat(split(",", module.trusted_ci_jenkins_io_vnet.public_ip_list), split(",", module.trusted_ci_jenkins_io_sponsorship_vnet.public_ip_list)),
     },
     "ci.jenkins.io" = {
-      "outbound_ips" = split(",", module.ci_jenkins_io_outbound_sponsorship.public_ip_list),
+      "outbound_ips" = split(",", module.public_sponsorship_vnet.public_ip_list),
     },
     "infra.ci.jenkins.io" = {
-      "outbound_ips" = concat(split(",", module.infra_ci_outbound_sponsorship.public_ip_list), split(",", module.privatek8s_outbound_sponsorship.public_ip_list)),
+      "outbound_ips" = concat(split(",", module.infra_ci_jenkins_io_sponsorship_vnet.public_ip_list), split(",", module.private_sponsorship_vnet.public_ip_list)),
     },
     "privatek8s_sponsorship.jenkins.io" = {
-      "outbound_ips"      = split(",", module.privatek8s_outbound_sponsorship.public_ip_list),
+      "outbound_ips"      = split(",", module.private_sponsorship_vnet.public_ip_list),
       "private_lb_subnet" = "privatek8s-sponsorship-tier",
     },
     "publick8s.jenkins.io" = {
-      "outbound_ips" = split(",", module.publick8s_outbound.public_ip_list),
+      "outbound_ips" = split(",", module.public_vnet.public_ip_list),
     },
     "infracijenkinsioagents1.jenkins.io" = {
-      "outbound_ips" = split(",", module.infra_ci_outbound_sponsorship.public_ip_list),
+      "outbound_ips" = split(",", module.infra_ci_jenkins_io_sponsorship_vnet.public_ip_list),
     },
     "private.vpn.jenkins.io" = {
       # VPN VM uses its public IP as outbound method (default Azure behavior) instead of the outbound NAT gateway

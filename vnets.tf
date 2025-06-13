@@ -47,10 +47,13 @@
 module "public_vnet" {
   source = "./.shared-tools/terraform/modules/azure-full-vnet"
 
-  base_name          = "public"
-  tags               = local.default_tags
-  location           = var.location
-  vnet_address_space = ["10.244.0.0/14", "fd00:db8:deca::/48"] # from 10.244.0.1 - to 10.247.255.255
+  base_name    = "public"
+  gateway_name = "publick8s-outbound"
+  # TODO: deprecate this attribute once publick8s AKS cluster is modernized to default to NAT gateway instead of outbound LB
+  gateway_subnets_exclude = ["public-vnet-data-tier"]
+  tags                    = local.default_tags
+  location                = var.location
+  vnet_address_space      = ["10.244.0.0/14", "fd00:db8:deca::/48"] # from 10.244.0.1 - to 10.247.255.255
   subnets = [
     {
       # Dedicated subnet for the  "publick8s" AKS cluster resources
@@ -131,6 +134,8 @@ module "private_sponsorship_vnet" {
   }
 
   base_name          = "private-sponsorship"
+  gateway_name       = "privatek8s-outbound-sponsorship"
+  outbound_ip_count  = 2
   tags               = local.default_tags
   location           = var.location
   vnet_address_space = ["10.240.0.0/14"] # 10.240.0.1 - 10.251.255.254
@@ -192,6 +197,8 @@ module "public_sponsorship_vnet" {
   }
 
   base_name          = "public-jenkins-sponsorship"
+  gateway_name       = "ci-jenkins-io-outbound-sponsorship"
+  outbound_ip_count  = 2
   tags               = local.default_tags
   location           = var.location
   vnet_address_space = ["10.200.0.0/14", "fd00:db8:decb::/48"]
@@ -237,6 +244,7 @@ module "trusted_ci_jenkins_io_vnet" {
   source = "./.shared-tools/terraform/modules/azure-full-vnet"
 
   base_name          = "trusted-ci-jenkins-io"
+  gateway_name       = "trusted-outbound"
   tags               = local.default_tags
   location           = var.location
   vnet_address_space = ["10.252.0.0/21"] # 10.252.0.1 - 10.252.7.254
@@ -281,6 +289,8 @@ module "trusted_ci_jenkins_io_sponsorship_vnet" {
   }
 
   base_name          = "trusted-ci-jenkins-io-sponsorship"
+  gateway_name       = "trusted-outbound-sponsorship"
+  outbound_ip_count  = 3
   tags               = local.default_tags
   location           = var.location
   vnet_address_space = ["10.204.0.0/24"] # 10.204.0.1 - 10.204.0.254
@@ -304,6 +314,7 @@ module "cert_ci_jenkins_io_vnet" {
   source = "./.shared-tools/terraform/modules/azure-full-vnet"
 
   base_name          = "cert-ci-jenkins-io"
+  gateway_name       = "cert-ci-jenkins-io-outbound"
   tags               = local.default_tags
   location           = var.location
   vnet_address_space = ["10.252.8.0/21"] # 10.252.8.1 - 10.252.15.254
@@ -341,6 +352,8 @@ module "cert_ci_jenkins_io_sponsorship_vnet" {
   }
 
   base_name          = "cert-ci-jenkins-io-sponsorship"
+  gateway_name       = "cert-ci-jenkins-io-outbound-sponsorship"
+  outbound_ip_count  = 2
   tags               = local.default_tags
   location           = var.location
   vnet_address_space = ["10.205.0.0/24"] # 10.205.0.1 - 10.205.0.254
@@ -369,6 +382,8 @@ module "infra_ci_jenkins_io_sponsorship_vnet" {
   }
 
   base_name          = "infra-ci-jenkins-io-sponsorship"
+  gateway_name       = "infra-ci-outbound-sponsorship"
+  outbound_ip_count  = 2
   tags               = local.default_tags
   location           = var.location
   vnet_address_space = ["10.206.0.0/22"] # 10.206.0.1 - 10.206.3.254
