@@ -22,6 +22,9 @@ resource "local_file" "jenkins_infra_data_report" {
     "infracijenkinsioagents1.jenkins.io" = {
       "outbound_ips" = split(",", module.infra_ci_jenkins_io_sponsorship_vnet.public_ip_list),
     },
+    "infracijenkinsioagents2.jenkins.io" = {
+      "outbound_ips" = split(",", module.infra_ci_jenkins_io_vnet.public_ip_list),
+    },
     "private.vpn.jenkins.io" = {
       # VPN VM uses its public IP as outbound method (default Azure behavior) instead of the outbound NAT gateway
       "outbound_ips" = [azurerm_public_ip.vpn_public.ip_address],
@@ -29,6 +32,7 @@ resource "local_file" "jenkins_infra_data_report" {
     "vnets" = {
       "cert-ci-jenkins-io-sponsorship-vnet"    = module.cert_ci_jenkins_io_sponsorship_vnet.vnet_address_space,
       "cert-ci-jenkins-io-vnet"                = module.cert_ci_jenkins_io_vnet.vnet_address_space,
+      "infra-ci-jenkins-io-vnet"               = module.infra_ci_jenkins_io_vnet.vnet_address_space,
       "infra-ci-jenkins-io-sponsorship-vnet"   = module.infra_ci_jenkins_io_sponsorship_vnet.vnet_address_space,
       "private-vnet"                           = module.private_vnet.vnet_address_space,
       "private-sponsorship-vnet"               = module.private_sponsorship_vnet.vnet_address_space,
