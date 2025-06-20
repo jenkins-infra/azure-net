@@ -125,31 +125,6 @@ resource "azurerm_dns_cname_record" "updates_jenkins_io" {
   })
 }
 
-## jenkinsistheway.io DNS zone records
-# Apex records for the jenkinsistheway.io redirector hosted on publick8s redirecting to stories.jenkins.io
-resource "azurerm_dns_a_record" "jenkinsistheway_io" {
-  name                = "@"
-  zone_name           = azurerm_dns_zone.jenkinsistheway_io.name
-  resource_group_name = azurerm_resource_group.proddns_jenkinsisthewayio.name
-  ttl                 = 60
-  records             = [local.public_ips["publick8s_public_ipv4_address"]]
-
-  tags = merge(local.default_tags, {
-    purpose = "Jenkinsistheway.io redirector to stories.jenkins.io"
-  })
-}
-resource "azurerm_dns_aaaa_record" "jenkinsistheway_io_ipv6" {
-  name                = "@"
-  zone_name           = azurerm_dns_zone.jenkinsistheway_io.name
-  resource_group_name = azurerm_resource_group.proddns_jenkinsisthewayio.name
-  ttl                 = 60
-  records             = [local.public_ips["publick8s_public_ipv6_address"]]
-
-  tags = merge(local.default_tags, {
-    purpose = "Jenkinsistheway.io redirector to stories.jenkins.io"
-  })
-}
-
 ### CNAME records
 # CNAME records targeting the public-nginx on publick8s cluster
 resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
