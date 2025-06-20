@@ -333,7 +333,7 @@ module "cert_ci_jenkins_io_vnet" {
     {
       name                                          = "cert-ci-jenkins-io-vnet-ephemeral-agents"
       address_prefixes                              = ["10.252.9.0/24"] # 10.252.9.1 - 10.252.9.254
-      service_endpoints                             = []
+      service_endpoints                             = ["Microsoft.Storage"]
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
@@ -364,7 +364,7 @@ module "cert_ci_jenkins_io_sponsorship_vnet" {
     {
       name                                          = "cert-ci-jenkins-io-sponsorship-vnet-ephemeral-agents"
       address_prefixes                              = ["10.205.0.0/24"] # 10.205.0.1 - 10.205.0.254
-      service_endpoints                             = []
+      service_endpoints                             = ["Microsoft.Storage"]
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
