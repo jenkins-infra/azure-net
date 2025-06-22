@@ -132,6 +132,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
   for_each = {
     "accounts"            = "accountapp for Jenkins users"
     "azure.updates"       = "Update Center hosted on Azure (Apache redirections service)"
+    "build.reports"       = "Public build reports about the private Jenkins controllers of the Jenkins infrastructure"
     "contributors.origin" = "Jenkins Contributors Spotlight website content origin for Fastly CDN"
     "docs.origin"         = "Versioned docs of jenkins.io content origin for Fastly CDN"
     "fallback.get"        = "Fallback address for mirrorbits" # Note: had a TTL of 10 minutes before, not 1 hour
