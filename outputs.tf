@@ -19,9 +19,6 @@ resource "local_file" "jenkins_infra_data_report" {
     "publick8s.jenkins.io" = {
       "outbound_ips" = split(",", module.public_vnet.public_ip_list),
     },
-    "infracijenkinsioagents1.jenkins.io" = {
-      "outbound_ips" = split(",", module.infra_ci_jenkins_io_sponsorship_vnet.public_ip_list),
-    },
     "infracijenkinsioagents2.jenkins.io" = {
       "outbound_ips" = split(",", module.infra_ci_jenkins_io_vnet.public_ip_list),
     },

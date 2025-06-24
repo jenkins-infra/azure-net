@@ -453,14 +453,6 @@ module "infra_ci_jenkins_io_sponsorship_vnet" {
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
     },
-    {
-      name                                          = "infra-ci-jenkins-io-sponsorship-vnet-kubernetes-agents"
-      address_prefixes                              = ["10.206.2.0/24"] # 10.206.2.0 - 10.206.2.254
-      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
-      delegations                                   = {}
-      private_link_service_network_policies_enabled = true
-      private_endpoint_network_policies             = "Enabled"
-    },
   ]
 
   peered_vnets = {
