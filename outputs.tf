@@ -10,7 +10,14 @@ resource "local_file" "jenkins_infra_data_report" {
       "outbound_ips" = split(",", module.public_sponsorship_vnet.public_ip_list),
     },
     "infra.ci.jenkins.io" = {
-      "outbound_ips" = concat(split(",", module.infra_ci_jenkins_io_sponsorship_vnet.public_ip_list), split(",", module.private_sponsorship_vnet.public_ip_list)),
+      "outbound_ips" = concat(
+        # Controller
+        split(",", module.private_sponsorship_vnet.public_ip_list),
+        # VM agents
+        split(",", module.infra_ci_jenkins_io_sponsorship_vnet.public_ip_list),
+        # Container agents
+        split(",", module.infra_ci_jenkins_io_vnet.public_ip_list),
+      ),
     },
     "privatek8s_sponsorship.jenkins.io" = {
       "outbound_ips"      = split(",", module.private_sponsorship_vnet.public_ip_list),
@@ -18,9 +25,6 @@ resource "local_file" "jenkins_infra_data_report" {
     },
     "publick8s.jenkins.io" = {
       "outbound_ips" = split(",", module.public_vnet.public_ip_list),
-    },
-    "infracijenkinsioagents2.jenkins.io" = {
-      "outbound_ips" = split(",", module.infra_ci_jenkins_io_vnet.public_ip_list),
     },
     "private.vpn.jenkins.io" = {
       # VPN VM uses its public IP as outbound method (default Azure behavior) instead of the outbound NAT gateway
