@@ -1,0 +1,50 @@
+name: Track the AWS Route53 DNS Zone Name Servers for delegated zones
+
+scms:
+  default:
+    kind: github
+    spec:
+      user: "{{ .github.user }}"
+      email: "{{ .github.email }}"
+      owner: "{{ .github.owner }}"
+      repository: "{{ .github.repository }}"
+      token: "{{ requiredEnv .github.token }}"
+      username: "{{ .github.username }}"
+      branch: "{{ .github.branch }}"
+
+sources:
+  getAwsCiJenkinsIoNameServers:
+    name: Get the Name Servers of the AWS Route 53 aws.ci.jenkins.io DNS zone
+    kind: json
+    spec:
+      file: https://reports.jenkins.io/jenkins-infra-data-reports/aws-sponsorship.json
+      key: aws\.ci\.jenkins\.io.name_servers
+    transformers:
+      - replacers:
+          - from: '['
+            to: ''
+          - from: ']'
+            to: ''
+
+targets:
+  updateNSRecord:
+    name: Update NS records for aws.ci.jenkins.io
+    kind: hcl
+    spec:
+      file: locals.tf
+      path: locals.aws_route53_nameservers_awscijenkinsio
+    scmid: default
+
+actions:
+  default:
+    kind: github/pullrequest
+    scmid: default
+    title: "feat(dns) Update NS records for aws.ci.jenkins.io"
+    spec:
+      description: |
+        A new set of Name Servers for the AWS Route 53 delegated zone for `aws.ci.jenkins.io` were detected in <https://reports.jenkins.io/jenkins-infra-data-reports/aws-sponsorship.json>.
+        This PR updates the `NS` records with the new detected values.
+      labels:
+        - terraform
+        - dns
+        - aws.ci.jenkins.io

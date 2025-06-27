@@ -32,19 +32,14 @@ resource "azurerm_dns_ns_record" "do_jenkins_io" {
   tags = local.default_tags
 }
 
-# Cleanup once the resources are managed in jenkins-infra/azure - https://github.com/jenkins-infra/helpdesk/issues/4630#issuecomment-2846886448
-removed {
-  from = azurerm_dns_zone.child_zones
+# NS records pointing to AWS Route53 name servers to delegate aws.ci.jenkins.io to them
+resource "azurerm_dns_ns_record" "aws_ci_jenkins_io" {
+  name                = "aws.ci"
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 60
 
-  lifecycle {
-    destroy = false
-  }
-}
-# Cleanup once the resources are managed in jenkins-infra/azure - https://github.com/jenkins-infra/helpdesk/issues/4630#issuecomment-2846886448
-removed {
-  from = azurerm_dns_ns_record.child_zone_ns_records
+  records = split(" ", local.aws_route53_nameservers_awscijenkinsio)
 
-  lifecycle {
-    destroy = false
-  }
+  tags = local.default_tags
 }
