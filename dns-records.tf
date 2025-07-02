@@ -439,3 +439,27 @@ resource "azurerm_dns_caa_record" "jenkins_caa" {
     purpose = "Jenkins user authentication service"
   })
 }
+
+# NS records pointing to DigitalOcean name servers to delegate do.jenkins.io to them
+resource "azurerm_dns_ns_record" "do_jenkins_io" {
+  name                = "do"
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 60
+
+  records = ["ns1.digitalocean.com", "ns2.digitalocean.com", "ns3.digitalocean.com"]
+
+  tags = local.default_tags
+}
+
+# NS records pointing to AWS Route53 name servers to delegate aws.ci.jenkins.io to them
+resource "azurerm_dns_ns_record" "aws_ci_jenkins_io" {
+  name                = "aws.ci"
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 60
+
+  records = split(" ", local.aws_route53_nameservers_awscijenkinsio)
+
+  tags = local.default_tags
+}
