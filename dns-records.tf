@@ -299,12 +299,8 @@ resource "azurerm_dns_cname_record" "jenkinsio_fastly" {
 
 # Custom CNAME records
 import {
-  to = azurerm_dns_cname_record.jenkinsio_customs["ci"]
-  id = "/subscriptions/dff2ec18-6a8e-405c-8e45-b7df7465acf0/resourceGroups/proddns_jenkinsio/providers/Microsoft.Network/dnsZones/jenkins.io/CNAME/ci"
-}
-import {
-  to = azurerm_dns_cname_record.jenkinsio_customs["assets.ci"]
-  id = "/subscriptions/dff2ec18-6a8e-405c-8e45-b7df7465acf0/resourceGroups/proddns_jenkinsio/providers/Microsoft.Network/dnsZones/jenkins.io/CNAME/assets.ci"
+  to = azurerm_dns_cname_record.jenkinsio_customs["issues"]
+  id = "/subscriptions/dff2ec18-6a8e-405c-8e45-b7df7465acf0/resourceGroups/proddns_jenkinsio/providers/Microsoft.Network/dnsZones/jenkins.io/CNAME/issues"
 }
 resource "azurerm_dns_cname_record" "jenkinsio_customs" {
   # Map of records and corresponding purposes
@@ -327,6 +323,11 @@ resource "azurerm_dns_cname_record" "jenkinsio_customs" {
       "description" = "Secondary utility domain for public controller ci.jenkins.io",
       "ttl"         = 60,
     },
+    "issues" = {
+      "target"      = "jenkinsci-jira-alb-368766416.us-west-2.elb.amazonaws.com",
+      "description" = "Jenkins public JIRA hosted by the Linux Foundation",
+      "ttl"         = 60,
+    }
   }
 
   name                = each.key
