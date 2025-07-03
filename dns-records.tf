@@ -298,10 +298,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_fastly" {
 }
 
 # Custom CNAME records
-import {
-  to = azurerm_dns_cname_record.jenkinsio_customs["issues"]
-  id = "/subscriptions/dff2ec18-6a8e-405c-8e45-b7df7465acf0/resourceGroups/proddns_jenkinsio/providers/Microsoft.Network/dnsZones/jenkins.io/CNAME/issues"
-}
 resource "azurerm_dns_cname_record" "jenkinsio_customs" {
   # Map of records and corresponding purposes
   for_each = {
@@ -327,7 +323,12 @@ resource "azurerm_dns_cname_record" "jenkinsio_customs" {
       "target"      = "jenkinsci-jira-alb-368766416.us-west-2.elb.amazonaws.com",
       "description" = "Jenkins public JIRA hosted by the Linux Foundation",
       "ttl"         = 60,
-    }
+    },
+    "testissues" = {
+      "target"      = "jira-rhel9-alb-1841417744.us-west-2.elb.amazonaws.com",
+      "description" = "Jenkins public JIRA hosted by the Linux Foundation",
+      "ttl"         = 60,
+    },
   }
 
   name                = each.key
