@@ -298,23 +298,41 @@ resource "azurerm_dns_cname_record" "jenkinsio_fastly" {
 }
 
 # Custom CNAME records
+import {
+  to = azurerm_dns_cname_record.jenkinsio_customs["ci"]
+  id = "/subscriptions/dff2ec18-6a8e-405c-8e45-b7df7465acf0/resourceGroups/proddns_jenkinsio/providers/Microsoft.Network/dnsZones/jenkins.io/CNAME/ci"
+}
+import {
+  to = azurerm_dns_cname_record.jenkinsio_customs["assets.ci"]
+  id = "/subscriptions/dff2ec18-6a8e-405c-8e45-b7df7465acf0/resourceGroups/proddns_jenkinsio/providers/Microsoft.Network/dnsZones/jenkins.io/CNAME/assets.ci"
+}
 resource "azurerm_dns_cname_record" "jenkinsio_customs" {
   # Map of records and corresponding purposes
   for_each = {
     "old.stats" = {
-      "target"      = "jenkins-infra.github.io"
+      "target"      = "jenkins-infra.github.io",
       "description" = "Website to download Jenkins packages",
     },
     "charts" = {
-      "target"      = "jenkinsci.github.io"
+      "target"      = "jenkinsci.github.io",
       "description" = "Jenkins Helm Chart repository",
+    },
+    "ci" = {
+      "target"      = "azure.ci.jenkins.io",
+      "description" = "Public controller ci.jenkins.io",
+      "ttl"         = 60,
+    },
+    "assets.ci" = {
+      "target"      = "assets.azure.ci.jenkins.io",
+      "description" = "Secondary utility domain for public controller ci.jenkins.io",
+      "ttl"         = 60,
     },
   }
 
   name                = each.key
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-  ttl                 = 300
+  ttl                 = lookup(each.value, "ttl", 300)
   record              = each.value["target"]
 
   tags = merge(local.default_tags, {
@@ -438,4 +456,28 @@ resource "azurerm_dns_caa_record" "jenkins_caa" {
   tags = merge(local.default_tags, {
     purpose = "Jenkins user authentication service"
   })
+}
+
+# NS records pointing to DigitalOcean name servers to delegate do.jenkins.io to them
+resource "azurerm_dns_ns_record" "do_jenkins_io" {
+  name                = "do"
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 60
+
+  records = ["ns1.digitalocean.com", "ns2.digitalocean.com", "ns3.digitalocean.com"]
+
+  tags = local.default_tags
+}
+
+# NS records pointing to AWS Route53 name servers to delegate aws.ci.jenkins.io to them
+resource "azurerm_dns_ns_record" "aws_ci_jenkins_io" {
+  name                = "aws.ci"
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 60
+
+  records = split(" ", local.aws_route53_nameservers_awscijenkinsio)
+
+  tags = local.default_tags
 }
