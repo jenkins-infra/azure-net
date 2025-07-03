@@ -318,12 +318,12 @@ resource "azurerm_dns_cname_record" "jenkinsio_customs" {
       "description" = "Jenkins Helm Chart repository",
     },
     "ci" = {
-      "target"      = "azure.ci.jenkins.io",
+      "target"      = "aws.ci.jenkins.io",
       "description" = "Public controller ci.jenkins.io",
       "ttl"         = 60,
     },
     "assets.ci" = {
-      "target"      = "assets.azure.ci.jenkins.io",
+      "target"      = "assets.aws.ci.jenkins.io",
       "description" = "Secondary utility domain for public controller ci.jenkins.io",
       "ttl"         = 60,
     },
