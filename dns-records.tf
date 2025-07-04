@@ -329,8 +329,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_customs" {
     "updates" = {
       "target"      = "azure.updates.jenkins.io"
       "description" = "Jenkins Update Center"
-      # TODO: extend
-      "ttl" = 60,
     }
   }
 
@@ -343,10 +341,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_customs" {
   tags = merge(local.default_tags, {
     purpose = each.value["description"]
   })
-}
-moved {
-  from = azurerm_dns_cname_record.updates_jenkins_io
-  to   = azurerm_dns_cname_record.jenkinsio_customs["updates"]
 }
 
 ### TXT records
