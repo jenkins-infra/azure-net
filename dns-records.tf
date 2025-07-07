@@ -113,17 +113,6 @@ resource "azurerm_dns_a_record" "aws_updates_jenkins_io" {
     purpose = "Jenkins AWS-hosted Update Center"
   })
 }
-resource "azurerm_dns_cname_record" "updates_jenkins_io" {
-  name                = "updates"
-  zone_name           = data.azurerm_dns_zone.jenkinsio.name
-  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-  ttl                 = 60
-  record              = "azure.updates.jenkins.io"
-
-  tags = merge(local.default_tags, {
-    purpose = "Jenkins Update Center"
-  })
-}
 
 ### CNAME records
 # CNAME records targeting the public-nginx on publick8s cluster
@@ -298,14 +287,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_fastly" {
 }
 
 # Custom CNAME records
-import {
-  to = azurerm_dns_cname_record.jenkinsio_customs["ci"]
-  id = "/subscriptions/dff2ec18-6a8e-405c-8e45-b7df7465acf0/resourceGroups/proddns_jenkinsio/providers/Microsoft.Network/dnsZones/jenkins.io/CNAME/ci"
-}
-import {
-  to = azurerm_dns_cname_record.jenkinsio_customs["assets.ci"]
-  id = "/subscriptions/dff2ec18-6a8e-405c-8e45-b7df7465acf0/resourceGroups/proddns_jenkinsio/providers/Microsoft.Network/dnsZones/jenkins.io/CNAME/assets.ci"
-}
 resource "azurerm_dns_cname_record" "jenkinsio_customs" {
   # Map of records and corresponding purposes
   for_each = {
@@ -320,13 +301,35 @@ resource "azurerm_dns_cname_record" "jenkinsio_customs" {
     "ci" = {
       "target"      = "aws.ci.jenkins.io",
       "description" = "Public controller ci.jenkins.io",
-      "ttl"         = 60,
+      # TODO: extend once migrated to AWS
+      "ttl" = 60,
     },
     "assets.ci" = {
       "target"      = "assets.aws.ci.jenkins.io",
       "description" = "Secondary utility domain for public controller ci.jenkins.io",
+      # TODO: extend once migrated to AWS
+      "ttl" = 60,
+    },
+    "issues" = {
+      "target"      = "jenkinsci-jira-alb-368766416.us-west-2.elb.amazonaws.com",
+      "description" = "Jenkins public JIRA hosted by the Linux Foundation",
+      # TODO: extend once migrated to new LF JIRA
+      "ttl" = 60,
+    },
+    "testissues" = {
+      "target"      = "jira-rhel9-alb-1841417744.us-west-2.elb.amazonaws.com",
+      "description" = "Jenkins public JIRA hosted by the Linux Foundation",
       "ttl"         = 60,
     },
+    "_84facad5c463aeab1f2d19d5964a5879.testissues" = {
+      "target"      = "_e8c79d63c1e3d4e259f943cdcacaf330.xlfgrmvvlj.acm-validations.aws",
+      "description" = "TLS temporary challenge for LF (IT-28124) - jenkins-infra/helpdesk-4644",
+      "ttl"         = 60,
+    },
+    "updates" = {
+      "target"      = "azure.updates.jenkins.io"
+      "description" = "Jenkins Update Center"
+    }
   }
 
   name                = each.key
