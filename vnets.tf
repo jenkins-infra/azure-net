@@ -117,7 +117,6 @@ module "private_vnet" {
 
   peered_vnets = {
     "${module.public_vnet.vnet_name}"                          = module.public_vnet.vnet_id,
-    "${module.public_sponsorship_vnet.vnet_name}"              = module.public_sponsorship_vnet.vnet_id,
     "${module.public_db_vnet.vnet_name}"                       = module.public_db_vnet.vnet_id,
     "${module.cert_ci_jenkins_io_vnet.vnet_name}"              = module.cert_ci_jenkins_io_vnet.vnet_id
     "${module.trusted_ci_jenkins_io_vnet.vnet_name}"           = module.trusted_ci_jenkins_io_vnet.vnet_id
@@ -179,58 +178,6 @@ module "private_sponsorship_vnet" {
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
     }
-  ]
-
-  peered_vnets = {
-    # Accesses through VPN and infra.ci agents
-    "${module.private_vnet.vnet_name}" = module.private_vnet.vnet_id,
-    # Accesses through the infra.ci agents private vnet
-    "${module.infra_ci_jenkins_io_sponsorship_vnet.vnet_name}" = module.infra_ci_jenkins_io_sponsorship_vnet.vnet_id,
-    "${module.infra_ci_jenkins_io_vnet.vnet_name}"             = module.infra_ci_jenkins_io_vnet.vnet_id
-  }
-}
-
-module "public_sponsorship_vnet" {
-  source = "./.shared-tools/terraform/modules/azure-full-vnet"
-
-  providers = {
-    azurerm = azurerm.jenkins-sponsorship
-  }
-
-  base_name          = "public-jenkins-sponsorship"
-  gateway_name       = "ci-jenkins-io-outbound-sponsorship"
-  outbound_ip_count  = 2
-  tags               = local.default_tags
-  location           = var.location
-  vnet_address_space = ["10.200.0.0/14", "fd00:db8:decb::/48"]
-  subnets = [
-    {
-      name                                          = "public-jenkins-sponsorship-vnet-ci_jenkins_io_agents"
-      address_prefixes                              = ["10.200.2.0/24"] # 10.200.2.1 - 10.200.2.254
-      service_endpoints                             = ["Microsoft.Storage"]
-      delegations                                   = {}
-      private_link_service_network_policies_enabled = false
-      private_endpoint_network_policies             = "Disabled"
-    },
-    {
-      name = "public-jenkins-sponsorship-vnet-ci_jenkins_io_controller"
-      address_prefixes = [
-        "10.200.1.0/24",           # 10.200.1.1 - 10.200.1.254
-        "fd00:db8:decb:deed::/64", # smaller size
-      ],
-      service_endpoints                             = ["Microsoft.Storage"]
-      delegations                                   = {}
-      private_link_service_network_policies_enabled = true
-      private_endpoint_network_policies             = "Disabled"
-    },
-    {
-      name                                          = "public-jenkins-sponsorship-vnet-ci_jenkins_io_kubernetes"
-      address_prefixes                              = ["10.201.0.0/24"] # 10.201.0.0 - 10.201.0.254
-      service_endpoints                             = ["Microsoft.Storage"]
-      delegations                                   = {}
-      private_link_service_network_policies_enabled = false
-      private_endpoint_network_policies             = "Enabled"
-    },
   ]
 
   peered_vnets = {
@@ -414,7 +361,6 @@ module "infra_ci_jenkins_io_vnet" {
   ]
 
   peered_vnets = {
-    "${module.public_sponsorship_vnet.vnet_name}"              = module.public_sponsorship_vnet.vnet_id,
     "${module.private_vnet.vnet_name}"                         = module.private_vnet.vnet_id,
     "${module.public_db_vnet.vnet_name}"                       = module.public_db_vnet.vnet_id,
     "${module.private_sponsorship_vnet.vnet_name}"             = module.private_sponsorship_vnet.vnet_id,
@@ -456,7 +402,6 @@ module "infra_ci_jenkins_io_sponsorship_vnet" {
   ]
 
   peered_vnets = {
-    "${module.public_sponsorship_vnet.vnet_name}"  = module.public_sponsorship_vnet.vnet_id,
     "${module.private_vnet.vnet_name}"             = module.private_vnet.vnet_id,
     "${module.public_db_vnet.vnet_name}"           = module.public_db_vnet.vnet_id,
     "${module.private_sponsorship_vnet.vnet_name}" = module.private_sponsorship_vnet.vnet_id,
