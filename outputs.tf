@@ -6,9 +6,6 @@ resource "local_file" "jenkins_infra_data_report" {
     "trusted.ci.jenkins.io" = {
       "outbound_ips" = concat(split(",", module.trusted_ci_jenkins_io_vnet.public_ip_list), split(",", module.trusted_ci_jenkins_io_sponsorship_vnet.public_ip_list)),
     },
-    "ci.jenkins.io" = {
-      "outbound_ips" = split(",", module.public_sponsorship_vnet.public_ip_list),
-    },
     "infra.ci.jenkins.io" = {
       "outbound_ips" = concat(
         # Controller
@@ -38,7 +35,6 @@ resource "local_file" "jenkins_infra_data_report" {
       "private-vnet"                           = module.private_vnet.vnet_address_space,
       "private-sponsorship-vnet"               = module.private_sponsorship_vnet.vnet_address_space,
       "public-db-vnet"                         = module.public_db_vnet.vnet_address_space,
-      "public-jenkins-sponsorship-vnet"        = module.public_sponsorship_vnet.vnet_address_space,
       "public-vnet"                            = module.public_vnet.vnet_address_space,
       "trusted-ci-jenkins-io-sponsorship-vnet" = module.trusted_ci_jenkins_io_sponsorship_vnet.vnet_address_space,
       "trusted-ci-jenkins-io-vnet"             = module.trusted_ci_jenkins_io_vnet.vnet_address_space,
