@@ -377,6 +377,9 @@ resource "azurerm_dns_txt_record" "apex_jenkinsio" {
   record {
     value = "v=spf1 include:mailgun.org include:sendgrid.net include:_spf.google.com ~all"
   }
+  record {
+    value = "jetbrains-domain-verification=9memu05gp112di1q7gijggppf"
+  }
 
   tags = local.default_tags
 }
