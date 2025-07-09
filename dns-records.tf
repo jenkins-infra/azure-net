@@ -377,6 +377,9 @@ resource "azurerm_dns_txt_record" "apex_jenkinsio" {
   record {
     value = "v=spf1 include:mailgun.org include:sendgrid.net include:_spf.google.com ~all"
   }
+  record {
+    value = "jetbrains-domain-verification=9memu05gp112di1q7gijggppf"
+  }
 
   tags = local.default_tags
 }
@@ -400,19 +403,6 @@ resource "azurerm_dns_txt_record" "apex_jenkinsciorg" {
   }
 
   tags = local.default_tags
-}
-
-resource "azurerm_dns_txt_record" "jetbrains_sponsorship_domain_verification" {
-  name                = "@"
-  zone_name           = data.azurerm_dns_zone.jenkinsio.name
-  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-  ttl                 = 60
-
-  record {
-    value = "jetbrains-domain-verification=9memu05gp112di1q7gijggppf"
-  }
-
-  tags                = local.default_tags
 }
 
 ### CAA Records
