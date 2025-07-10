@@ -383,7 +383,19 @@ resource "azurerm_dns_txt_record" "apex_jenkinsio" {
 
   tags = local.default_tags
 }
+# Used for Maven Central ownership proof
+resource "azurerm_dns_txt_record" "lib_jenkins_io" {
+  name                = "lib"
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 60
 
+  record {
+    value = "ae2wiz6pk8"
+  }
+
+  tags = local.default_tags
+}
 resource "azurerm_dns_txt_record" "apex_jenkinsciorg" {
   name                = "@"
   zone_name           = data.azurerm_dns_zone.jenkinsciorg.name
