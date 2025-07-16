@@ -378,6 +378,7 @@ resource "azurerm_dns_txt_record" "apex_jenkinsio" {
     value = "v=spf1 include:mailgun.org include:sendgrid.net include:_spf.google.com ~all"
   }
   record {
+    # Used to verify domain ownership. JB checks every 24h.
     value = "jetbrains-domain-verification=9memu05gp112di1q7gijggppf"
   }
 
