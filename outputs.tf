@@ -16,6 +16,10 @@ resource "local_file" "jenkins_infra_data_report" {
         split(",", module.infra_ci_jenkins_io_vnet.public_ip_list),
       ),
     },
+    "privatek8s.jenkins.io" = {
+      "outbound_ips"      = split(",", module.private_vnet.public_ip_list),
+      "private_lb_subnet" = "privatek8s-tier",
+    },
     "privatek8s_sponsorship.jenkins.io" = {
       "outbound_ips"      = split(",", module.private_sponsorship_vnet.public_ip_list),
       "private_lb_subnet" = "privatek8s-sponsorship-tier",
