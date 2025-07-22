@@ -113,6 +113,44 @@ module "private_vnet" {
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
     },
+    {
+      # Dedicated subnet for the "privatek8s" AKS cluster resources
+      ## Important: the "terraform-production" Enterprise Application used by this repo pipeline needs to be able to manage this virtual network.
+      ## Ref. https://github.com/jenkins-infra/terraform-states/blob/e5164afee643d7423a6f90f2bc260b89fc36d9e3/azure/main.tf#L114-L129
+      name                                          = "privatek8s-tier"
+      address_prefixes                              = ["10.249.0.0/16"] # from 10.249.0.0 to 10.249.255.254
+      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
+    },
+    {
+      # Dedicated subnet for the release nodes of the "privatek8s" AKS cluster resources
+      name                                          = "privatek8s-release-tier"
+      address_prefixes                              = ["10.250.0.0/25"] # from 10.250.0.0 to 10.250.0.127
+      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
+    },
+    {
+      # Dedicated subnet for the release nodes of the "privatek8s" for the controller infraci AKS cluster resources
+      name                                          = "privatek8s-infraci-ctrl-tier"
+      address_prefixes                              = ["10.250.0.128/26"] # from 10.250.0.128 to 10.250.0.191
+      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
+    },
+    {
+      # Dedicated subnet for the private nodes of the "privatek8s" for the controller releaseci AKS cluster resources
+      name                                          = "privatek8s-releaseci-ctrl-tier"
+      address_prefixes                              = ["10.250.0.192/26"] # from 10.250.0.192 to 10.250.0.255
+      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
+    }
   ]
 
   peered_vnets = {
@@ -145,7 +183,7 @@ module "private_sponsorship_vnet" {
       ## Important: the "terraform-production" Enterprise Application used by this repo pipeline needs to be able to manage this virtual network.
       ## Ref. https://github.com/jenkins-infra/terraform-states/blob/e5164afee643d7423a6f90f2bc260b89fc36d9e3/azure/main.tf#L114-L129
       name                                          = "privatek8s-sponsorship-tier"
-      address_prefixes                              = ["10.241.0.0/16"]
+      address_prefixes                              = ["10.241.0.0/16"] # from 10.241.0.0 to 10.241.255.254
       service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
