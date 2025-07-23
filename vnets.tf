@@ -34,13 +34,13 @@
 #      │                                   │          └──────────────────┘
 #      │                                   ▼
 #      │                                 ┌──────────────────┐
-#      │         ┌───────────────────────┤                  │                                     ┌───────────────────────────┐
-#      │         │                       │                  ▼                                     │                           │
-#      │         │      ┌──────────┐     │                  │                                     │                           │
-#      └─────────►      │Bounce VM │     │   Trusted VNet   │◄───────────────────────────────────►│  Trusted-sponsoredVVnet   │
-#                │      └──────────┘     │                  │               Vnet peering          │                           │
-#                │                       │                  │                                     │                           │
-#                └───────────────────────┤                  │                                     └───────────────────────────┘
+#      │         ┌───────────────────────┤                  │
+#      │         │                       │                  ▼
+#      │         │      ┌──────────┐     │                  │
+#      └─────────►      │Bounce VM │     │   Trusted VNet   │
+#                │      └──────────┘     │                  │
+#                │                       │                  │
+#                └───────────────────────┤                  │
 #                                        └──────────────────┘
 # See also https://github.com/jenkins-infra/azure/blob/legacy-tf/plans/vnets.tf
 
@@ -263,37 +263,7 @@ module "trusted_ci_jenkins_io_vnet" {
   ]
 
   peered_vnets = {
-    "${module.private_vnet.vnet_name}"                           = module.private_vnet.vnet_id,
-    "${module.trusted_ci_jenkins_io_sponsorship_vnet.vnet_name}" = module.trusted_ci_jenkins_io_sponsorship_vnet.vnet_id,
-  }
-}
-
-module "trusted_ci_jenkins_io_sponsorship_vnet" {
-  source = "./.shared-tools/terraform/modules/azure-full-vnet"
-
-  providers = {
-    azurerm = azurerm.jenkins-sponsorship
-  }
-
-  base_name          = "trusted-ci-jenkins-io-sponsorship"
-  gateway_name       = "trusted-outbound-sponsorship"
-  outbound_ip_count  = 3
-  tags               = local.default_tags
-  location           = var.location
-  vnet_address_space = ["10.204.0.0/24"] # 10.204.0.1 - 10.204.0.254
-  subnets = [
-    {
-      name                                          = "trusted-ci-jenkins-io-sponsorship-vnet-ephemeral-agents"
-      address_prefixes                              = ["10.204.0.0/24"] # 10.204.0.1 - 10.204.0.254
-      service_endpoints                             = ["Microsoft.Storage"]
-      delegations                                   = {}
-      private_link_service_network_policies_enabled = true
-      private_endpoint_network_policies             = "Enabled"
-    },
-  ]
-
-  peered_vnets = {
-    "${module.trusted_ci_jenkins_io_vnet.vnet_name}" = module.trusted_ci_jenkins_io_vnet.vnet_id
+    "${module.private_vnet.vnet_name}" = module.private_vnet.vnet_id,
   }
 }
 
