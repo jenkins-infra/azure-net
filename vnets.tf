@@ -90,11 +90,14 @@ module "public_vnet" {
 module "private_vnet" {
   source = "./.shared-tools/terraform/modules/azure-full-vnet"
 
-  base_name          = "private"
-  tags               = local.default_tags
-  location           = var.location
-  gateway_name       = "private-outbound"
-  outbound_ip_count  = 2
+  base_name         = "private"
+  tags              = local.default_tags
+  location          = var.location
+  gateway_name      = "private-outbound"
+  outbound_ip_count = 2
+  gateway_subnets_exclude = [
+    "private-vnet-dmz", # Outbound method for the VPN VM should use its public IP
+  ]
   vnet_address_space = ["10.248.0.0/14"] # 10.248.0.1 - 10.251.255.254
   subnets = [
     {
