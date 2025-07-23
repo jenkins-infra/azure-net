@@ -1,7 +1,7 @@
 resource "local_file" "jenkins_infra_data_report" {
   content = jsonencode({
     "cert.ci.jenkins.io" = {
-      "outbound_ips" = concat(split(",", module.cert_ci_jenkins_io_vnet.public_ip_list), split(",", module.cert_ci_jenkins_io_sponsorship_vnet.public_ip_list)),
+      "outbound_ips" = split(",", module.cert_ci_jenkins_io_vnet.public_ip_list),
     },
     "trusted.ci.jenkins.io" = {
       "outbound_ips" = split(",", module.trusted_ci_jenkins_io_vnet.public_ip_list),
@@ -32,7 +32,6 @@ resource "local_file" "jenkins_infra_data_report" {
       "outbound_ips" = [azurerm_public_ip.vpn_public.ip_address],
     },
     "vnets" = {
-      "cert-ci-jenkins-io-sponsorship-vnet"  = module.cert_ci_jenkins_io_sponsorship_vnet.vnet_address_space,
       "cert-ci-jenkins-io-vnet"              = module.cert_ci_jenkins_io_vnet.vnet_address_space,
       "infra-ci-jenkins-io-vnet"             = module.infra_ci_jenkins_io_vnet.vnet_address_space,
       "infra-ci-jenkins-io-sponsorship-vnet" = module.infra_ci_jenkins_io_sponsorship_vnet.vnet_address_space,
