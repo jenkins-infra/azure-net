@@ -10,9 +10,7 @@ resource "local_file" "jenkins_infra_data_report" {
       "outbound_ips" = concat(
         # Controller
         split(",", module.private_sponsorship_vnet.public_ip_list),
-        # VM agents
-        split(",", module.infra_ci_jenkins_io_sponsorship_vnet.public_ip_list),
-        # Container agents
+        # Agents
         split(",", module.infra_ci_jenkins_io_vnet.public_ip_list),
       ),
     },
@@ -32,14 +30,13 @@ resource "local_file" "jenkins_infra_data_report" {
       "outbound_ips" = [azurerm_public_ip.vpn_public.ip_address],
     },
     "vnets" = {
-      "cert-ci-jenkins-io-vnet"              = module.cert_ci_jenkins_io_vnet.vnet_address_space,
-      "infra-ci-jenkins-io-vnet"             = module.infra_ci_jenkins_io_vnet.vnet_address_space,
-      "infra-ci-jenkins-io-sponsorship-vnet" = module.infra_ci_jenkins_io_sponsorship_vnet.vnet_address_space,
-      "private-vnet"                         = module.private_vnet.vnet_address_space,
-      "private-sponsorship-vnet"             = module.private_sponsorship_vnet.vnet_address_space,
-      "public-db-vnet"                       = module.public_db_vnet.vnet_address_space,
-      "public-vnet"                          = module.public_vnet.vnet_address_space,
-      "trusted-ci-jenkins-io-vnet"           = module.trusted_ci_jenkins_io_vnet.vnet_address_space,
+      "cert-ci-jenkins-io-vnet"    = module.cert_ci_jenkins_io_vnet.vnet_address_space,
+      "infra-ci-jenkins-io-vnet"   = module.infra_ci_jenkins_io_vnet.vnet_address_space,
+      "private-vnet"               = module.private_vnet.vnet_address_space,
+      "private-sponsorship-vnet"   = module.private_sponsorship_vnet.vnet_address_space,
+      "public-db-vnet"             = module.public_db_vnet.vnet_address_space,
+      "public-vnet"                = module.public_vnet.vnet_address_space,
+      "trusted-ci-jenkins-io-vnet" = module.trusted_ci_jenkins_io_vnet.vnet_address_space,
     }
   })
   filename = "${path.module}/jenkins-infra-data-reports/azure-net.json"
