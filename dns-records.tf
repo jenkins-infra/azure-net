@@ -203,12 +203,29 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_private_publick8s" {
   })
 }
 
+# CNAME records targeting the public-nginx on privatek8s (CDF) cluster
+resource "azurerm_dns_cname_record" "jenkinsio_target_public_privatek8s_cdf" {
+  # Map of records and corresponding purposes
+  for_each = {
+    "infra-webhooks.ci" = "infra.ci.jenkins.io webhooks from GitHub"
+  }
+
+  name                = each.key
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 300
+  record              = "public.privatek8s.jenkins.io" # A record defined in https://github.com/jenkins-infra/azure
+
+  tags = merge(local.default_tags, {
+    purpose = each.value
+  })
+}
+
 # CNAME records targeting the public-nginx on privatek8s-sponsorship cluster
 resource "azurerm_dns_cname_record" "jenkinsio_target_public_privatek8s" {
   # Map of records and corresponding purposes
   for_each = {
     "webhook-github-comment-ops" = "github-comment-ops GitHub App"
-    "infra-webhooks.ci"          = "infra.ci.jenkins.io webhooks from GitHub"
   }
 
   name                = each.key
@@ -222,12 +239,29 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_privatek8s" {
   })
 }
 
+# CNAME records targeting the private-nginx on privatek8s cluster
+resource "azurerm_dns_cname_record" "jenkinsio_target_private_privatek8s_cdf" {
+  # Map of records and corresponding purposes
+  for_each = {
+    "infra.ci" = "infra.ci.jenkins.io, only accessible via the private VPN"
+  }
+
+  name                = each.key
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 300
+  record              = "private.privatek8s.jenkins.io" # A record managed manually
+
+  tags = merge(local.default_tags, {
+    purpose = each.value
+  })
+}
+
 # CNAME records targeting the private-nginx on privatek8s-sponsorship cluster
 resource "azurerm_dns_cname_record" "jenkinsio_target_private_privatek8s" {
   # Map of records and corresponding purposes
   for_each = {
     "release.ci" = "release.ci.jenkins.io, only accessible via the private VPN"
-    "infra.ci"   = "infra.ci.jenkins.io, only accessible via the private VPN"
   }
 
   name                = each.key
