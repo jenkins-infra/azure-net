@@ -9,7 +9,7 @@ resource "local_file" "jenkins_infra_data_report" {
     "infra.ci.jenkins.io" = {
       "outbound_ips" = concat(
         # Controller
-        split(",", module.private_sponsorship_vnet.public_ip_list),
+        split(",", module.private_vnet.public_ip_list),
         # Agents
         split(",", module.infra_ci_jenkins_io_vnet.public_ip_list),
       ),
@@ -17,10 +17,6 @@ resource "local_file" "jenkins_infra_data_report" {
     "privatek8s.jenkins.io" = {
       "outbound_ips"      = split(",", module.private_vnet.public_ip_list),
       "private_lb_subnet" = "privatek8s-tier",
-    },
-    "privatek8s_sponsorship.jenkins.io" = {
-      "outbound_ips"      = split(",", module.private_sponsorship_vnet.public_ip_list),
-      "private_lb_subnet" = "privatek8s-sponsorship-tier",
     },
     "publick8s.jenkins.io" = {
       "outbound_ips" = split(",", module.public_vnet.public_ip_list),
@@ -33,7 +29,6 @@ resource "local_file" "jenkins_infra_data_report" {
       "cert-ci-jenkins-io-vnet"    = module.cert_ci_jenkins_io_vnet.vnet_address_space,
       "infra-ci-jenkins-io-vnet"   = module.infra_ci_jenkins_io_vnet.vnet_address_space,
       "private-vnet"               = module.private_vnet.vnet_address_space,
-      "private-sponsorship-vnet"   = module.private_sponsorship_vnet.vnet_address_space,
       "public-db-vnet"             = module.public_db_vnet.vnet_address_space,
       "public-vnet"                = module.public_vnet.vnet_address_space,
       "trusted-ci-jenkins-io-vnet" = module.trusted_ci_jenkins_io_vnet.vnet_address_space,

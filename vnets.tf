@@ -15,13 +15,13 @@
 #                                                               │                │
 #      │                                                        │                │
 #      │                                           ┌────────────▼───┐            │
-#      │         ┌───────────────────────┐         │                │◄───────────┘                               ┌──────────────────────────┐
-#      │         │                       │         │                │ Vnet peering                               │                          │
-#      ├─────────►  Private VPN Gateway  ◄─────────►  Private VNet  │                                            │                          │
-#      │         │                       │         │                │                                            │   InfraCi-sponsoredvnet  │
-#      │         └───────────────────────┘ ┌──────►│                │◄──────────────────────────────────────────►│                          │
-#      │                                   │       └───────▲────────┘              Vnet peering                  │                          │
-#      │                                   │               │Vnet Peering                                         └──────────────────────────┘
+#      │         ┌───────────────────────┐         │                │◄───────────┘
+#      │         │                       │         │                │ Vnet peering
+#      ├─────────►  Private VPN Gateway  ◄─────────►  Private VNet  │
+#      │         │                       │         │                │
+#      │         └───────────────────────┘ ┌──────►│                │
+#      │                                   │       └───────▲────────┘
+#      │                                   │               │Vnet Peering
 #      │                                   │               │
 #      │                            VNet Peering      ┌────▼─────────────┐
 #      │                                   │          │                  │
@@ -164,67 +164,6 @@ module "private_vnet" {
     "${module.cert_ci_jenkins_io_vnet.vnet_name}"    = module.cert_ci_jenkins_io_vnet.vnet_id
     "${module.trusted_ci_jenkins_io_vnet.vnet_name}" = module.trusted_ci_jenkins_io_vnet.vnet_id
     "${module.infra_ci_jenkins_io_vnet.vnet_name}"   = module.infra_ci_jenkins_io_vnet.vnet_id
-    "${module.private_sponsorship_vnet.vnet_name}"   = module.private_sponsorship_vnet.vnet_id
-  }
-}
-
-module "private_sponsorship_vnet" {
-  source = "./.shared-tools/terraform/modules/azure-full-vnet"
-
-  providers = {
-    azurerm = azurerm.jenkins-sponsorship
-  }
-
-  base_name          = "private-sponsorship"
-  gateway_name       = "privatek8s-outbound-sponsorship"
-  outbound_ip_count  = 2
-  tags               = local.default_tags
-  location           = var.location
-  vnet_address_space = ["10.240.0.0/14"] # 10.240.0.1 - 10.251.255.254
-  subnets = [
-    {
-      # Dedicated subnet for the "privatek8s-sponsorship" AKS cluster resources on sponsorship account
-      ## Important: the "terraform-production" Enterprise Application used by this repo pipeline needs to be able to manage this virtual network.
-      ## Ref. https://github.com/jenkins-infra/terraform-states/blob/e5164afee643d7423a6f90f2bc260b89fc36d9e3/azure/main.tf#L114-L129
-      name                                          = "privatek8s-sponsorship-tier"
-      address_prefixes                              = ["10.241.0.0/16"] # from 10.241.0.0 to 10.241.255.254
-      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
-      delegations                                   = {}
-      private_link_service_network_policies_enabled = true
-      private_endpoint_network_policies             = "Enabled"
-    },
-    {
-      # Dedicated subnet for the release nodes of the "privatek8s-sponsorship" AKS cluster resources on sponsorship account
-      name                                          = "privatek8s-sponsorship-release-tier"
-      address_prefixes                              = ["10.242.0.0/25"] # from 10.242.0.0 to 10.242.0.127
-      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
-      delegations                                   = {}
-      private_link_service_network_policies_enabled = true
-      private_endpoint_network_policies             = "Enabled"
-    },
-    {
-      # Dedicated subnet for the release nodes of the "privatek8s-sponsorship" for the controller infraci AKS cluster resources on sponsorship account
-      name                                          = "privatek8s-sponsorship-infraci-ctrl-tier"
-      address_prefixes                              = ["10.242.0.128/26"] # from 10.242.0.128 to 10.242.0.191
-      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
-      delegations                                   = {}
-      private_link_service_network_policies_enabled = true
-      private_endpoint_network_policies             = "Enabled"
-    },
-    {
-      # Dedicated subnet for the private nodes of the "privatek8s-sponsorship" for the controller releaseci AKS cluster resources on sponsorship account
-      name                                          = "privatek8s-sponsorship-releaseci-ctrl-tier"
-      address_prefixes                              = ["10.242.0.192/26"] # from 10.242.0.192 to 10.242.0.255
-      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
-      delegations                                   = {}
-      private_link_service_network_policies_enabled = true
-      private_endpoint_network_policies             = "Enabled"
-    }
-  ]
-
-  peered_vnets = {
-    "${module.private_vnet.vnet_name}"             = module.private_vnet.vnet_id,
-    "${module.infra_ci_jenkins_io_vnet.vnet_name}" = module.infra_ci_jenkins_io_vnet.vnet_id
   }
 }
 
@@ -339,9 +278,8 @@ module "infra_ci_jenkins_io_vnet" {
   ]
 
   peered_vnets = {
-    "${module.private_vnet.vnet_name}"             = module.private_vnet.vnet_id,
-    "${module.public_db_vnet.vnet_name}"           = module.public_db_vnet.vnet_id,
-    "${module.private_sponsorship_vnet.vnet_name}" = module.private_sponsorship_vnet.vnet_id,
+    "${module.private_vnet.vnet_name}"   = module.private_vnet.vnet_id,
+    "${module.public_db_vnet.vnet_name}" = module.public_db_vnet.vnet_id,
   }
 }
 
