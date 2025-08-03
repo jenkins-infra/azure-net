@@ -326,7 +326,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_customs" {
       "description" = "TLS challenge for LF (IT-28124) - jenkins-infra/helpdesk-4644",
       "ttl"         = 60,
     },
-    "_b1ff2d9eff9b1643970f47de4281ce22.issues.jenkins.io" = {
+    "_b1ff2d9eff9b1643970f47de4281ce22.issues" = {
       "target"      = "_d7eac0ec254ecc89fbb3d23a37f99fbd.zbkrxsrfvj.acm-validations.aws",
       "description" = "TLS challenge for issues.jenbkins.io (managed by LF) - jenkins-infra/helpdesk-4757",
       "ttl"         = 60,
