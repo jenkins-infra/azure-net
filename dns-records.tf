@@ -323,7 +323,12 @@ resource "azurerm_dns_cname_record" "jenkinsio_customs" {
     },
     "_84facad5c463aeab1f2d19d5964a5879.testissues" = {
       "target"      = "_e8c79d63c1e3d4e259f943cdcacaf330.xlfgrmvvlj.acm-validations.aws",
-      "description" = "TLS temporary challenge for LF (IT-28124) - jenkins-infra/helpdesk-4644",
+      "description" = "TLS challenge for LF (IT-28124) - jenkins-infra/helpdesk-4644",
+      "ttl"         = 60,
+    },
+    "_b1ff2d9eff9b1643970f47de4281ce22.issues.jenkins.io" = {
+      "target"      = "_d7eac0ec254ecc89fbb3d23a37f99fbd.zbkrxsrfvj.acm-validations.aws",
+      "description" = "TLS challenge for issues.jenbkins.io (managed by LF) - jenkins-infra/helpdesk-4757",
       "ttl"         = 60,
     },
     "updates" = {
