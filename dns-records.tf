@@ -136,6 +136,8 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
     "plugins.origin"      = "Plugins website content origin for Fastly CDN"
     "rating"              = "Jenkins releases rating service"
     "reports"             = "Public reports about Jenkins services and components consumed by RPU, plugins website and others"
+    "staging.get"         = "Test instance for get.jenkins.io"
+    "staging.updates"     = "Test instance for updates.jenkins.io"
     "uplink"              = "Jenkins telemetry service"
     "weekly.ci"           = "Jenkins Weekly demo controller"
     "wiki"                = "Static Wiki Confluence export"
