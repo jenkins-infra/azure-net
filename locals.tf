@@ -13,10 +13,17 @@ locals {
     }
   }
 
+  # TODO: track with updatecli
   public_ips = {
     "publick8s_public_ipv4_address" = "20.7.178.24"          # defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
     "publick8s_public_ipv6_address" = "2603:1030:408:5::15a" # defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
     "ldap_jenkins_io_ipv4_address"  = "20.7.180.148"         # defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
+  }
+
+  admin_public_ips = {
+    dduportal = ["89.84.210.161"],
+    smerle33  = ["82.64.5.129"],
+    mwaite    = ["162.142.59.220"],
   }
 
   # Tracked by updatecli, easier to use a string split as a list by Terraform
