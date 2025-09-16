@@ -9,7 +9,7 @@ resource "azurerm_public_ip" "vpn_public" {
   resource_group_name = azurerm_resource_group.vpn.name
   location            = azurerm_resource_group.vpn.location
   allocation_method   = "Static"
-  sku                 = "Basic"
+  sku                 = "Standard"
   tags                = local.default_tags
 }
 
