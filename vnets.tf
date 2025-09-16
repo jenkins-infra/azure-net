@@ -47,13 +47,11 @@
 module "public_vnet" {
   source = "./.shared-tools/terraform/modules/azure-full-vnet"
 
-  base_name    = "public"
-  gateway_name = "publick8s-outbound"
-  # TODO: deprecate this attribute once publick8s AKS cluster is modernized to default to NAT gateway instead of outbound LB
-  gateway_subnets_exclude = ["public-vnet-data-tier"]
-  tags                    = local.default_tags
-  location                = var.location
-  vnet_address_space      = ["10.244.0.0/14", "fd00:db8:deca::/48"] # from 10.244.0.1 - to 10.247.255.255
+  base_name          = "public"
+  gateway_name       = "publick8s-outbound"
+  tags               = local.default_tags
+  location           = var.location
+  vnet_address_space = ["10.244.0.0/14", "fd00:db8:deca::/48"] # from 10.244.0.1 - to 10.247.255.255
   subnets = [
     {
       # Dedicated subnet for the  "publick8s" AKS cluster resources
