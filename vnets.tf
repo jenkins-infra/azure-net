@@ -80,8 +80,9 @@ module "public_vnet" {
   ]
 
   peered_vnets = {
-    "${module.private_vnet.vnet_name}"   = module.private_vnet.vnet_id,
-    "${module.public_db_vnet.vnet_name}" = module.public_db_vnet.vnet_id,
+    "${module.private_vnet.vnet_name}"             = module.private_vnet.vnet_id,
+    "${module.public_db_vnet.vnet_name}"           = module.public_db_vnet.vnet_id,
+    "${module.infra_ci_jenkins_io_vnet.vnet_name}" = module.infra_ci_jenkins_io_vnet.vnet_id,
   }
 }
 
@@ -278,6 +279,7 @@ module "infra_ci_jenkins_io_vnet" {
   peered_vnets = {
     "${module.private_vnet.vnet_name}"   = module.private_vnet.vnet_id,
     "${module.public_db_vnet.vnet_name}" = module.public_db_vnet.vnet_id,
+    "${module.public_vnet.vnet_name}"    = module.public_vnet.vnet_id,
   }
 }
 
