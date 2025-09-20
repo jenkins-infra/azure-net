@@ -61,7 +61,7 @@ module "public_vnet" {
       name = "publick8s-tier"
       address_prefixes = [
         "10.245.0.0/24",           # 10.245.0.1 - 10.245.0.254
-        "fd00:db8:deca:deed::/64", # smaller size as we're using kubenet (required by dual-stack AKS cluster), which allocate one IP per node instead of one IP per pod (in case of Azure CNI)
+        "fd00:db8:deca:deed::/64", # fd00:db8:deca:deed:0:0:0:0 - fd00:db8:deca:deed:ffff:ffff:ffff:ffff
       ]
       service_endpoints                             = ["Microsoft.Storage"]
       delegations                                   = {}
@@ -77,6 +77,21 @@ module "public_vnet" {
       private_link_service_network_policies_enabled = false
       private_endpoint_network_policies             = "Enabled"
     },
+    {
+      # publick8s AKS cluster with Azure CNI and dual-stack
+      name = "publick8s"
+      address_prefixes = [
+        "10.245.2.0/24",           # 10.245.2.1 - 10.245.2.254
+        "fd00:db8:deca:deee::/64", # fd00:db8:deca:deee:0:0:0:0 - fd00:db8:deca:deee:ffff:ffff:ffff:ffff
+      ]
+      service_endpoints                             = []
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = false # Required to define Azure PLS
+      private_endpoint_network_policies             = "Enabled"
+    },
+  ]
+  gateway_subnets_exclude = [
+    "publick8s", # This clusters utilizes a LB for outbound IPv4
   ]
 
   peered_vnets = {
