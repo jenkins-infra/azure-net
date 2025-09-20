@@ -45,7 +45,7 @@
 # See also https://github.com/jenkins-infra/azure/blob/legacy-tf/plans/vnets.tf
 
 module "public_vnet" {
-  source = "./.shared-tools/terraform/modules/azure-full-vnet"
+  source = "./modules/azure-full-vnet"
 
   base_name          = "public"
   gateway_name       = "publick8s-outbound"
@@ -67,6 +67,7 @@ module "public_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = false
       private_endpoint_network_policies             = "Enabled"
+      use_default_outbound_access                   = true
     },
     {
       # Dedicated subnet for machine to machine private communications
@@ -76,6 +77,7 @@ module "public_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = false
       private_endpoint_network_policies             = "Enabled"
+      use_default_outbound_access                   = true
     },
     {
       # publick8s AKS cluster with Azure CNI and dual-stack
@@ -88,6 +90,7 @@ module "public_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = false # Required to define Azure PLS
       private_endpoint_network_policies             = "Enabled"
+      use_default_outbound_access                   = false
     },
   ]
   gateway_subnets_exclude = [
@@ -102,7 +105,7 @@ module "public_vnet" {
 }
 
 module "private_vnet" {
-  source = "./.shared-tools/terraform/modules/azure-full-vnet"
+  source = "./modules/azure-full-vnet"
 
   base_name         = "private"
   tags              = local.default_tags
@@ -122,6 +125,7 @@ module "private_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
+      use_default_outbound_access                   = true
     },
     {
       # Dedicated subnet for machine to machine private communications
@@ -131,6 +135,7 @@ module "private_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
+      use_default_outbound_access                   = true
     },
     {
       # Dedicated subnet for the "privatek8s" AKS cluster resources
@@ -142,6 +147,7 @@ module "private_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
+      use_default_outbound_access                   = true
     },
     {
       # Dedicated subnet for the release nodes of the "privatek8s" AKS cluster resources
@@ -151,6 +157,7 @@ module "private_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
+      use_default_outbound_access                   = true
     },
     {
       # Dedicated subnet for the release nodes of the "privatek8s" for the controller infraci AKS cluster resources
@@ -160,6 +167,7 @@ module "private_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
+      use_default_outbound_access                   = true
     },
     {
       # Dedicated subnet for the private nodes of the "privatek8s" for the controller releaseci AKS cluster resources
@@ -169,6 +177,7 @@ module "private_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
+      use_default_outbound_access                   = true
     }
   ]
 
@@ -182,7 +191,7 @@ module "private_vnet" {
 }
 
 module "trusted_ci_jenkins_io_vnet" {
-  source = "./.shared-tools/terraform/modules/azure-full-vnet"
+  source = "./modules/azure-full-vnet"
 
   base_name          = "trusted-ci-jenkins-io"
   gateway_name       = "trusted-outbound"
@@ -197,6 +206,7 @@ module "trusted_ci_jenkins_io_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
+      use_default_outbound_access                   = true
     },
     {
       name                                          = "trusted-ci-jenkins-io-vnet-ephemeral-agents"
@@ -205,6 +215,7 @@ module "trusted_ci_jenkins_io_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
+      use_default_outbound_access                   = true
     },
     {
       name                                          = "trusted-ci-jenkins-io-vnet-permanent-agents"
@@ -213,6 +224,7 @@ module "trusted_ci_jenkins_io_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Disabled"
+      use_default_outbound_access                   = true
     },
   ]
 
@@ -222,7 +234,7 @@ module "trusted_ci_jenkins_io_vnet" {
 }
 
 module "cert_ci_jenkins_io_vnet" {
-  source = "./.shared-tools/terraform/modules/azure-full-vnet"
+  source = "./modules/azure-full-vnet"
 
   base_name          = "cert-ci-jenkins-io"
   gateway_name       = "cert-ci-jenkins-io-outbound"
@@ -238,6 +250,7 @@ module "cert_ci_jenkins_io_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
+      use_default_outbound_access                   = true
     },
     {
       name                                          = "cert-ci-jenkins-io-vnet-ephemeral-agents"
@@ -246,6 +259,7 @@ module "cert_ci_jenkins_io_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
+      use_default_outbound_access                   = true
     },
   ]
 
@@ -255,7 +269,7 @@ module "cert_ci_jenkins_io_vnet" {
 }
 
 module "infra_ci_jenkins_io_vnet" {
-  source = "./.shared-tools/terraform/modules/azure-full-vnet"
+  source = "./modules/azure-full-vnet"
 
   base_name          = "infra-ci-jenkins-io"
   gateway_name       = "infra-ci-jenkins-io-outbound"
@@ -272,6 +286,7 @@ module "infra_ci_jenkins_io_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
+      use_default_outbound_access                   = true
     },
     {
       name                                          = "infra-ci-jenkins-io-vnet-packer-builds"
@@ -280,6 +295,7 @@ module "infra_ci_jenkins_io_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
+      use_default_outbound_access                   = true
     },
     {
       name                                          = "infra-ci-jenkins-io-vnet-kubernetes-agents"
@@ -288,6 +304,7 @@ module "infra_ci_jenkins_io_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
+      use_default_outbound_access                   = true
     },
   ]
 
@@ -300,7 +317,7 @@ module "infra_ci_jenkins_io_vnet" {
 
 # separate vNET as Postgres/Mysql flexible server currently doesn't support a vNET with ipv4 and ipv6 address spaces
 module "public_db_vnet" {
-  source = "./.shared-tools/terraform/modules/azure-full-vnet"
+  source = "./modules/azure-full-vnet"
 
   base_name          = "public"
   use_existing_rg    = true
@@ -317,6 +334,7 @@ module "public_db_vnet" {
       service_endpoints                             = [],
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
+      use_default_outbound_access                   = true
       delegations = {
         "pgsql" = {
           service_delegations = [{
@@ -336,6 +354,7 @@ module "public_db_vnet" {
       service_endpoints                             = [],
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled",
+      use_default_outbound_access                   = true
       delegations = {
         "mysql" = {
           service_delegations = [{
