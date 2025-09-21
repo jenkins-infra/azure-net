@@ -86,7 +86,7 @@ module "public_vnet" {
         "10.245.2.0/24",           # 10.245.2.1 - 10.245.2.254
         "fd00:db8:deca:deee::/64", # fd00:db8:deca:deee:0:0:0:0 - fd00:db8:deca:deee:ffff:ffff:ffff:ffff
       ]
-      service_endpoints                             = []
+      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
       delegations                                   = {}
       private_link_service_network_policies_enabled = false # Required to define Azure PLS
       private_endpoint_network_policies             = "Enabled"
