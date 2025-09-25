@@ -124,6 +124,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_new_publick8s" {
     "plugin-health" = "Plugin Health Scoring application"
     "wiki"          = "Static Wiki Confluence export"
     "javadoc"       = "Jenkins Javadoc"
+    "weekly.ci"     = "Jenkins Weekly demo controller"
   }
 
   name                = each.key
@@ -157,7 +158,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
     "staging.get"         = "Test instance for get.jenkins.io"
     "staging.updates"     = "Test instance for updates.jenkins.io"
     "uplink"              = "Jenkins telemetry service"
-    "weekly.ci"           = "Jenkins Weekly demo controller"
     "www.origin"          = "Jenkins website content origin for Fastly CDN"
   }
 
