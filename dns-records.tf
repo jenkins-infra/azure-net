@@ -116,6 +116,24 @@ resource "azurerm_dns_a_record" "aws_updates_jenkins_io" {
 
 ### CNAME records
 # CNAME records targeting the public-nginx on publick8s cluster
+resource "azurerm_dns_cname_record" "jenkinsio_target_public_new_publick8s" {
+  depends_on = [azurerm_dns_cname_record.jenkinsio_target_public_publick8s]
+  # Map of records and corresponding purposes
+  for_each = {
+    "plugin-health" = "Plugin Health Scoring application"
+  }
+
+  name                = each.key
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 60
+  record              = "public.publick8s.jenkins.io" # A record defined in https://github.com/jenkins-infra/azure/blob/main/old_publick8s.tf
+
+  tags = merge(local.default_tags, {
+    purpose = each.value
+  })
+}
+# TODO: remove once empty (e.g. migration finished)
 resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
   # Map of records and corresponding purposes
   for_each = {
@@ -131,7 +149,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
     "mirrors"             = "Jenkins binary distribution via mirrorbits"
     "mirrors.updates"     = "Update Center hosted on Azure (Mirrorbits redirections service)"
     "stats"               = "New Jenkins Statistics website"
-    "plugin-health"       = "Plugin Health Scoring application"
     "plugin-site-issues"  = "Plugins website API content origin for Fastly CDN"
     "plugins.origin"      = "Plugins website content origin for Fastly CDN"
     "rating"              = "Jenkins releases rating service"
@@ -154,6 +171,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
     purpose = each.value
   })
 }
+
 # CNAME records for the legacy domain jenkins-ci.org, pointing to their modern counterpart
 resource "azurerm_dns_cname_record" "jenkinsciorg_target_jenkinsio" {
   # Map of records and corresponding purposes. Some records only exists in jenkins.io as jenkins-ci.org is only legacy
