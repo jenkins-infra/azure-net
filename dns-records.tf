@@ -132,6 +132,9 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_new_publick8s" {
     "docs.origin"         = "Versioned docs of jenkins.io content origin for Fastly CDN"
     "plugin-site-issues"  = "Plugins website API content origin for Fastly CDN"
     "stats"               = "New Jenkins Statistics website"
+    "rating"              = "Jenkins releases rating service"
+    "reports"             = "Public reports about Jenkins services and components consumed by RPU, plugins website and others"
+    "uplink"              = "Jenkins telemetry service"
   }
 
   name                = each.key
@@ -154,11 +157,8 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
     "incrementals"    = "incrementals publisher to incrementals Maven repository"
     "mirrors"         = "Jenkins binary distribution via mirrorbits"
     "mirrors.updates" = "Update Center hosted on Azure (Mirrorbits redirections service)"
-    "rating"          = "Jenkins releases rating service"
-    "reports"         = "Public reports about Jenkins services and components consumed by RPU, plugins website and others"
     "staging.get"     = "Test instance for get.jenkins.io"
     "staging.updates" = "Test instance for updates.jenkins.io"
-    "uplink"          = "Jenkins telemetry service"
   }
 
   name                = each.key
