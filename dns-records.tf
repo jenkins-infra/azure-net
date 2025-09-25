@@ -117,7 +117,6 @@ resource "azurerm_dns_a_record" "aws_updates_jenkins_io" {
 ### CNAME records
 # CNAME records targeting the public-nginx on publick8s cluster
 resource "azurerm_dns_cname_record" "jenkinsio_target_public_new_publick8s" {
-  depends_on = [azurerm_dns_cname_record.jenkinsio_target_public_publick8s]
   # Map of records and corresponding purposes
   for_each = {
     "accounts"            = "accountapp for Jenkins users"
