@@ -120,11 +120,13 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_new_publick8s" {
   depends_on = [azurerm_dns_cname_record.jenkinsio_target_public_publick8s]
   # Map of records and corresponding purposes
   for_each = {
-    "accounts"      = "accountapp for Jenkins users"
-    "plugin-health" = "Plugin Health Scoring application"
-    "wiki"          = "Static Wiki Confluence export"
-    "javadoc"       = "Jenkins Javadoc"
-    "weekly.ci"     = "Jenkins Weekly demo controller"
+    "accounts"       = "accountapp for Jenkins users"
+    "plugin-health"  = "Plugin Health Scoring application"
+    "wiki"           = "Static Wiki Confluence export"
+    "javadoc"        = "Jenkins Javadoc"
+    "weekly.ci"      = "Jenkins Weekly demo controller"
+    "plugins.origin" = "Plugins website content origin for Fastly CDN"
+    "www.origin"     = "Jenkins website content origin for Fastly CDN"
   }
 
   name                = each.key
@@ -152,13 +154,11 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
     "mirrors.updates"     = "Update Center hosted on Azure (Mirrorbits redirections service)"
     "stats"               = "New Jenkins Statistics website"
     "plugin-site-issues"  = "Plugins website API content origin for Fastly CDN"
-    "plugins.origin"      = "Plugins website content origin for Fastly CDN"
     "rating"              = "Jenkins releases rating service"
     "reports"             = "Public reports about Jenkins services and components consumed by RPU, plugins website and others"
     "staging.get"         = "Test instance for get.jenkins.io"
     "staging.updates"     = "Test instance for updates.jenkins.io"
     "uplink"              = "Jenkins telemetry service"
-    "www.origin"          = "Jenkins website content origin for Fastly CDN"
   }
 
   name                = each.key
