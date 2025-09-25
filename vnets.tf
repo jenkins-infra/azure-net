@@ -47,38 +47,12 @@
 module "public_vnet" {
   source = "./modules/azure-full-vnet"
 
-  base_name          = "public"
-  gateway_name       = "publick8s-outbound"
-  tags               = local.default_tags
-  location           = var.location
+  base_name = "public"
+  tags      = local.default_tags
+  location  = var.location
+  # No NAT gateway as the AKS cluster requires an LB for its outbound method (due to IPv6 unsupported on NAT gateways)
   vnet_address_space = ["10.244.0.0/14", "fd00:db8:deca::/48"] # from 10.244.0.1 - to 10.247.255.255
   subnets = [
-    {
-      # Dedicated subnet for the  "publick8s" AKS cluster resources
-      ## Important: the "terraform-production" Enterprise Application used by this repo pipeline needs to be able to manage this virtual network.
-      ## See the corresponding role assignment for this vnet added in the (private) terraform-state repo:
-      ## https://github.com/jenkins-infra/terraform-states/blob/17df75c38040c9b1087bade3654391bc5db45ffd/azure/main.tf#L59
-      name = "publick8s-tier"
-      address_prefixes = [
-        "10.245.0.0/24",           # 10.245.0.1 - 10.245.0.254
-        "fd00:db8:deca:deed::/64", # fd00:db8:deca:deed:0:0:0:0 - fd00:db8:deca:deed:ffff:ffff:ffff:ffff
-      ]
-      service_endpoints                             = ["Microsoft.Storage"]
-      delegations                                   = {}
-      private_link_service_network_policies_enabled = false
-      private_endpoint_network_policies             = "Enabled"
-      use_default_outbound_access                   = true
-    },
-    {
-      # Dedicated subnet for machine to machine private communications
-      name                                          = "public-vnet-data-tier"
-      address_prefixes                              = ["10.245.1.0/24"] # 10.245.1.1 - 10.245.1.254
-      service_endpoints                             = []
-      delegations                                   = {}
-      private_link_service_network_policies_enabled = false
-      private_endpoint_network_policies             = "Enabled"
-      use_default_outbound_access                   = true
-    },
     {
       # publick8s AKS cluster with Azure CNI and dual-stack
       name = "publick8s"
@@ -92,9 +66,6 @@ module "public_vnet" {
       private_endpoint_network_policies             = "Enabled"
       use_default_outbound_access                   = false
     },
-  ]
-  gateway_subnets_exclude = [
-    "publick8s", # This clusters utilizes a LB for outbound IPv4
   ]
 
   peered_vnets = {
