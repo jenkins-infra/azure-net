@@ -148,7 +148,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 60
-  record              = "public.publick8s.jenkins.io" # A record defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
+  record              = "public.publick8s-endless-ghoul.jenkins.io" # A record defined in https://github.com/jenkins-infra/azure/blob/main/old_publick8s.tf
 
   tags = merge(local.default_tags, {
     purpose = each.value
