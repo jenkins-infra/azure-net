@@ -120,6 +120,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_new_publick8s" {
   depends_on = [azurerm_dns_cname_record.jenkinsio_target_public_publick8s]
   # Map of records and corresponding purposes
   for_each = {
+    "accounts"      = "accountapp for Jenkins users"
     "plugin-health" = "Plugin Health Scoring application"
   }
 
@@ -137,7 +138,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_new_publick8s" {
 resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
   # Map of records and corresponding purposes
   for_each = {
-    "accounts"            = "accountapp for Jenkins users"
     "azure.updates"       = "Update Center hosted on Azure (Apache redirections service)"
     "builds.reports"      = "Public build reports about the private Jenkins controllers of the Jenkins infrastructure"
     "contributors.origin" = "Jenkins Contributors Spotlight website content origin for Fastly CDN"
