@@ -122,6 +122,8 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_new_publick8s" {
   for_each = {
     "accounts"      = "accountapp for Jenkins users"
     "plugin-health" = "Plugin Health Scoring application"
+    "wiki"          = "Static Wiki Confluence export"
+    "javadoc"       = "Jenkins Javadoc"
   }
 
   name                = each.key
@@ -145,7 +147,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
     "fallback.get"        = "Fallback address for mirrorbits" # Note: had a TTL of 10 minutes before, not 1 hour
     "get"                 = "Jenkins binary distribution via mirrorbits"
     "incrementals"        = "incrementals publisher to incrementals Maven repository"
-    "javadoc"             = "Jenkins Javadoc"
     "mirrors"             = "Jenkins binary distribution via mirrorbits"
     "mirrors.updates"     = "Update Center hosted on Azure (Mirrorbits redirections service)"
     "stats"               = "New Jenkins Statistics website"
@@ -157,7 +158,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
     "staging.updates"     = "Test instance for updates.jenkins.io"
     "uplink"              = "Jenkins telemetry service"
     "weekly.ci"           = "Jenkins Weekly demo controller"
-    "wiki"                = "Static Wiki Confluence export"
     "www.origin"          = "Jenkins website content origin for Fastly CDN"
   }
 
