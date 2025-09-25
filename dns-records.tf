@@ -135,6 +135,12 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_new_publick8s" {
     "rating"              = "Jenkins releases rating service"
     "reports"             = "Public reports about Jenkins services and components consumed by RPU, plugins website and others"
     "uplink"              = "Jenkins telemetry service"
+    "azure.updates"   = "Update Center hosted on Azure (Apache redirections service)"
+    "fallback.get"    = "Fallback address for mirrorbits" # Note: had a TTL of 10 minutes before, not 1 hour
+    "get"             = "Jenkins binary distribution via mirrorbits"
+    "incrementals"    = "incrementals publisher to incrementals Maven repository"
+    "mirrors"         = "Jenkins binary distribution via mirrorbits"
+    "mirrors.updates" = "Update Center hosted on Azure (Mirrorbits redirections service)"
   }
 
   name                = each.key
@@ -142,30 +148,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_new_publick8s" {
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 60
   record              = "public.publick8s.jenkins.io" # A record defined in https://github.com/jenkins-infra/azure/blob/main/old_publick8s.tf
-
-  tags = merge(local.default_tags, {
-    purpose = each.value
-  })
-}
-# TODO: remove once empty (e.g. migration finished)
-resource "azurerm_dns_cname_record" "jenkinsio_target_public_publick8s" {
-  # Map of records and corresponding purposes
-  for_each = {
-    "azure.updates"   = "Update Center hosted on Azure (Apache redirections service)"
-    "fallback.get"    = "Fallback address for mirrorbits" # Note: had a TTL of 10 minutes before, not 1 hour
-    "get"             = "Jenkins binary distribution via mirrorbits"
-    "incrementals"    = "incrementals publisher to incrementals Maven repository"
-    "mirrors"         = "Jenkins binary distribution via mirrorbits"
-    "mirrors.updates" = "Update Center hosted on Azure (Mirrorbits redirections service)"
-    "staging.get"     = "Test instance for get.jenkins.io"
-    "staging.updates" = "Test instance for updates.jenkins.io"
-  }
-
-  name                = each.key
-  zone_name           = data.azurerm_dns_zone.jenkinsio.name
-  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-  ttl                 = 60
-  record              = "public.publick8s-endless-ghoul.jenkins.io" # A record defined in https://github.com/jenkins-infra/azure/blob/main/old_publick8s.tf
 
   tags = merge(local.default_tags, {
     purpose = each.value
