@@ -135,12 +135,12 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_new_publick8s" {
     "rating"              = "Jenkins releases rating service"
     "reports"             = "Public reports about Jenkins services and components consumed by RPU, plugins website and others"
     "uplink"              = "Jenkins telemetry service"
-    "azure.updates"   = "Update Center hosted on Azure (Apache redirections service)"
-    "fallback.get"    = "Fallback address for mirrorbits" # Note: had a TTL of 10 minutes before, not 1 hour
-    "get"             = "Jenkins binary distribution via mirrorbits"
-    "incrementals"    = "incrementals publisher to incrementals Maven repository"
-    "mirrors"         = "Jenkins binary distribution via mirrorbits"
-    "mirrors.updates" = "Update Center hosted on Azure (Mirrorbits redirections service)"
+    "azure.updates"       = "Update Center hosted on Azure (Apache redirections service)"
+    "fallback.get"        = "Fallback address for mirrorbits" # Note: had a TTL of 10 minutes before, not 1 hour
+    "get"                 = "Jenkins binary distribution via mirrorbits"
+    "incrementals"        = "incrementals publisher to incrementals Maven repository"
+    "mirrors"             = "Jenkins binary distribution via mirrorbits"
+    "mirrors.updates"     = "Update Center hosted on Azure (Mirrorbits redirections service)"
   }
 
   name                = each.key
