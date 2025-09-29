@@ -96,7 +96,7 @@ module "private_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
-      use_default_outbound_access                   = true
+      use_default_outbound_access                   = false
     },
     {
       # Dedicated subnet for machine to machine private communications
@@ -106,7 +106,7 @@ module "private_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
-      use_default_outbound_access                   = true
+      use_default_outbound_access                   = false
     },
     {
       # Dedicated subnet for the "privatek8s" AKS cluster resources
@@ -118,7 +118,7 @@ module "private_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
-      use_default_outbound_access                   = true
+      use_default_outbound_access                   = false
     },
     {
       # Dedicated subnet for the release nodes of the "privatek8s" AKS cluster resources
@@ -128,7 +128,7 @@ module "private_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
-      use_default_outbound_access                   = true
+      use_default_outbound_access                   = false
     },
     {
       # Dedicated subnet for the release nodes of the "privatek8s" for the controller infraci AKS cluster resources
@@ -138,7 +138,7 @@ module "private_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
-      use_default_outbound_access                   = true
+      use_default_outbound_access                   = false
     },
     {
       # Dedicated subnet for the private nodes of the "privatek8s" for the controller releaseci AKS cluster resources
@@ -148,7 +148,7 @@ module "private_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
-      use_default_outbound_access                   = true
+      use_default_outbound_access                   = false
     }
   ]
 
@@ -177,7 +177,7 @@ module "trusted_ci_jenkins_io_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
-      use_default_outbound_access                   = true
+      use_default_outbound_access                   = false
     },
     {
       name                                          = "trusted-ci-jenkins-io-vnet-ephemeral-agents"
@@ -186,7 +186,7 @@ module "trusted_ci_jenkins_io_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
-      use_default_outbound_access                   = true
+      use_default_outbound_access                   = false
     },
     {
       name                                          = "trusted-ci-jenkins-io-vnet-permanent-agents"
@@ -195,7 +195,7 @@ module "trusted_ci_jenkins_io_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Disabled"
-      use_default_outbound_access                   = true
+      use_default_outbound_access                   = false
     },
   ]
 
@@ -221,7 +221,7 @@ module "cert_ci_jenkins_io_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
-      use_default_outbound_access                   = true
+      use_default_outbound_access                   = false
     },
     {
       name                                          = "cert-ci-jenkins-io-vnet-ephemeral-agents"
@@ -230,7 +230,7 @@ module "cert_ci_jenkins_io_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
-      use_default_outbound_access                   = true
+      use_default_outbound_access                   = false
     },
   ]
 
@@ -257,7 +257,7 @@ module "infra_ci_jenkins_io_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
-      use_default_outbound_access                   = true
+      use_default_outbound_access                   = false
     },
     {
       name                                          = "infra-ci-jenkins-io-vnet-packer-builds"
@@ -266,7 +266,7 @@ module "infra_ci_jenkins_io_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
-      use_default_outbound_access                   = true
+      use_default_outbound_access                   = false
     },
     {
       name                                          = "infra-ci-jenkins-io-vnet-kubernetes-agents"
@@ -275,7 +275,7 @@ module "infra_ci_jenkins_io_vnet" {
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
-      use_default_outbound_access                   = true
+      use_default_outbound_access                   = false
     },
   ]
 
