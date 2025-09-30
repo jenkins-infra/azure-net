@@ -35,7 +35,7 @@ resource "azurerm_subnet" "vnet_subnets" {
   service_endpoints                             = each.value.service_endpoints
   private_link_service_network_policies_enabled = try(each.value.private_link_service_network_policies_enabled, true)
   private_endpoint_network_policies             = try(each.value.private_endpoint_network_policies, "Enabled")
-  default_outbound_access_enabled               = try(each.value.use_default_outbound_access, false)
+  default_outbound_access_enabled               = false
 
   dynamic "delegation" {
     for_each = each.value.delegations
