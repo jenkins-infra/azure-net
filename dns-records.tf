@@ -162,6 +162,7 @@ resource "azurerm_dns_cname_record" "jenkinsciorg_target_jenkinsio" {
     "mirrors"  = "Jenkins binary distribution via mirrorbits"
     "updates"  = "Jenkins Update Center"
     "wiki"     = "Static Wiki Confluence export"
+    "usage"    = "Usage telemetry for jenkins controllers"
   }
 
   name                = each.key
@@ -505,4 +506,53 @@ resource "azurerm_dns_ns_record" "aws_ci_jenkins_io" {
   records = split(" ", local.aws_route53_nameservers_awscijenkinsio)
 
   tags = local.default_tags
+}
+
+
+# ---------------------- IMPORT
+
+# import {
+#   to = azurerm_dns_a_record.usage
+#   id = "/subscriptions/dff2ec18-6a8e-405c-8e45-b7df7465acf0/resourceGroups/proddns_jenkinsio/providers/Microsoft.Network/dnsZones/jenkins.io/A/usage"
+# }
+
+# resource "azurerm_dns_a_record" "usage" {
+#   name                = "usage"
+#   zone_name           = data.azurerm_dns_zone.jenkinsio.name
+#   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+#   ttl                 = 60
+#   records             = ["52.204.62.78"]
+
+#   tags = merge(local.default_tags, {
+#     purpose = "usage.jenkins.io used to get telemetry from jenkins controllers"
+#   })
+# }
+
+resource "azurerm_dns_a_record" "usage_aws" {
+  name                = "usage.aws"
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 60
+  records             = ["52.204.62.78"]
+
+  tags = merge(local.default_tags, {
+    purpose = "usage.aws.jenkins.io used to get telemetry from jenkins controllers (Cloudbees AWS VM)"
+  })
+}
+
+resource "azurerm_dns_cname_record" "usage" {
+  name                = "usage"
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 60
+  record              = "usage.aws.jenkins.io"
+
+  tags = merge(local.default_tags, {
+    purpose = "usage.aws.jenkins.io used to get telemetry from jenkins controllers (Cloudbees AWS VM)"
+  })
+}
+
+import {
+  to = azurerm_dns_cname_record.jenkinsciorg_target_jenkinsio["usage"]
+  id = "/subscriptions/dff2ec18-6a8e-405c-8e45-b7df7465acf0/resourceGroups/proddns_jenkinsci/providers/Microsoft.Network/dnsZones/jenkins-ci.org/CNAME/usage"
 }
