@@ -525,14 +525,9 @@ resource "azurerm_dns_cname_record" "usage" {
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 60
-  record              = "usage.aws.jenkins.io"
+  record              = "usage.do.jenkins.io"
 
   tags = merge(local.default_tags, {
-    purpose = "usage.aws.jenkins.io used to get telemetry from jenkins controllers (Cloudbees AWS VM)"
+    purpose = "usage.jenkins.io used to get telemetry from jenkins controllers"
   })
-}
-
-import {
-  to = azurerm_dns_cname_record.jenkinsciorg_target_jenkinsio["usage"]
-  id = "/subscriptions/dff2ec18-6a8e-405c-8e45-b7df7465acf0/resourceGroups/proddns_jenkinsci/providers/Microsoft.Network/dnsZones/jenkins-ci.org/CNAME/usage"
 }
