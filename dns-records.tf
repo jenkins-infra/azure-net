@@ -528,6 +528,6 @@ resource "azurerm_dns_cname_record" "usage" {
   record              = "usage.do.jenkins.io"
 
   tags = merge(local.default_tags, {
-    purpose = "usage.do.jenkins.io used to get telemetry from jenkins controllers"
+    purpose = "usage.jenkins.io used to get telemetry from jenkins controllers"
   })
 }
