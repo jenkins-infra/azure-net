@@ -508,18 +508,6 @@ resource "azurerm_dns_ns_record" "aws_ci_jenkins_io" {
   tags = local.default_tags
 }
 
-resource "azurerm_dns_a_record" "usage_aws" {
-  name                = "usage.aws"
-  zone_name           = data.azurerm_dns_zone.jenkinsio.name
-  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-  ttl                 = 60
-  records             = ["52.204.62.78"]
-
-  tags = merge(local.default_tags, {
-    purpose = "usage.aws.jenkins.io used to get telemetry from jenkins controllers (Cloudbees AWS VM)"
-  })
-}
-
 resource "azurerm_dns_cname_record" "usage" {
   name                = "usage"
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
