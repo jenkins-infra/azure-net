@@ -153,11 +153,12 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_new_publick8s" {
   })
 }
 
-# CNAME records for the legacy domain jenkins-ci.org, pointing to their modern counterpart
+# CNAME records for the legacy domain jenkins-ci.org, pointing to their modern (e.g. *.jenkins.io) counterpart
 resource "azurerm_dns_cname_record" "jenkinsciorg_target_jenkinsio" {
   # Map of records and corresponding purposes. Some records only exists in jenkins.io as jenkins-ci.org is only legacy
   for_each = {
     "accounts" = "accountapp for Jenkins users"
+    "archives" = "archives.jenkins.io stores all the Jenkins binaries (installers, plugins, etc.) and acts a s fallback for the download (and update center) mirror systems.",
     "javadoc"  = "Jenkins Javadoc"
     "mirrors"  = "Jenkins binary distribution via mirrorbits"
     "updates"  = "Jenkins Update Center"
@@ -508,14 +509,34 @@ resource "azurerm_dns_ns_record" "aws_ci_jenkins_io" {
   tags = local.default_tags
 }
 
-resource "azurerm_dns_cname_record" "usage" {
-  name                = "usage"
+# CNAMEs of services hosted in DigitalOcean which has its own DNS zone "*.do.jenkins.io" - https://github.com/jenkins-infra/digitalocean/blob/main/dns.tf
+resource "azurerm_dns_cname_record" "digitalocean_cnames" {
+  for_each = {
+    "archives" = "archives.jenkins.io stores all the Jenkins binaries (installers, plugins, etc.) and acts a s fallback for the download (and update center) mirror systems.",
+    "usage"    = "usage.jenkins.io used to get telemetry from jenkins controllers",
+    "census"   = "census.jenkins.io is a permanent agent machine for trusted.ci.jenkins.io which processes all the Jenkins platform statistics from usage.jenkins.io in a private area."
+  }
+  name                = each.key
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 60
-  record              = "usage.do.jenkins.io"
-
+  record              = "${each.key}.do.jenkins.io"
   tags = merge(local.default_tags, {
-    purpose = "usage.jenkins.io used to get telemetry from jenkins controllers"
+    purpose = each.value,
   })
+}
+
+moved {
+  from = azurerm_dns_cname_record.usage
+  to   = azurerm_dns_cname_record.digitalocean_cnames["usage"]
+}
+
+import {
+  to = azurerm_dns_cname_record.digitalocean_cnames["archives"]
+  id = "/subscriptions/dff2ec18-6a8e-405c-8e45-b7df7465acf0/resourceGroups/proddns_jenkinsio/providers/Microsoft.Network/dnsZones/jenkins.io/CNAME/archives"
+}
+
+import {
+  to = azurerm_dns_cname_record.jenkinsciorg_target_jenkinsio["archives"]
+  id = "/subscriptions/dff2ec18-6a8e-405c-8e45-b7df7465acf0/resourceGroups/proddns_jenkinsci/providers/Microsoft.Network/dnsZones/jenkins-ci.org/CNAME/archives"
 }
