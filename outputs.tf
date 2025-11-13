@@ -18,9 +18,6 @@ resource "local_file" "jenkins_infra_data_report" {
       "outbound_ips"      = split(",", module.private_vnet.public_ip_list),
       "private_lb_subnet" = "privatek8s-tier",
     },
-    "publick8s.jenkins.io" = {
-      "outbound_ips" = split(",", module.public_vnet.public_ip_list),
-    },
     "private.vpn.jenkins.io" = {
       # VPN VM uses its public IP as outbound method (default Azure behavior) instead of the outbound NAT gateway
       "outbound_ips" = [azurerm_public_ip.vpn_public.ip_address],
