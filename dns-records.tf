@@ -319,16 +319,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_customs" {
       # TODO: extend once migrated to new LF JIRA
       "ttl" = 60,
     },
-    "testissues" = {
-      "target"      = "jira-rhel9-alb-1841417744.us-west-2.elb.amazonaws.com",
-      "description" = "Jenkins public JIRA hosted by the Linux Foundation",
-      "ttl"         = 60,
-    },
-    "_84facad5c463aeab1f2d19d5964a5879.testissues" = {
-      "target"      = "_e8c79d63c1e3d4e259f943cdcacaf330.xlfgrmvvlj.acm-validations.aws",
-      "description" = "TLS challenge for LF (IT-28124) - jenkins-infra/helpdesk-4644",
-      "ttl"         = 60,
-    },
     "_b1ff2d9eff9b1643970f47de4281ce22.issues" = {
       "target"      = "_d7eac0ec254ecc89fbb3d23a37f99fbd.zbkrxsrfvj.acm-validations.aws",
       "description" = "TLS challenge for issues.jenbkins.io (managed by LF) - jenkins-infra/helpdesk-4757",
@@ -524,19 +514,4 @@ resource "azurerm_dns_cname_record" "digitalocean_cnames" {
   tags = merge(local.default_tags, {
     purpose = each.value,
   })
-}
-
-moved {
-  from = azurerm_dns_cname_record.usage
-  to   = azurerm_dns_cname_record.digitalocean_cnames["usage"]
-}
-
-import {
-  to = azurerm_dns_cname_record.digitalocean_cnames["archives"]
-  id = "/subscriptions/dff2ec18-6a8e-405c-8e45-b7df7465acf0/resourceGroups/proddns_jenkinsio/providers/Microsoft.Network/dnsZones/jenkins.io/CNAME/archives"
-}
-
-import {
-  to = azurerm_dns_cname_record.jenkinsciorg_target_jenkinsio["archives"]
-  id = "/subscriptions/dff2ec18-6a8e-405c-8e45-b7df7465acf0/resourceGroups/proddns_jenkinsci/providers/Microsoft.Network/dnsZones/jenkins-ci.org/CNAME/archives"
 }
