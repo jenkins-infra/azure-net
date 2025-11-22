@@ -192,9 +192,9 @@ resource "azurerm_dns_cname_record" "repo_jenkinsci_org" {
 resource "azurerm_dns_cname_record" "jenkinsio_target_private_publick8s" {
   # Map of records and corresponding purposes
   for_each = {
-    "admin.accounts"                = "Keycloak admin for Jenkins users"
-    "staging.get.jenkins.io"        = "Staging of get.jenkins.io"
-    "staging.pkg.origin.jenkins.io" = "Staging of pkg.origin.jenkins.io"
+    "admin.accounts"     = "Keycloak admin for Jenkins users"
+    "staging.get"        = "Staging of get.jenkins.io"
+    "staging.pkg.origin" = "Staging of pkg.origin.jenkins.io"
   }
 
   name                = each.key
