@@ -120,26 +120,26 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_new_publick8s" {
   # Map of records and corresponding purposes
   for_each = {
     "accounts"            = "accountapp for Jenkins users"
-    "plugin-health"       = "Plugin Health Scoring application"
-    "wiki"                = "Static Wiki Confluence export"
-    "javadoc"             = "Jenkins Javadoc"
-    "weekly.ci"           = "Jenkins Weekly demo controller"
-    "plugins.origin"      = "Plugins website content origin for Fastly CDN"
-    "www.origin"          = "Jenkins website content origin for Fastly CDN"
+    "azure.updates"       = "Update Center hosted on Azure (Apache redirections service)"
     "builds.reports"      = "Public build reports about the private Jenkins controllers of the Jenkins infrastructure"
     "contributors.origin" = "Jenkins Contributors Spotlight website content origin for Fastly CDN"
     "docs.origin"         = "Versioned docs of jenkins.io content origin for Fastly CDN"
-    "plugin-site-issues"  = "Plugins website API content origin for Fastly CDN"
-    "stats"               = "New Jenkins Statistics website"
-    "rating"              = "Jenkins releases rating service"
-    "reports"             = "Public reports about Jenkins services and components consumed by RPU, plugins website and others"
-    "uplink"              = "Jenkins telemetry service"
-    "azure.updates"       = "Update Center hosted on Azure (Apache redirections service)"
     "fallback.get"        = "Fallback address for mirrorbits" # Note: had a TTL of 10 minutes before, not 1 hour
     "get"                 = "Jenkins binary distribution via mirrorbits"
     "incrementals"        = "incrementals publisher to incrementals Maven repository"
-    "mirrors"             = "Jenkins binary distribution via mirrorbits"
+    "javadoc"             = "Jenkins Javadoc"
     "mirrors.updates"     = "Update Center hosted on Azure (Mirrorbits redirections service)"
+    "mirrors"             = "Jenkins binary distribution via mirrorbits"
+    "plugin-health"       = "Plugin Health Scoring application"
+    "plugin-site-issues"  = "Plugins website API content origin for Fastly CDN"
+    "plugins.origin"      = "Plugins website content origin for Fastly CDN"
+    "rating"              = "Jenkins releases rating service"
+    "reports"             = "Public reports about Jenkins services and components consumed by RPU, plugins website and others"
+    "stats"               = "New Jenkins Statistics website"
+    "uplink"              = "Jenkins telemetry service"
+    "weekly.ci"           = "Jenkins Weekly demo controller"
+    "wiki"                = "Static Wiki Confluence export"
+    "www.origin"          = "Jenkins website content origin for Fastly CDN"
   }
 
   name                = each.key
@@ -162,8 +162,8 @@ resource "azurerm_dns_cname_record" "jenkinsciorg_target_jenkinsio" {
     "javadoc"  = "Jenkins Javadoc"
     "mirrors"  = "Jenkins binary distribution via mirrorbits"
     "updates"  = "Jenkins Update Center"
-    "wiki"     = "Static Wiki Confluence export"
     "usage"    = "Usage telemetry for jenkins controllers"
+    "wiki"     = "Static Wiki Confluence export"
   }
 
   name                = each.key
@@ -192,7 +192,9 @@ resource "azurerm_dns_cname_record" "repo_jenkinsci_org" {
 resource "azurerm_dns_cname_record" "jenkinsio_target_private_publick8s" {
   # Map of records and corresponding purposes
   for_each = {
-    "admin.accounts" = "Keycloak admin for Jenkins users"
+    "admin.accounts"                = "Keycloak admin for Jenkins users"
+    "staging.get.jenkins.io"        = "Staging of get.jenkins.io"
+    "staging.pkg.origin.jenkins.io" = "Staging of pkg.origin.jenkins.io"
   }
 
   name                = each.key
