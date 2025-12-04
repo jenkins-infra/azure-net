@@ -127,6 +127,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_new_publick8s" {
     "fallback.get"        = "Fallback address for mirrorbits" # Note: had a TTL of 10 minutes before, not 1 hour
     "get"                 = "Jenkins binary distribution via mirrorbits"
     "incrementals"        = "incrementals publisher to incrementals Maven repository"
+    "issue-redirect"      = "Redirects JENKINS Jira issues to GitHub if they are migrated else to Jira"
     "javadoc"             = "Jenkins Javadoc"
     "mirrors.updates"     = "Update Center hosted on Azure (Mirrorbits redirections service)"
     "mirrors"             = "Jenkins binary distribution via mirrorbits"
