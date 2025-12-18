@@ -141,6 +141,8 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_new_publick8s" {
     "weekly.ci"           = "Jenkins Weekly demo controller"
     "wiki"                = "Static Wiki Confluence export"
     "www.origin"          = "Jenkins website content origin for Fastly CDN"
+    # TODO: uncomment to migrate to publick8s - https://github.com/jenkins-infra/helpdesk/issues/3705#issuecomment-3664641127
+    # "pkg.origin"         = "Jenkins Package Downloads service"
   }
 
   name                = each.key
@@ -176,17 +178,6 @@ resource "azurerm_dns_cname_record" "jenkinsciorg_target_jenkinsio" {
   tags = merge(local.default_tags, {
     purpose = each.value
   })
-}
-
-# CNAME records for the legacy domain jenkins-ci.org, pointing to their modern counterpart
-resource "azurerm_dns_cname_record" "repo_jenkinsci_org" {
-  name                = "repo"
-  zone_name           = data.azurerm_dns_zone.jenkinsciorg.name
-  resource_group_name = data.azurerm_resource_group.proddns_jenkinsci.name
-  ttl                 = 60
-  record              = "jenkinsci.jfrog.org"
-
-  tags = local.default_tags
 }
 
 # CNAME records targeting the private-nginx on publick8s cluster
@@ -330,12 +321,46 @@ resource "azurerm_dns_cname_record" "jenkinsio_customs" {
     "updates" = {
       "target"      = "azure.updates.jenkins.io"
       "description" = "Jenkins Update Center"
-    }
+    },
+    "pkg" = {
+      "target"      = "dualstack.d.sni.global.fastly.net",
+      "description" = "Jenkins Package Downloads with Fastly as CDN",
+    },
+    # TODO: remove to migrate to publick8s - https://github.com/jenkins-infra/helpdesk/issues/3705#issuecomment-3664641127
+    "pkg.origin" = {
+      "target"      = "aws.updates.jenkins.io",
+      "description" = "Jenkins Package Downloads service",
+      "ttl"         = 60,
+    },
   }
 
   name                = each.key
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = lookup(each.value, "ttl", 300)
+  record              = each.value["target"]
+
+  tags = merge(local.default_tags, {
+    purpose = each.value["description"]
+  })
+}
+resource "azurerm_dns_cname_record" "jenkinsciorg_customs" {
+  # Map of records and corresponding purposes
+  for_each = {
+    "repo" = {
+      "target"      = "jenkinsci.jfrog.org",
+      "description" = "Artifactory instance hosted by Jfrog",
+      "ttl"         = 60,
+    },
+    "pkg" = {
+      "target"      = "pkg.origin.jenkins.io", # Cannot point to Fastly (would require a Fastly custom website)
+      "description" = "Jenkins Package Downloads with Fastly as CDN",
+    }
+  }
+
+  name                = each.key
+  zone_name           = data.azurerm_dns_zone.jenkinsciorg.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsci.name
   ttl                 = lookup(each.value, "ttl", 300)
   record              = each.value["target"]
 
