@@ -265,7 +265,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_fastly" {
   for_each = {
     "contributors" = "Jenkins Contributors Spotlight website",
     "docs"         = "Versioned docs of jenkins.io",
-    "pkg"          = "Website to download Jenkins packages",
+    "pkg"          = "Jenkins Package Downloads with Fastly as CDN",
     "plugins"      = "Website to browse and download Jenkins plugins",
     "stories"      = "Website with Jenkins User stories and testimonies",
     "way.the.is"   = "Old alias for stories.jenkins.io",
@@ -321,10 +321,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_customs" {
     "updates" = {
       "target"      = "azure.updates.jenkins.io"
       "description" = "Jenkins Update Center"
-    },
-    "pkg" = {
-      "target"      = "dualstack.d.sni.global.fastly.net",
-      "description" = "Jenkins Package Downloads with Fastly as CDN",
     },
     # TODO: remove to migrate to publick8s - https://github.com/jenkins-infra/helpdesk/issues/3705#issuecomment-3664641127
     "pkg.origin" = {
