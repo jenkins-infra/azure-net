@@ -131,6 +131,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_new_publick8s" {
     "javadoc"             = "Jenkins Javadoc"
     "mirrors.updates"     = "Update Center hosted on Azure (Mirrorbits redirections service)"
     "mirrors"             = "Jenkins binary distribution via mirrorbits"
+    "pkg.origin"          = "Jenkins Package Downloads service"
     "plugin-health"       = "Plugin Health Scoring application"
     "plugin-site-issues"  = "Plugins website API content origin for Fastly CDN"
     "plugins.origin"      = "Plugins website content origin for Fastly CDN"
@@ -141,8 +142,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_new_publick8s" {
     "weekly.ci"           = "Jenkins Weekly demo controller"
     "wiki"                = "Static Wiki Confluence export"
     "www.origin"          = "Jenkins website content origin for Fastly CDN"
-    # TODO: uncomment to migrate to publick8s - https://github.com/jenkins-infra/helpdesk/issues/3705#issuecomment-3664641127
-    # "pkg.origin"         = "Jenkins Package Downloads service"
   }
 
   name                = each.key
@@ -321,12 +320,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_customs" {
     "updates" = {
       "target"      = "azure.updates.jenkins.io"
       "description" = "Jenkins Update Center"
-    },
-    # TODO: remove to migrate to publick8s - https://github.com/jenkins-infra/helpdesk/issues/3705#issuecomment-3664641127
-    "pkg.origin" = {
-      "target"      = "aws.updates.jenkins.io",
-      "description" = "Jenkins Package Downloads service",
-      "ttl"         = 60,
     },
   }
 
