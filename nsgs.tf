@@ -97,19 +97,6 @@ resource "azurerm_network_security_group" "public_apptier" {
     destination_address_prefix = "*"
   }
   security_rule {
-    name                   = "allow-rsyncd-inbound"
-    priority               = 103
-    direction              = "Inbound"
-    access                 = "Allow"
-    protocol               = "Tcp"
-    source_port_range      = "*"
-    destination_port_range = "873"
-    # 52.202.51.185: pkg.origin.jenkins.io
-    # TODO: replace by the object reference data when all DNS entries will be imported
-    source_address_prefixes    = ["52.202.51.185/32"]
-    destination_address_prefix = "*"
-  }
-  security_rule {
     name                       = "allow-private-ssh-inbound"
     priority                   = 4001
     direction                  = "Inbound"
