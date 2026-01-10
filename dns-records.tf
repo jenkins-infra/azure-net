@@ -101,19 +101,6 @@ resource "azurerm_dns_a_record" "ldap_jenkins_io" {
   })
 }
 
-# Records for the legacy Update Center in AWS CloudBees account
-resource "azurerm_dns_a_record" "aws_updates_jenkins_io" {
-  name                = "aws.updates"
-  zone_name           = data.azurerm_dns_zone.jenkinsio.name
-  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-  ttl                 = 60
-  records             = ["52.202.51.185"]
-
-  tags = merge(local.default_tags, {
-    purpose = "Jenkins AWS-hosted Update Center"
-  })
-}
-
 ### CNAME records
 # CNAME records targeting the public-nginx on publick8s cluster
 resource "azurerm_dns_cname_record" "jenkinsio_target_public_new_publick8s" {
