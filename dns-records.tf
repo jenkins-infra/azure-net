@@ -292,7 +292,19 @@ resource "azurerm_dns_cname_record" "jenkinsio_customs" {
     },
     "assets.ci" = {
       "target"      = "assets.aws.ci.jenkins.io",
-      "description" = "Secondary utility domain for public controller ci.jenkins.io",
+      "description" = "Resource root URL for public controller ci.jenkins.io",
+      # TODO: extend once migrated to AWS
+      "ttl" = 60,
+    },
+    "assets.cert.ci" = {
+      "target"      = "cert.ci.jenkins.io",
+      "description" = "Resource root URL for private controller cert.ci.jenkins.io",
+      # TODO: extend once migrated to AWS
+      "ttl" = 60,
+    },
+    "assets.trusted.ci" = {
+      "target"      = "trusted.ci.jenkins.io",
+      "description" = "Resource root URL for private controller trusted.ci.jenkins.io",
       # TODO: extend once migrated to AWS
       "ttl" = 60,
     },
