@@ -296,18 +296,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_customs" {
       # TODO: extend once migrated to AWS
       "ttl" = 60,
     },
-    "assets.cert.ci" = {
-      "target"      = "cert.ci.jenkins.io",
-      "description" = "Resource root URL for private controller cert.ci.jenkins.io",
-      # TODO: extend once migrated to AWS
-      "ttl" = 60,
-    },
-    "assets.trusted.ci" = {
-      "target"      = "trusted.ci.jenkins.io",
-      "description" = "Resource root URL for private controller trusted.ci.jenkins.io",
-      # TODO: extend once migrated to AWS
-      "ttl" = 60,
-    },
     "issues" = {
       "target"      = "jenkinsci-jira-alb-368766416.us-west-2.elb.amazonaws.com",
       "description" = "Jenkins public JIRA hosted by the Linux Foundation",
