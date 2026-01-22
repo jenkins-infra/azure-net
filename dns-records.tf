@@ -107,6 +107,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_new_publick8s" {
   # Map of records and corresponding purposes
   for_each = {
     "accounts"            = "accountapp for Jenkins users"
+    "assets.weekly.ci"    = "Resource root URL for public controller weekly.ci.jenkins.io"
     "azure.updates"       = "Update Center hosted on Azure (Apache redirections service)"
     "builds.reports"      = "Public build reports about the private Jenkins controllers of the Jenkins infrastructure"
     "contributors.origin" = "Jenkins Contributors Spotlight website content origin for Fastly CDN"
@@ -209,8 +210,10 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_privatek8s_cdf" {
 resource "azurerm_dns_cname_record" "jenkinsio_target_private_privatek8s_cdf" {
   # Map of records and corresponding purposes
   for_each = {
-    "infra.ci"   = "infra.ci.jenkins.io, only accessible via the private VPN",
-    "release.ci" = "release.ci.jenkins.io, only accessible via the private VPN"
+    "infra.ci"          = "infra.ci.jenkins.io, only accessible via the private VPN",
+    "release.ci"        = "release.ci.jenkins.io, only accessible via the private VPN"
+    "assets.infra.ci"   = "Resource root URL for private controller infra.ci.jenkins.io",
+    "assets.release.ci" = "Resource root URL for private controller release.ci.jenkins.io"
   }
 
   name                = each.key
@@ -289,7 +292,19 @@ resource "azurerm_dns_cname_record" "jenkinsio_customs" {
     },
     "assets.ci" = {
       "target"      = "assets.aws.ci.jenkins.io",
-      "description" = "Secondary utility domain for public controller ci.jenkins.io",
+      "description" = "Resource root URL for public controller ci.jenkins.io",
+      # TODO: extend once migrated to AWS
+      "ttl" = 60,
+    },
+    "assets.cert.ci" = {
+      "target"      = "cert.ci.jenkins.io",
+      "description" = "Resource root URL for private controller cert.ci.jenkins.io",
+      # TODO: extend once migrated to AWS
+      "ttl" = 60,
+    },
+    "assets.trusted.ci" = {
+      "target"      = "trusted.ci.jenkins.io",
+      "description" = "Resource root URL for private controller trusted.ci.jenkins.io",
       # TODO: extend once migrated to AWS
       "ttl" = 60,
     },
