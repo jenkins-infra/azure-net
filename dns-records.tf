@@ -112,7 +112,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_new_publick8s" {
     "azure.updates"       = "Update Center hosted on Azure (Apache redirections service)"
     "builds.reports"      = "Public build reports about the private Jenkins controllers of the Jenkins infrastructure"
     "contributors.origin" = "Jenkins Contributors Spotlight website content origin for Fastly CDN"
-    "docs.origin"         = "Versioned docs of jenkins.io content origin for Fastly CDN" # TODO: to be replaced by alpha.docs
     "fallback.get"        = "Fallback address for mirrorbits" # Note: had a TTL of 10 minutes before, not 1 hour
     "get"                 = "Jenkins binary distribution via mirrorbits"
     "incrementals"        = "incrementals publisher to incrementals Maven repository"
