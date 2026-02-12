@@ -253,7 +253,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_fastly" {
   # Map of records and corresponding purposes
   for_each = {
     "contributors" = "Jenkins Contributors Spotlight website",
-    "docs"         = "Versioned docs of jenkins.io",
     "pkg"          = "Jenkins Package Downloads with Fastly as CDN",
     "plugins"      = "Website to browse and download Jenkins plugins",
     "stories"      = "Website with Jenkins User stories and testimonies",
