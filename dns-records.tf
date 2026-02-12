@@ -112,6 +112,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_new_publick8s" {
     "azure.updates"       = "Update Center hosted on Azure (Apache redirections service)"
     "builds.reports"      = "Public build reports about the private Jenkins controllers of the Jenkins infrastructure"
     "contributors.origin" = "Jenkins Contributors Spotlight website content origin for Fastly CDN"
+    "docs"                = "Versioned docs of jenkins.io (redirect to alpha.docs.jenkins.io until finalized)",
     "fallback.get"        = "Fallback address for mirrorbits" # Note: had a TTL of 10 minutes before, not 1 hour
     "get"                 = "Jenkins binary distribution via mirrorbits"
     "incrementals"        = "incrementals publisher to incrementals Maven repository"
@@ -253,7 +254,6 @@ resource "azurerm_dns_cname_record" "jenkinsio_fastly" {
   # Map of records and corresponding purposes
   for_each = {
     "contributors" = "Jenkins Contributors Spotlight website",
-    "docs"         = "Versioned docs of jenkins.io",
     "pkg"          = "Jenkins Package Downloads with Fastly as CDN",
     "plugins"      = "Website to browse and download Jenkins plugins",
     "stories"      = "Website with Jenkins User stories and testimonies",
