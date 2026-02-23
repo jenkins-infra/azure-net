@@ -2,3 +2,7 @@
 data "azuread_service_principal" "terraform-azure-net-production" {
   display_name = "terraform-azure-net-production"
 }
+
+data "azurerm_subscription" "jenkins_sponsored" {
+  provider = azurerm.jenkins-sponsored
+}

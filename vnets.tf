@@ -23,15 +23,15 @@
 #      │                                   │       └───────▲────────┘
 #      │                                   │               │Vnet Peering
 #      │                                   │               │
-#      │                            VNet Peering      ┌────▼─────────────┐
-#      │                                   │          │                  │
-#      │                                   │          │                  │
-#      │                                   │          │                  │
-#      │                                   │          │   Cert CI VNet   │
-#      │                                   │          │                  │
-#      │                                   │          │                  │
-#      │                                   │          │                  │
-#      │                                   │          └──────────────────┘
+  #      │                            VNet Peering           ┌──────────────────────────────────────►────────────────────────┐   
+  #      │                                   │          ┌────▼─────────────┐                        │                        │   
+  #      │                                   │          │                  │     Vnet peerings      │                        │   
+  #      │                                   │          │                  │                        │                        │   
+  #      │                                   │          │   Cert CI VNet   ◄────────────────────────►  CertCi-sponsoredVnet  │   
+  #      │                                   │          │                  │                        │                        │   
+  #      │                                   │          │                  │                        │                        │   
+  #      │                                   │          │                  │                        │                        │   
+  #      │                                   │          └──────────────────┘                        └────────────────────────┘   
 #      │                                   ▼
 #      │                                 ┌──────────────────┐
 #      │         ┌───────────────────────┤                  │
@@ -223,7 +223,39 @@ module "cert_ci_jenkins_io_vnet" {
   ]
 
   peered_vnets = {
-    "${module.private_vnet.vnet_name}" = module.private_vnet.vnet_id
+    "${module.private_vnet.vnet_name}"                      = module.private_vnet.vnet_id
+    "${module.cert_ci_jenkins_io_sponsored_vnet.vnet_name}" = module.cert_ci_jenkins_io_sponsored_vnet.vnet_id
+  }
+}
+
+module "cert_ci_jenkins_io_sponsored_vnet" {
+  source = "./modules/azure-full-vnet"
+
+  providers = {
+    azurerm = azurerm.jenkins-sponsored
+  }
+
+  base_name          = "cert-ci-jenkins-io-sponsored"
+  gateway_name       = "cert-ci-jenkins-io-outbound-sponsored"
+  outbound_ip_count  = 2
+  tags               = local.default_tags
+  location           = var.location
+  vnet_address_space = ["10.205.0.0/23"] # 10.205.0.1 - 10.205.1.254
+
+  subnets = [
+    {
+      name                                          = "cert-ci-jenkins-io-sponsored-vnet-ephemeral-agents"
+      address_prefixes                              = ["10.205.0.0/24"] # 10.205.0.1 - 10.205.0.254
+      service_endpoints                             = ["Microsoft.Storage"]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
+    },
+  ]
+
+  peered_vnets = {
+    "${module.private_vnet.vnet_name}"            = module.private_vnet.vnet_id,
+    "${module.cert_ci_jenkins_io_vnet.vnet_name}" = module.cert_ci_jenkins_io_vnet.vnet_id
   }
 }
 
