@@ -224,19 +224,19 @@ module "cert_ci_jenkins_io_vnet" {
 
   peered_vnets = {
     "${module.private_vnet.vnet_name}"                        = module.private_vnet.vnet_id
-    "${module.cert_ci_jenkins_io_sponsorship_vnet.vnet_name}" = module.cert_ci_jenkins_io_sponsorship_vnet.vnet_id
+    "${module.cert_ci_jenkins_io_sponsored_vnet.vnet_name}" = module.cert_ci_jenkins_io_sponsored_vnet.vnet_id
   }
 }
 
-module "cert_ci_jenkins_io_sponsorship_vnet" {
+module "cert_ci_jenkins_io_sponsored_vnet" {
   source = "./modules/azure-full-vnet"
 
   providers = {
     azurerm = azurerm.jenkins-sponsored
   }
 
-  base_name          = "cert-ci-jenkins-io-sponsorship"
-  gateway_name       = "cert-ci-jenkins-io-outbound-sponsorship"
+  base_name          = "cert-ci-jenkins-io-sponsored"
+  gateway_name       = "cert-ci-jenkins-io-outbound-sponsored"
   outbound_ip_count  = 2
   tags               = local.default_tags
   location           = var.location
@@ -244,7 +244,7 @@ module "cert_ci_jenkins_io_sponsorship_vnet" {
 
   subnets = [
     {
-      name                                          = "cert-ci-jenkins-io-sponsorship-vnet-ephemeral-agents"
+      name                                          = "cert-ci-jenkins-io-sponsored-vnet-ephemeral-agents"
       address_prefixes                              = ["10.205.0.0/24"] # 10.205.0.1 - 10.205.0.254
       service_endpoints                             = ["Microsoft.Storage"]
       delegations                                   = {}
