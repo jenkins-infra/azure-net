@@ -232,7 +232,7 @@ module "cert_ci_jenkins_io_sponsorship_vnet" {
   source = "./modules/azure-full-vnet"
 
   providers = {
-    azurerm = azurerm.jenkins-sponsorship
+    azurerm = azurerm.jenkins-sponsored
   }
 
   base_name          = "cert-ci-jenkins-io-sponsorship"
