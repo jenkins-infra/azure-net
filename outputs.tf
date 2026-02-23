@@ -29,12 +29,12 @@ resource "local_file" "jenkins_infra_data_report" {
     },
     "vnets" = {
       "cert-ci-jenkins-io-sponsored-vnet" = module.cert_ci_jenkins_io_sponsored_vnet.vnet_address_space,
-      "cert-ci-jenkins-io-vnet"             = module.cert_ci_jenkins_io_vnet.vnet_address_space,
-      "infra-ci-jenkins-io-vnet"            = module.infra_ci_jenkins_io_vnet.vnet_address_space,
-      "private-vnet"                        = module.private_vnet.vnet_address_space,
-      "public-db-vnet"                      = module.public_db_vnet.vnet_address_space,
-      "public-vnet"                         = module.public_vnet.vnet_address_space,
-      "trusted-ci-jenkins-io-vnet"          = module.trusted_ci_jenkins_io_vnet.vnet_address_space,
+      "cert-ci-jenkins-io-vnet"           = module.cert_ci_jenkins_io_vnet.vnet_address_space,
+      "infra-ci-jenkins-io-vnet"          = module.infra_ci_jenkins_io_vnet.vnet_address_space,
+      "private-vnet"                      = module.private_vnet.vnet_address_space,
+      "public-db-vnet"                    = module.public_db_vnet.vnet_address_space,
+      "public-vnet"                       = module.public_vnet.vnet_address_space,
+      "trusted-ci-jenkins-io-vnet"        = module.trusted_ci_jenkins_io_vnet.vnet_address_space,
     }
   })
   filename = "${path.module}/jenkins-infra-data-reports/azure-net.json"

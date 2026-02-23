@@ -223,7 +223,7 @@ module "cert_ci_jenkins_io_vnet" {
   ]
 
   peered_vnets = {
-    "${module.private_vnet.vnet_name}"                        = module.private_vnet.vnet_id
+    "${module.private_vnet.vnet_name}"                      = module.private_vnet.vnet_id
     "${module.cert_ci_jenkins_io_sponsored_vnet.vnet_name}" = module.cert_ci_jenkins_io_sponsored_vnet.vnet_id
   }
 }
