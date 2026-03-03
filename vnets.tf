@@ -239,7 +239,7 @@ module "cert_ci_jenkins_io_sponsored_vnet" {
   gateway_name       = "cert-ci-jenkins-io-outbound-sponsored"
   outbound_ip_count  = 2
   tags               = local.default_tags
-  location           = var.location
+  location           = var.cert_ci_location
   vnet_address_space = ["10.205.0.0/23"] # 10.205.0.1 - 10.205.1.254
 
   subnets = [
