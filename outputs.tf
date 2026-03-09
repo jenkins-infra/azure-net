@@ -9,7 +9,6 @@ resource "local_file" "jenkins_infra_data_report" {
       ),
     },
     "trusted.ci.jenkins.io" = {
-      "outbound_ips" = split(",", module.trusted_ci_jenkins_io_vnet.public_ip_list),
       "outbound_ips" = concat(
         # Controller
         split(",", module.trusted_ci_jenkins_io_vnet.public_ip_list),
