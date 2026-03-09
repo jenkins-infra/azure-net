@@ -152,6 +152,7 @@ module "private_vnet" {
     "${module.trusted_ci_jenkins_io_vnet.vnet_name}"           = module.trusted_ci_jenkins_io_vnet.vnet_id,
     "${module.infra_ci_jenkins_io_vnet.vnet_name}"             = module.infra_ci_jenkins_io_vnet.vnet_id,
     "${module.cert_ci_jenkins_io_sponsored_vnet.vnet_name}"    = module.cert_ci_jenkins_io_sponsored_vnet.vnet_id,
+    "${module.trusted_ci_jenkins_io_sponsored_vnet.vnet_name}" = module.trusted_ci_jenkins_io_sponsored_vnet.vnet_id,
   }
 }
 
@@ -191,7 +192,41 @@ module "trusted_ci_jenkins_io_vnet" {
   ]
 
   peered_vnets = {
-    "${module.private_vnet.vnet_name}" = module.private_vnet.vnet_id,
+    "${module.private_vnet.vnet_name}"                         = module.private_vnet.vnet_id,
+    "${module.trusted_ci_jenkins_io_sponsored_vnet.vnet_name}" = module.trusted_ci_jenkins_io_sponsored_vnet.vnet_id
+  }
+}
+
+module "trusted_ci_jenkins_io_sponsored_vnet" {
+  source = "./modules/azure-full-vnet"
+
+  base_name          = "trusted-ci-jenkins-io-sponsored"
+  gateway_name       = "trusted-outbound"
+  tags               = local.default_tags
+  location           = var.location
+  vnet_address_space = ["10.252.16.0/23"] # 10.252.16.0 - 10.252.17.255
+  subnets = [
+    {
+      name                                          = "trusted-ci-jenkins-io-sponsored-vnet-ephemeral-agents"
+      address_prefixes                              = ["10.252.16.0/24"] # 10.252.16.0 - 10.252.16.255
+      service_endpoints                             = ["Microsoft.Storage"]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
+    },
+    {
+      name                                          = "trusted-ci-jenkins-io-sponsored-vnet-permanent-agents"
+      address_prefixes                              = ["10.252.17.0/25"] # 10.252.17.0 - 10.252.17.127
+      service_endpoints                             = ["Microsoft.Storage"]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Disabled"
+    },
+  ]
+
+  peered_vnets = {
+    "${module.private_vnet.vnet_name}"               = module.private_vnet.vnet_id,
+    "${module.trusted_ci_jenkins_io_vnet.vnet_name}" = module.trusted_ci_jenkins_io_vnet.vnet_id
   }
 }
 
