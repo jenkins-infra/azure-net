@@ -201,6 +201,10 @@ module "trusted_ci_jenkins_io_vnet" {
 module "trusted_ci_jenkins_io_sponsored_vnet" {
   source = "./modules/azure-full-vnet"
 
+  providers = {
+    azurerm = azurerm.jenkins-sponsored
+  }
+
   base_name          = "trusted-ci-jenkins-io-sponsored"
   gateway_name       = "trusted-outbound"
   tags               = local.default_tags
