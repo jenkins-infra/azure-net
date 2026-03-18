@@ -69,9 +69,10 @@ module "public_vnet" {
   ]
 
   peered_vnets = {
-    "${module.private_vnet.vnet_name}"             = module.private_vnet.vnet_id,
-    "${module.public_db_vnet.vnet_name}"           = module.public_db_vnet.vnet_id,
-    "${module.infra_ci_jenkins_io_vnet.vnet_name}" = module.infra_ci_jenkins_io_vnet.vnet_id,
+    "${module.private_vnet.vnet_name}"                       = module.private_vnet.vnet_id,
+    "${module.public_db_vnet.vnet_name}"                     = module.public_db_vnet.vnet_id,
+    "${module.infra_ci_jenkins_io_vnet.vnet_name}"           = module.infra_ci_jenkins_io_vnet.vnet_id,
+    "${module.infra_ci_jenkins_io_sponsored_vnet.vnet_name}" = module.infra_ci_jenkins_io_sponsored_vnet.vnet_id,
   }
 }
 
@@ -152,6 +153,7 @@ module "private_vnet" {
     "${module.cert_ci_jenkins_io_vnet.vnet_name}"              = module.cert_ci_jenkins_io_vnet.vnet_id,
     "${module.trusted_ci_jenkins_io_vnet.vnet_name}"           = module.trusted_ci_jenkins_io_vnet.vnet_id,
     "${module.infra_ci_jenkins_io_vnet.vnet_name}"             = module.infra_ci_jenkins_io_vnet.vnet_id,
+    "${module.infra_ci_jenkins_io_sponsored_vnet.vnet_name}"   = module.infra_ci_jenkins_io_sponsored_vnet.vnet_id,
     "${module.cert_ci_jenkins_io_sponsored_vnet.vnet_name}"    = module.cert_ci_jenkins_io_sponsored_vnet.vnet_id,
     "${module.trusted_ci_jenkins_io_sponsored_vnet.vnet_name}" = module.trusted_ci_jenkins_io_sponsored_vnet.vnet_id,
   }
@@ -330,9 +332,60 @@ module "infra_ci_jenkins_io_vnet" {
   ]
 
   peered_vnets = {
-    "${module.private_vnet.vnet_name}"   = module.private_vnet.vnet_id,
-    "${module.public_db_vnet.vnet_name}" = module.public_db_vnet.vnet_id,
-    "${module.public_vnet.vnet_name}"    = module.public_vnet.vnet_id,
+    "${module.private_vnet.vnet_name}"                       = module.private_vnet.vnet_id,
+    "${module.public_db_vnet.vnet_name}"                     = module.public_db_vnet.vnet_id,
+    "${module.public_vnet.vnet_name}"                        = module.public_vnet.vnet_id,
+    "${module.infra_ci_jenkins_io_sponsored_vnet.vnet_name}" = module.infra_ci_jenkins_io_sponsored_vnet.vnet_id,
+  }
+}
+
+
+module "infra_ci_jenkins_io_sponsored_vnet" {
+  source = "./modules/azure-full-vnet"
+
+  providers = {
+    azurerm = azurerm.jenkins-sponsored
+  }
+
+  base_name          = "infra-ci-jenkins-io-sponsored"
+  gateway_name       = "infra-ci-jenkins-io-outbound-sponsored"
+  outbound_ip_count  = 2
+  tags               = local.default_tags
+  location           = var.location
+  vnet_address_space = ["10.5.4.0/22"] # 10.5.4.1 - 10.5.7.254
+
+  subnets = [
+    {
+      name                                          = "infra-ci-jenkins-io-sponsored-vnet-ephemeral-agents"
+      address_prefixes                              = ["10.5.4.0/24"] # 10.5.4.1 - 10.5.4.254
+      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
+    },
+    {
+      name                                          = "infra-ci-jenkins-io-sponsored-vnet-packer-builds"
+      address_prefixes                              = ["10.5.5.0/24"] # 10.5.5.1 - 10.5.5.254
+      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
+    },
+    {
+      name                                          = "infra-ci-jenkins-io-sponsored-vnet-kubernetes-agents"
+      address_prefixes                              = ["10.5.6.0/24"] # 10.5.6.0 - 10.5.6.254
+      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
+    },
+  ]
+
+  peered_vnets = {
+    "${module.private_vnet.vnet_name}"             = module.private_vnet.vnet_id,
+    "${module.public_db_vnet.vnet_name}"           = module.public_db_vnet.vnet_id,
+    "${module.public_vnet.vnet_name}"              = module.public_vnet.vnet_id,
+    "${module.infra_ci_jenkins_io_vnet.vnet_name}" = module.infra_ci_jenkins_io_vnet.vnet_id,
   }
 }
 
@@ -387,8 +440,9 @@ module "public_db_vnet" {
     }
   ]
   peered_vnets = {
-    "${module.infra_ci_jenkins_io_vnet.vnet_name}" = module.infra_ci_jenkins_io_vnet.vnet_id
-    "${module.public_vnet.vnet_name}"              = module.public_vnet.vnet_id
-    "${module.private_vnet.vnet_name}"             = module.private_vnet.vnet_id
+    "${module.infra_ci_jenkins_io_vnet.vnet_name}"           = module.infra_ci_jenkins_io_vnet.vnet_id
+    "${module.infra_ci_jenkins_io_sponsored_vnet.vnet_name}" = module.infra_ci_jenkins_io_sponsored_vnet.vnet_id,
+    "${module.public_vnet.vnet_name}"                        = module.public_vnet.vnet_id
+    "${module.private_vnet.vnet_name}"                       = module.private_vnet.vnet_id
   }
 }
