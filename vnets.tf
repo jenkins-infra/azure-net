@@ -306,14 +306,6 @@ module "infra_ci_jenkins_io_vnet" {
 
   subnets = [
     {
-      name                                          = "infra-ci-jenkins-io-vnet-ephemeral-agents"
-      address_prefixes                              = ["10.5.0.0/24"] # 10.5.0.1 - 10.5.0.254
-      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
-      delegations                                   = {}
-      private_link_service_network_policies_enabled = true
-      private_endpoint_network_policies             = "Enabled"
-    },
-    {
       name                                          = "infra-ci-jenkins-io-vnet-packer-builds"
       address_prefixes                              = ["10.5.1.0/24"] # 10.5.1.1 - 10.5.1.254
       service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
