@@ -336,7 +336,7 @@ module "infra_ci_jenkins_io_sponsored_vnet" {
   outbound_ip_count  = 2
   tags               = local.default_tags
   location           = var.location
-  vnet_address_space = ["10.5.4.0/22"] # 10.5.4.1 - 10.5.7.254
+  vnet_address_space = ["10.5.4.0/21"] # 10.5.4.1 - 10.5.7.254
 
   subnets = [
     {
