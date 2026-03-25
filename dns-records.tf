@@ -6,7 +6,7 @@ resource "azurerm_dns_a_record" "jenkins_io" {
   name                = "@"
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-  ttl                 = 60
+  ttl                 = 300
   records             = [local.public_ips["publick8s_public_ipv4_address"]]
 
   tags = merge(local.default_tags, {
@@ -17,7 +17,7 @@ resource "azurerm_dns_aaaa_record" "jenkins_io" {
   name                = "@"
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-  ttl                 = 60
+  ttl                 = 300
   records             = [local.public_ips["publick8s_public_ipv6_address"]]
 
   tags = merge(local.default_tags, {
@@ -30,7 +30,7 @@ resource "azurerm_dns_a_record" "jenkinsciorg" {
   name                = "@"
   zone_name           = data.azurerm_dns_zone.jenkinsciorg.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsci.name
-  ttl                 = 60
+  ttl                 = 300
   records             = [local.public_ips["publick8s_public_ipv4_address"]]
 
   tags = merge(local.default_tags, {
@@ -41,7 +41,7 @@ resource "azurerm_dns_aaaa_record" "jenkinsciorg" {
   name                = "@"
   zone_name           = data.azurerm_dns_zone.jenkinsciorg.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsci.name
-  ttl                 = 60
+  ttl                 = 300
   records             = [local.public_ips["publick8s_public_ipv6_address"]]
 
   tags = merge(local.default_tags, {
@@ -55,7 +55,7 @@ resource "azurerm_dns_a_record" "listsjenkinsciorg" {
   name                = "lists"
   zone_name           = data.azurerm_dns_zone.jenkinsciorg.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsci.name
-  ttl                 = 60
+  ttl                 = 300
   records             = ["140.211.9.53"]
 
   tags = merge(local.default_tags, {
@@ -66,7 +66,7 @@ resource "azurerm_dns_aaaa_record" "listsjenkinsciorg" {
   name                = "lists"
   zone_name           = data.azurerm_dns_zone.jenkinsciorg.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsci.name
-  ttl                 = 60
+  ttl                 = 300
   records             = ["2605:bc80:3010:104::8cd3:935"]
 
   tags = merge(local.default_tags, {
@@ -77,7 +77,7 @@ resource "azurerm_dns_txt_record" "listsjenkinsciorg" {
   name                = "lists"
   zone_name           = data.azurerm_dns_zone.jenkinsciorg.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsci.name
-  ttl                 = 60
+  ttl                 = 300
 
   record {
     value = "v=spf1 mx include:_spf.osuosl.org ~all"
@@ -93,7 +93,7 @@ resource "azurerm_dns_a_record" "ldap_jenkins_io" {
   name                = "ldap"
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-  ttl                 = 60
+  ttl                 = 300
   records             = [local.public_ips["ldap_jenkins_io_ipv4_address"]]
 
   tags = merge(local.default_tags, {
@@ -136,7 +136,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_new_publick8s" {
   name                = each.key
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-  ttl                 = 60
+  ttl                 = 300
   record              = "public.publick8s.jenkins.io" # A record defined in https://github.com/jenkins-infra/azure/blob/main/old_publick8s.tf
 
   tags = merge(local.default_tags, {
@@ -160,7 +160,7 @@ resource "azurerm_dns_cname_record" "jenkinsciorg_target_jenkinsio" {
   name                = each.key
   zone_name           = data.azurerm_dns_zone.jenkinsciorg.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsci.name
-  ttl                 = 60
+  ttl                 = 300
   record              = "${each.key}.jenkins.io"
 
   tags = merge(local.default_tags, {
@@ -180,7 +180,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_private_publick8s" {
   name                = each.key
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-  ttl                 = 60
+  ttl                 = 300
   record              = "private.publick8s.jenkins.io" # A record defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
 
   tags = merge(local.default_tags, {
@@ -288,24 +288,24 @@ resource "azurerm_dns_cname_record" "jenkinsio_customs" {
       "target"      = "aws.ci.jenkins.io",
       "description" = "Public controller ci.jenkins.io",
       # TODO: extend once migrated to AWS
-      "ttl" = 60,
+      "ttl" = 300,
     },
     "assets.ci" = {
       "target"      = "assets.aws.ci.jenkins.io",
       "description" = "Resource root URL for public controller ci.jenkins.io",
       # TODO: extend once migrated to AWS
-      "ttl" = 60,
+      "ttl" = 300,
     },
     "issues" = {
       "target"      = "jenkinsci-jira-alb-368766416.us-west-2.elb.amazonaws.com",
       "description" = "Jenkins public JIRA hosted by the Linux Foundation",
       # TODO: extend once migrated to new LF JIRA
-      "ttl" = 60,
+      "ttl" = 300,
     },
     "_b1ff2d9eff9b1643970f47de4281ce22.issues" = {
       "target"      = "_d7eac0ec254ecc89fbb3d23a37f99fbd.zbkrxsrfvj.acm-validations.aws",
       "description" = "TLS challenge for issues.jenbkins.io (managed by LF) - jenkins-infra/helpdesk-4757",
-      "ttl"         = 60,
+      "ttl"         = 300,
     },
     "updates" = {
       "target"      = "azure.updates.jenkins.io"
@@ -329,7 +329,7 @@ resource "azurerm_dns_cname_record" "jenkinsciorg_customs" {
     "repo" = {
       "target"      = "jenkinsci.jfrog.org",
       "description" = "Artifactory instance hosted by Jfrog",
-      "ttl"         = 60,
+      "ttl"         = 300,
     },
     "pkg" = {
       "target"      = "pkg.origin.jenkins.io", # Cannot point to Fastly (would require a Fastly custom website)
@@ -366,7 +366,7 @@ resource "azurerm_dns_txt_record" "apex_jenkinsio" {
   name                = "@"
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-  ttl                 = 60
+  ttl                 = 300
   record {
     # Used for Libera Chat - https://www.jenkins.io/blog/2021/06/17/libera-chat/
     value = "libera-MjLnxZ2KPqJJnJr6X4WFovAe"
@@ -394,7 +394,7 @@ resource "azurerm_dns_txt_record" "lib_jenkins_io" {
   name                = "lib"
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-  ttl                 = 60
+  ttl                 = 300
 
   record {
     value = "ae2wiz6pk8"
@@ -406,7 +406,7 @@ resource "azurerm_dns_txt_record" "apex_jenkinsciorg" {
   name                = "@"
   zone_name           = data.azurerm_dns_zone.jenkinsciorg.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsci.name
-  ttl                 = 60
+  ttl                 = 300
   record {
     # Sendgrid email setup and SPF
     value = "v=spf1 mx ip4:199.193.196.24 ip4:140.211.15.0/24 ip4:140.211.8.0/23 ip4:173.203.60.151 ip4:140.211.166.128/25 include:sendgrid.net -all"
@@ -433,7 +433,7 @@ resource "azurerm_dns_caa_record" "jenkins_caa" {
   name                = "@"
   zone_name           = each.key
   resource_group_name = each.value
-  ttl                 = 60
+  ttl                 = 300
 
   record {
     flags = 0
@@ -487,7 +487,7 @@ resource "azurerm_dns_ns_record" "do_jenkins_io" {
   name                = "do"
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-  ttl                 = 60
+  ttl                 = 300
 
   records = ["ns1.digitalocean.com", "ns2.digitalocean.com", "ns3.digitalocean.com"]
 
@@ -499,7 +499,7 @@ resource "azurerm_dns_ns_record" "aws_ci_jenkins_io" {
   name                = "aws.ci"
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-  ttl                 = 60
+  ttl                 = 300
 
   records = split(" ", local.aws_route53_nameservers_awscijenkinsio)
 
@@ -516,7 +516,7 @@ resource "azurerm_dns_cname_record" "digitalocean_cnames" {
   name                = each.key
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-  ttl                 = 60
+  ttl                 = 300
   record              = "${each.key}.do.jenkins.io"
   tags = merge(local.default_tags, {
     purpose = each.value,
