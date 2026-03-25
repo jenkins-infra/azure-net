@@ -363,6 +363,14 @@ module "infra_ci_jenkins_io_sponsored_vnet" {
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
     },
+    {
+      name                                          = "infra-ci-jenkins-io-sponsored-vnet-commons"
+      address_prefixes                              = ["10.5.7.0/27"] # 10.5.7.0 - 10.5.7.31
+      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
+    },
   ]
 
   peered_vnets = {
