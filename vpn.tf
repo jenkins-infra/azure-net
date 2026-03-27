@@ -151,8 +151,6 @@ resource "azurerm_linux_virtual_machine" "vpn" {
     publisher = "Canonical"
     offer     = "0001-com-ubuntu-server-jammy"
     sku       = "22_04-lts-gen2"
-    // TODO: use fixed version + updatecli manifest if it recreates the VM
-    # az vm image list --all --publisher="Canonical" --sku="22_04-lts-gen2" --offer="0001-com-ubuntu-server-jammy"
     version = "22.04.202211160"
   }
 

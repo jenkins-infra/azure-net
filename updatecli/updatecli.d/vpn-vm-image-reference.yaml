@@ -1,0 +1,40 @@
+name: Update private.vpn.jenkins.io VM image reference
+
+scms:
+  default:
+    kind: github
+    spec:
+      user: "{{ .github.user }}"
+      email: "{{ .github.email }}"
+      owner: "{{ .github.owner }}"
+      repository: "{{ .github.repository }}"
+      token: "{{ requiredEnv .github.token }}"
+      username: "{{ .github.username }}"
+      branch: "{{ .github.branch }}"
+
+sources:
+  getLatestImage:
+    name: Get latest Ubuntu VM image from Canonical
+    kind: shell
+    spec:
+      command: |
+        az vm image list --all --publisher="Canonical" --sku="22_04-lts-gen2" --offer="0001-com-ubuntu-server-jammy" \
+        | jq -r '.[].version' | sort -u | tail -1
+
+targets:
+  updateVpnImageReference:
+    name: Update private VPN VM source image reference
+    kind: hcl
+    spec:
+      file: vpn.tf
+      path: resource.azurerm_linux_virtual_machine.vpn.source_image_reference.version
+    scmid: default
+
+actions:
+  default:
+    kind: github/pullrequest
+    scmid: default
+    title: Bump private.vpn.jenkins.io VM source image reference to {{ source "getLatestImage" }}
+    spec:
+      labels:
+        - vpn
