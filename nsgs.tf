@@ -60,7 +60,6 @@ resource "azurerm_network_security_group" "public_apptier" {
   tags = local.default_tags
 
   ## Inbound rules
-  #trivy:ignore:azure-network-no-public-ingress
   security_rule {
     name                       = "allow-http-inbound"
     priority                   = 100
@@ -72,7 +71,6 @@ resource "azurerm_network_security_group" "public_apptier" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
-  #trivy:ignore:azure-network-no-public-ingress
   security_rule {
     name                       = "allow-https-inbound"
     priority                   = 101
@@ -84,7 +82,6 @@ resource "azurerm_network_security_group" "public_apptier" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
-  #trivy:ignore:azure-network-no-public-ingress
   security_rule {
     name                       = "allow-ldap-inbound"
     priority                   = 102
@@ -120,7 +117,6 @@ resource "azurerm_network_security_group" "public_apptier" {
     source_address_prefix        = "*"
     destination_address_prefixes = module.private_vnet.vnet_address_space
   }
-  #trivy:ignore:azure-network-no-public-egress
   security_rule {
     name                       = "allow-https-outbound"
     priority                   = 2101
