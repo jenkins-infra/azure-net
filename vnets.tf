@@ -209,7 +209,7 @@ module "trusted_ci_jenkins_io_sponsored_vnet" {
   gateway_name       = "trusted-outbound"
   tags               = local.default_tags
   location           = var.location
-  vnet_address_space = ["10.252.16.0/23"] # 10.252.16.0 - 10.252.17.255
+  vnet_address_space = ["10.252.16.0/22"] # 10.252.16.0 - 10.252.19.254
   subnets = [
     {
       name                                          = "trusted-ci-jenkins-io-sponsored-vnet-ephemeral-agents"
@@ -221,12 +221,21 @@ module "trusted_ci_jenkins_io_sponsored_vnet" {
     },
     {
       name                                          = "trusted-ci-jenkins-io-sponsored-vnet-permanent-agents"
-      address_prefixes                              = ["10.252.17.0/25"] # 10.252.17.0 - 10.252.17.127
+      address_prefixes                              = ["10.252.17.0/24"] # 10.252.17.0 - 10.252.17.127
       service_endpoints                             = ["Microsoft.Storage"]
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Disabled"
     },
+    {
+      name                                          = "trusted-ci-jenkins-io-sponsored-vnet-commons"
+      address_prefixes                              = ["10.252.18.0/24"] # 10.252.18.0 - 10.252.18.127
+      service_endpoints                             = ["Microsoft.Storage"]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Disabled"
+    },
+    // We have a /24 left for controller
   ]
 
   peered_vnets = {
@@ -351,9 +360,9 @@ module "infra_ci_jenkins_io_sponsored_vnet" {
   ]
 
   peered_vnets = {
-    "${module.private_vnet.vnet_name}"             = module.private_vnet.vnet_id,
-    "${module.public_db_vnet.vnet_name}"           = module.public_db_vnet.vnet_id,
-    "${module.public_vnet.vnet_name}"              = module.public_vnet.vnet_id,
+    "${module.private_vnet.vnet_name}"   = module.private_vnet.vnet_id,
+    "${module.public_db_vnet.vnet_name}" = module.public_db_vnet.vnet_id,
+    "${module.public_vnet.vnet_name}"    = module.public_vnet.vnet_id,
   }
 }
 
