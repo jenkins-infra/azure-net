@@ -129,8 +129,3 @@ resource "azurerm_network_security_group" "public_apptier" {
     destination_address_prefix = "*"
   }
 }
-
-moved {
-  from = azurerm_network_security_group.trusted_ci_jenkins_io_sponsored_vnet
-  to   = module.trusted_ci_jenkins_io_sponsored_vnet.azurerm_network_security_group.default[0]
-}
