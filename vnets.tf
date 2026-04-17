@@ -210,6 +210,7 @@ module "trusted_ci_jenkins_io_sponsored_vnet" {
   tags               = local.default_tags
   location           = var.location
   vnet_address_space = ["10.252.16.0/22"] # 10.252.16.0 - 10.252.19.254
+  set_default_nsg    = true
   subnets = [
     {
       name                                          = "trusted-ci-jenkins-io-sponsored-vnet-ephemeral-agents"

@@ -130,15 +130,7 @@ resource "azurerm_network_security_group" "public_apptier" {
   }
 }
 
-####################################################################################
-## Network Security Group for trusted.ci.jenkins.io's sponsored virtual network
-## TODO: migrate in the azure-vnet module (opt-in)
-####################################################################################
-resource "azurerm_network_security_group" "trusted_ci_jenkins_io_sponsored_vnet" {
-  provider = azurerm.jenkins-sponsored
-
-  name                = "trusted-ci-jenkins-io-sponsored-vnet"
-  location            = var.location
-  resource_group_name = module.trusted_ci_jenkins_io_sponsored_vnet.vnet_rg_name
-  tags                = local.default_tags
+moved {
+  from = azurerm_network_security_group.trusted_ci_jenkins_io_sponsored_vnet
+  to   = module.trusted_ci_jenkins_io_sponsored_vnet.azurerm_network_security_group.default_nsg[0]
 }
