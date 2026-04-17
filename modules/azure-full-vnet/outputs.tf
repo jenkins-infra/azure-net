@@ -24,5 +24,5 @@ output "public_ip_list" {
 
 output "default_nsg_name" {
   // Empty string if no default NSG set up
-  value = var.set_default_nsg ? azurerm_network_security_group.default_nsg[0].name : ""
+  value = var.set_default_nsg ? azurerm_network_security_group.default[0].name : ""
 }
