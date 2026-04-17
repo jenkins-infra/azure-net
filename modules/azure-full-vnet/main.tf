@@ -105,3 +105,21 @@ resource "azurerm_subnet_nat_gateway_association" "outbound" {
   subnet_id      = each.value
   nat_gateway_id = azurerm_nat_gateway.outbound[0].id
 }
+
+####################################################################################
+## Default NSG (only if var.set_default_nsg is true)
+####################################################################################
+resource "azurerm_network_security_group" "default_nsg" {
+  count = var.set_default_nsg ? 1 : 0
+
+  name                = azurerm_virtual_network.vnet.name
+  location            = azurerm_virtual_network.vnet.location
+  resource_group_name = azurerm_virtual_network.vnet.resource_group_name
+  tags                = var.tags
+}
+resource "azurerm_subnet_network_security_group_association" "default_nsg" {
+  for_each = var.set_default_nsg ? azurerm_subnet.vnet_subnets : {}
+
+  subnet_id                 = each.value.id
+  network_security_group_id = azurerm_network_security_group.default_nsg[0].id
+}

@@ -70,3 +70,9 @@ variable "outbound_ip_count" {
   description = "Number of outbound IPs to use."
   default     = 1
 }
+
+variable "set_default_nsg" {
+  type        = bool
+  description = "Should we create a Network Security Group with the same name as the virtual network and associated to all of its subnets (defaults to false)?"
+  default     = false
+}
