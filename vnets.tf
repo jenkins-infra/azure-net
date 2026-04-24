@@ -174,22 +174,6 @@ module "trusted_ci_jenkins_io_vnet" {
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
     },
-    {
-      name                                          = "trusted-ci-jenkins-io-vnet-ephemeral-agents"
-      address_prefixes                              = ["10.252.1.0/24"] # 10.252.1.1 - 10.252.1.254
-      service_endpoints                             = ["Microsoft.Storage"]
-      delegations                                   = {}
-      private_link_service_network_policies_enabled = true
-      private_endpoint_network_policies             = "Enabled"
-    },
-    {
-      name                                          = "trusted-ci-jenkins-io-vnet-permanent-agents"
-      address_prefixes                              = ["10.252.2.0/24"] # 10.252.2.1 - 10.252.2.254
-      service_endpoints                             = ["Microsoft.Storage"]
-      delegations                                   = {}
-      private_link_service_network_policies_enabled = true
-      private_endpoint_network_policies             = "Disabled"
-    },
   ]
 
   peered_vnets = {
