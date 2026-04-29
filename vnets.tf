@@ -193,7 +193,7 @@ module "trusted_ci_jenkins_io_sponsored_vnet" {
   gateway_name       = "trusted-outbound"
   tags               = local.default_tags
   location           = var.location
-  vnet_address_space = ["10.252.16.0/22"] # 10.252.16.0 - 10.252.19.254
+  vnet_address_space = ["10.252.16.0/22"] # 10.252.16.0 - 10.252.19.255
   set_default_nsg    = true
   subnets = [
     {
@@ -206,7 +206,7 @@ module "trusted_ci_jenkins_io_sponsored_vnet" {
     },
     {
       name                                          = "trusted-ci-jenkins-io-sponsored-vnet-permanent-agents"
-      address_prefixes                              = ["10.252.17.0/24"] # 10.252.17.0 - 10.252.17.127
+      address_prefixes                              = ["10.252.17.0/24"] # 10.252.17.0 - 10.252.17.255
       service_endpoints                             = ["Microsoft.Storage"]
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
@@ -214,13 +214,20 @@ module "trusted_ci_jenkins_io_sponsored_vnet" {
     },
     {
       name                                          = "trusted-ci-jenkins-io-sponsored-vnet-commons"
-      address_prefixes                              = ["10.252.18.0/24"] # 10.252.18.0 - 10.252.18.127
+      address_prefixes                              = ["10.252.18.0/24"] # 10.252.18.0 - 10.252.18.255
       service_endpoints                             = ["Microsoft.Storage"]
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Disabled"
     },
-    // We have a /24 left for controller
+    {
+      name                                          = "trusted-ci-jenkins-io-sponsored-vnet-controller"
+      address_prefixes                              = ["10.252.19.0/24"] # 10.252.19.0 - 10.252.19.255
+      service_endpoints                             = ["Microsoft.Storage"]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Disabled"
+    },
   ]
 
   peered_vnets = {
