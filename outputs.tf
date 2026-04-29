@@ -10,9 +10,6 @@ resource "local_file" "jenkins_infra_data_report" {
     },
     "trusted.ci.jenkins.io" = {
       "outbound_ips" = concat(
-        # Controller
-        split(",", module.trusted_ci_jenkins_io_vnet.public_ip_list),
-        # Agents
         split(",", module.trusted_ci_jenkins_io_sponsored_vnet.public_ip_list)
       ),
     },
@@ -40,7 +37,6 @@ resource "local_file" "jenkins_infra_data_report" {
       "public-db-vnet"                       = module.public_db_vnet.vnet_address_space,
       "public-vnet"                          = module.public_vnet.vnet_address_space,
       "trusted-ci-jenkins-io-sponsored-vnet" = module.trusted_ci_jenkins_io_sponsored_vnet.vnet_address_space,
-      "trusted-ci-jenkins-io-vnet"           = module.trusted_ci_jenkins_io_vnet.vnet_address_space,
     }
   })
   filename = "${path.module}/jenkins-infra-data-reports/azure-net.json"

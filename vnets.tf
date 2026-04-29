@@ -17,31 +17,31 @@
 #      │                                           ┌────────────▼───┐            │
 #      │         ┌───────────────────────┐         │                │◄───────────┘
 #      │         │                       │         │                │ Vnet peering
-#      ├─────────►  Private VPN Gateway  ◄─────────►  Private VNet  │
-#      │         │                       │         │                │
-#      │         └───────────────────────┘ ┌──────►│                │
-#      │                                   │       └▲──────▲────────┘
-#      │                                   │        │      │Vnet Peering
-#      │                                   │        │      │
-#      │                            VNet Peering    │      ┌──────────────────────────────────────►────────────────────────┐
-#      │                                   │        │ ┌────▼─────────────┐                        │                        │
-#      │                                   │        │ │                  │     Vnet peerings      │                        │
-#      │                                   │        │ │                  │                        │                        │
-#      │                                   │        │ │   Cert CI VNet   ◄────────────────────────►  CertCi-sponsored Vnet │
-#      │                                   │        │ │                  │                        │                        │
-#      │                                   │        │ │                  │                        │                        │
-#      │                                   │        │ │                  │                        │                        │
-#      │                                   │        │ └──────────────────┘                        └────────────────────────┘
-#      │                                   ▼        └───────────────────────────────┐
-#      │                                 ┌──────────────────┐         ┌─────────────▼──────────┐
-#      │         ┌───────────────────────┤                  │         │                        │
-#      │         │                       │                  │         │                        │
-#      │         │      ┌──────────┐     │                  │         │                        │
-#      └─────────►      │Bounce VM │     │   Trusted VNet   ◄─────────► Trusted-sponsored VNet │
-#                │      └──────────┘     │                  │         │                        │
-#                │                       │                  │         │                        │
-#                └───────────────────────┤                  │         │                        │
-#                                        └──────────────────┘         └────────────────────────┘
+#      └─────────►  Private VPN Gateway  ◄─────────►  Private VNet  │
+#                │                       │         │                │
+#                └───────────────────────┘ ┌──────►│                │
+#                                          │       └───────▲────────┘
+#                                          │               │Vnet Peering
+#                                          │               │
+#                                   VNet Peering           ┌──────────────────────────────────────►────────────────────────┐
+#                                          │          ┌────▼─────────────┐                        │                        │
+#                                          │          │                  │     Vnet peerings      │                        │
+#                                          │          │                  │                        │                        │
+#                                          │          │   Cert CI VNet   ◄────────────────────────►  CertCi-sponsored Vnet │
+#                                          │          │                  │                        │                        │
+#                                          │          │                  │                        │                        │
+#                                          │          │                  │                        │                        │
+#                                          │          └──────────────────┘                        └────────────────────────┘
+#                                          ▼
+#                                        ┌────────────────────────────┐
+#                                        │                            │
+#                                        │                            │
+#                                        │                            │
+#                                        │   Trusted-sponsored VNet   │
+#                                        │                            │
+#                                        │                            │
+#                                        │                            │
+#                                        └────────────────────────────┘
 #
 # See also https://github.com/jenkins-infra/azure/blob/legacy-tf/plans/vnets.tf
 
@@ -150,35 +150,9 @@ module "private_vnet" {
     "${module.public_vnet.vnet_name}"                          = module.public_vnet.vnet_id,
     "${module.public_db_vnet.vnet_name}"                       = module.public_db_vnet.vnet_id,
     "${module.cert_ci_jenkins_io_vnet.vnet_name}"              = module.cert_ci_jenkins_io_vnet.vnet_id,
-    "${module.trusted_ci_jenkins_io_vnet.vnet_name}"           = module.trusted_ci_jenkins_io_vnet.vnet_id,
     "${module.infra_ci_jenkins_io_sponsored_vnet.vnet_name}"   = module.infra_ci_jenkins_io_sponsored_vnet.vnet_id,
     "${module.cert_ci_jenkins_io_sponsored_vnet.vnet_name}"    = module.cert_ci_jenkins_io_sponsored_vnet.vnet_id,
     "${module.trusted_ci_jenkins_io_sponsored_vnet.vnet_name}" = module.trusted_ci_jenkins_io_sponsored_vnet.vnet_id,
-  }
-}
-
-module "trusted_ci_jenkins_io_vnet" {
-  source = "./modules/azure-full-vnet"
-
-  base_name          = "trusted-ci-jenkins-io"
-  gateway_name       = "trusted-outbound"
-  tags               = local.default_tags
-  location           = var.location
-  vnet_address_space = ["10.252.0.0/21"] # 10.252.0.1 - 10.252.7.254
-  subnets = [
-    {
-      name                                          = "trusted-ci-jenkins-io-vnet-controller"
-      address_prefixes                              = ["10.252.0.0/24"] # 10.252.0.1 - 10.252.0.254
-      service_endpoints                             = []
-      delegations                                   = {}
-      private_link_service_network_policies_enabled = true
-      private_endpoint_network_policies             = "Enabled"
-    },
-  ]
-
-  peered_vnets = {
-    "${module.private_vnet.vnet_name}"                         = module.private_vnet.vnet_id,
-    "${module.trusted_ci_jenkins_io_sponsored_vnet.vnet_name}" = module.trusted_ci_jenkins_io_sponsored_vnet.vnet_id
   }
 }
 
@@ -231,8 +205,7 @@ module "trusted_ci_jenkins_io_sponsored_vnet" {
   ]
 
   peered_vnets = {
-    "${module.private_vnet.vnet_name}"               = module.private_vnet.vnet_id,
-    "${module.trusted_ci_jenkins_io_vnet.vnet_name}" = module.trusted_ci_jenkins_io_vnet.vnet_id
+    "${module.private_vnet.vnet_name}" = module.private_vnet.vnet_id,
   }
 }
 
