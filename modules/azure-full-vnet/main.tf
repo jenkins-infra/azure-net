@@ -123,3 +123,37 @@ resource "azurerm_subnet_network_security_group_association" "default" {
   subnet_id                 = each.value.id
   network_security_group_id = azurerm_network_security_group.default[0].id
 }
+## Outbound Rules (different set of priorities than Inbound rules) ##
+# This rule overrides an Azure-Default rule. its priority must be < 65000.
+resource "azurerm_network_security_rule" "deny_all_outbound_from_vnet" {
+  count = var.set_default_nsg ? 1 : 0
+
+  name                        = "deny-all-outbound-from-vnet"
+  priority                    = 4096 # Maximum value allowed by the Azure Terraform Provider
+  direction                   = "Outbound"
+  access                      = "Deny"
+  protocol                    = "*"
+  source_port_range           = "*"
+  destination_port_range      = "*"
+  source_address_prefix       = "VirtualNetwork"
+  destination_address_prefix  = "*"
+  network_security_group_name = azurerm_network_security_group.default[0].name
+  resource_group_name         = azurerm_network_security_group.default[0].resource_group_name
+}
+## Inbound Rules (different set of priorities than Outbound rules) ##
+# This rule overrides an Azure-Default rule. its priority must be < 65000
+resource "azurerm_network_security_rule" "deny_all_inbound_to_vnet" {
+  count = var.set_default_nsg ? 1 : 0
+
+  name                        = "deny-all-inbound-to-vnet"
+  priority                    = 4096 # Maximum value allowed by the Azure Terraform Provider
+  direction                   = "Inbound"
+  access                      = "Deny"
+  protocol                    = "*"
+  source_port_range           = "*"
+  destination_port_range      = "*"
+  source_address_prefix       = "*"
+  destination_address_prefix  = "VirtualNetwork"
+  network_security_group_name = azurerm_network_security_group.default[0].name
+  resource_group_name         = azurerm_network_security_group.default[0].resource_group_name
+}
