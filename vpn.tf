@@ -157,4 +157,13 @@ resource "azurerm_linux_virtual_machine" "vpn" {
   }
 
   tags = local.default_tags
+
+  lifecycle {
+    ignore_changes = [
+      # Ignoring user_data in case we make changes to the tpl file (which could lead to destroying VMs inadvertently).
+      user_data,
+      # We don't want to re-create VMs when a new image is specified
+      source_image_reference,
+    ]
+  }
 }
