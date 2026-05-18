@@ -331,64 +331,6 @@ module "infra_ci_jenkins_io_sponsored_vnet" {
   }
 }
 
-module "privatek8s_sponsored_vnet" {
-  source = "./modules/azure-full-vnet"
-
-  base_name          = "privatek8s-sponsored"
-  tags               = local.default_tags
-  location           = var.location
-  gateway_name       = "privatek8s-outbound"
-  outbound_ip_count  = 2
-  vnet_address_space = ["10.6.0.0/21"] # 10.6.0.0 - 10.6.7.255
-  subnets = [
-    {
-      name                                          = "privatek8s-sponsored-commons"
-      address_prefixes                              = ["10.6.0.0/24"] # 10.6.0.0 - 10.6.0.255
-      service_endpoints                             = []              # No service endpoint required: only Private Endpoints/ LBs are expected in this network
-      delegations                                   = {}
-      private_link_service_network_policies_enabled = true
-      private_endpoint_network_policies             = "Enabled"
-    },
-    {
-      name                                          = "privatek8s-sponsored-app"
-      address_prefixes                              = ["10.6.1.0/24"] # 10.6.1.0 - 10.6.1.255
-      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
-      delegations                                   = {}
-      private_link_service_network_policies_enabled = true
-      private_endpoint_network_policies             = "Enabled"
-    },
-    {
-      name                                          = "privatek8s-sponsored-release-ci-jenkins-io-controller"
-      address_prefixes                              = ["10.6.2.0/24"] # 10.6.2.0 - 10.6.2.255
-      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
-      delegations                                   = {}
-      private_link_service_network_policies_enabled = true
-      private_endpoint_network_policies             = "Enabled"
-    },
-    {
-      name                                          = "privatek8s-sponsored-release-ci-jenkins-io-agents"
-      address_prefixes                              = ["10.6.3.0/24"] # 10.6.3.0 - 10.6.3.255
-      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
-      delegations                                   = {}
-      private_link_service_network_policies_enabled = true
-      private_endpoint_network_policies             = "Enabled"
-    },
-    {
-      name                                          = "privatek8s-sponsored-infra-ci-jenkins-io-controller"
-      address_prefixes                              = ["10.6.4.0/24"] # 10.6.4.0 - 10.6.4.255
-      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
-      delegations                                   = {}
-      private_link_service_network_policies_enabled = true
-      private_endpoint_network_policies             = "Enabled"
-    }
-  ]
-
-  peered_vnets = {
-    "${module.private_vnet.vnet_name}"                       = module.private_vnet.vnet_id,
-    "${module.infra_ci_jenkins_io_sponsored_vnet.vnet_name}" = module.infra_ci_jenkins_io_sponsored_vnet.vnet_id,
-  }
-}
-
 # separate vNET as Postgres/Mysql flexible server currently doesn't support a vNET with ipv4 and ipv6 address spaces
 module "public_db_vnet" {
   source = "./modules/azure-full-vnet"
