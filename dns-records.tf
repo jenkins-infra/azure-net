@@ -192,8 +192,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_private_publick8s" {
 resource "azurerm_dns_cname_record" "jenkinsio_target_public_privatek8s_cdf" {
   # Map of records and corresponding purposes
   for_each = {
-    "infra-webhooks.ci"          = "infra.ci.jenkins.io webhooks from GitHub"
-    # "webhook-github-comment-ops" = "github-comment-ops GitHub App"
+    "infra-webhooks.ci" = "infra.ci.jenkins.io webhooks from GitHub"
   }
 
   name                = each.key
@@ -230,10 +229,8 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_privatek8s_sponsore
 resource "azurerm_dns_cname_record" "jenkinsio_target_private_privatek8s_cdf" {
   # Map of records and corresponding purposes
   for_each = {
-    "infra.ci"          = "infra.ci.jenkins.io, only accessible via the private VPN",
-    "release.ci"        = "release.ci.jenkins.io, only accessible via the private VPN"
-    "assets.infra.ci"   = "Resource root URL for private controller infra.ci.jenkins.io",
-    "assets.release.ci" = "Resource root URL for private controller release.ci.jenkins.io"
+    "infra.ci"        = "infra.ci.jenkins.io, only accessible via the private VPN",
+    "assets.infra.ci" = "Resource root URL for private controller infra.ci.jenkins.io",
   }
 
   name                = each.key
@@ -241,6 +238,37 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_private_privatek8s_cdf" {
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 300
   record              = "private.privatek8s.jenkins.io" # A record managed manually
+
+  tags = merge(local.default_tags, {
+    purpose = each.value
+  })
+}
+
+moved {
+  from = azurerm_dns_cname_record.jenkinsio_target_private_privatek8s_cdf["assets.release.ci"]
+  to   = azurerm_dns_cname_record.jenkinsio_target_private_privatek8s_sponsored["assets.release.ci"]
+}
+moved {
+  from = azurerm_dns_cname_record.jenkinsio_target_private_privatek8s_cdf["release.ci"]
+  to   = azurerm_dns_cname_record.jenkinsio_target_private_privatek8s_sponsored["release.ci"]
+}
+
+
+# CNAME records targeting the private-nginx on privatek8s-sponsored cluster
+resource "azurerm_dns_cname_record" "jenkinsio_target_private_privatek8s_sponsored" {
+  # Map of records and corresponding purposes
+  for_each = {
+    # "infra.ci"          = "infra.ci.jenkins.io, only accessible via the private VPN",
+    "release.ci" = "release.ci.jenkins.io, only accessible via the private VPN"
+    # "assets.infra.ci"   = "Resource root URL for private controller infra.ci.jenkins.io",
+    "assets.release.ci" = "Resource root URL for private controller release.ci.jenkins.io"
+  }
+
+  name                = each.key
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 300
+  record              = "private.privatek8s-sponsored.jenkins.io" # A record managed manually
 
   tags = merge(local.default_tags, {
     purpose = each.value
