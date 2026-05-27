@@ -193,7 +193,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_privatek8s_cdf" {
   # Map of records and corresponding purposes
   for_each = {
     "infra-webhooks.ci"          = "infra.ci.jenkins.io webhooks from GitHub"
-    "webhook-github-comment-ops" = "github-comment-ops GitHub App"
+    # "webhook-github-comment-ops" = "github-comment-ops GitHub App"
   }
 
   name                = each.key
@@ -201,6 +201,25 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_privatek8s_cdf" {
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
   ttl                 = 300
   record              = "public.privatek8s.jenkins.io" # A record defined in https://github.com/jenkins-infra/azure
+
+  tags = merge(local.default_tags, {
+    purpose = each.value
+  })
+}
+
+# CNAME records targeting the public-nginx on privatek8s (CDF) cluster
+resource "azurerm_dns_cname_record" "jenkinsio_target_public_privatek8s_sponsored" {
+  # Map of records and corresponding purposes
+  for_each = {
+    # "infra-webhooks.ci"          = "infra.ci.jenkins.io webhooks from GitHub"
+    "webhook-github-comment-ops" = "github-comment-ops GitHub App"
+  }
+
+  name                = each.key
+  zone_name           = data.azurerm_dns_zone.jenkinsio.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
+  ttl                 = 300
+  record              = "public.privatek8s-sponsored.jenkins.io" # A record defined in https://github.com/jenkins-infra/azure
 
   tags = merge(local.default_tags, {
     purpose = each.value
