@@ -1,9 +1,7 @@
-if (env.BRANCH_IS_PRIMARY) {
-    // Only trigger a daily check on the principal branch
-    properties([pipelineTriggers([cron('@daily')])])
-}
+@Library('pipeline-library@pull/1017/head') _
 
 terraform(
+  cronTriggerExpression: env.BRANCH_IS_PRIMARY ? '@daily' : '',
   stagingCredentials: [
     azureServicePrincipal(
       credentialsId: 'staging-terraform-azure-net-serviceprincipal',
