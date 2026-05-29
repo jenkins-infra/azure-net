@@ -1,7 +1,7 @@
 @Library('pipeline-library@pull/1017/head') _
 
 terraform(
-  cronTriggerExpression = env.BRANCH_IS_PRIMARY ? '@daily' : '',
+  cronTriggerExpression: env.BRANCH_IS_PRIMARY ? '@daily' : '',
   stagingCredentials: [
     azureServicePrincipal(
       credentialsId: 'staging-terraform-azure-net-serviceprincipal',
