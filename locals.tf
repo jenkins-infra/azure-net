@@ -24,6 +24,7 @@ locals {
     dduportal = ["86.207.165.174"],
     mwaite    = ["162.142.59.220"],
     hlemeur   = ["82.67.38.76"],
+    jay_jenkins = ["106.51.242.101"],
   }
 
   # Tracked by updatecli, easier to use a string split as a list by Terraform
