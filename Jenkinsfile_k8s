@@ -18,7 +18,7 @@ terraform(
       clientSecretVariable: 'ARM_CLIENT_SECRET',
       tenantIdVariable: 'ARM_TENANT_ID',
     ),
-    string(variable: 'TF_BACKEND_ARM_CLIENT_SECRET', credentialsId:'staging-terraform-azure-net-backend-config-arm-secret'),
+    string(variable: 'TF_BACKEND_ARM_CLIENT_SECRET', credentialsId:'production-terraform-azure-net-backend-config-arm-secret'),
   ],
   publishReports: ['jenkins-infra-data-reports/azure-net.json'],
 )
