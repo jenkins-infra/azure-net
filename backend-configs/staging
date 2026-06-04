@@ -1,0 +1,5 @@
+resource_group_name  = "tf-remote-state-azure-net-staging-5oAErn"
+storage_account_name = "azurenetstaging5oaern"
+container_name       = "azurenetstaging5oaern"
+client_id            = "43c8d81c-4168-4171-a4c0-518e55d04be3"
+# client_secret      = "" # Specified through the env. variable $TF_BACKEND_ARM_CLIENT_SECRET

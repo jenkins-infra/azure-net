@@ -1,0 +1,5 @@
+resource_group_name  = "tf-remote-state-azure-net-production-OUCBCr"
+storage_account_name = "azurenetproductioucbcr"
+container_name       = "azurenetproductioucbcr"
+client_id            = "db8e883a-102d-4800-ba22-3c3dc4e80d54"
+# client_secret      = "" # Specified through the env. variable $TF_BACKEND_ARM_CLIENT_SECRET
