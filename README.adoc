@@ -35,11 +35,7 @@ cd ../
 
 * The Azure Credential Secret value to allow the Terraform AzureRM Backend to access remote Azure storage:
 ** Must be specified in the environment variable `TF_BACKEND_ARM_CLIENT_SECRET`
-** The secret value should never be written in clear (not in a text file, not in the terminal). For instance on macOS, store it in your Keychain access and set the variable with `export TF_BACKEND_ARM_CLIENT_SECRET="$(security find-generic-password -a jenkins-tf-azure-backend-arm-secret -w)"`
-
-* Routing to database (private endpoints and private DNSes):
-** VPN access is required with routing to the database subnets set up to your user
-** As there are no public DNS, set up your local `/etc/hosts` (check the `providers.tf` for details)
+** The secret value should never be written in clear (not in a text file, not in the terminal). For instance on macOS, store it in your Keychain access and set the variable with `export TF_BACKEND_ARM_CLIENT_SECRET="$(security find-generic-password -a jenkins-tf-azure-net-backend-arm-secret -w)"`
 
 * If you intend to work with the production, the environment variable `TF_VAR_environment` must be set:
 
