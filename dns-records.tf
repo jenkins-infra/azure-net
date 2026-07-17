@@ -340,7 +340,7 @@ resource "azurerm_dns_cname_record" "jenkinsciorg_customs" {
   # Map of records and corresponding purposes
   for_each = {
     "repo" = {
-      "target"      = "jenkinsci.jfrog.org",
+      "target"      = "jenkinsci.jfrog.io",
       "description" = "Artifactory instance hosted by Jfrog",
       "ttl"         = 300,
     },
