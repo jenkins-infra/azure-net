@@ -207,14 +207,17 @@ module "cert_ci_jenkins_io_sponsored_vnet" {
   gateway_name       = "cert-ci-jenkins-io-outbound-sponsored"
   outbound_ip_count  = 2
   tags               = local.default_tags
-  location           = var.cert_ci_location
+  location           = "Sweden Central"
   vnet_address_space = ["10.205.0.0/23"] # 10.205.0.1 - 10.205.1.254
 
   subnets = [
     {
-      name                                          = "cert-ci-jenkins-io-sponsored-vnet-ephemeral-agents"
-      address_prefixes                              = ["10.205.0.0/24"] # 10.205.0.1 - 10.205.0.254
-      service_endpoints                             = ["Microsoft.Storage"]
+      name             = "cert-ci-jenkins-io-sponsored-vnet-ephemeral-agents"
+      address_prefixes = ["10.205.0.0/24"] # 10.205.0.1 - 10.205.0.254
+      service_endpoints = [
+        "Microsoft.Storage",        # Allow storage access from within the same region
+        "Microsoft.Storage.Global", # Allow storage access from other regions (since this network is in Sweden)
+      ]
       delegations                                   = {}
       private_link_service_network_policies_enabled = true
       private_endpoint_network_policies             = "Enabled"
