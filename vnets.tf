@@ -215,7 +215,6 @@ module "cert_ci_jenkins_io_sponsored_vnet" {
       name             = "cert-ci-jenkins-io-sponsored-vnet-ephemeral-agents"
       address_prefixes = ["10.205.0.0/24"] # 10.205.0.1 - 10.205.0.254
       service_endpoints = [
-        "Microsoft.Storage",        # Allow storage access from within the same region
         "Microsoft.Storage.Global", # Allow storage access from other regions (since this network is in Sweden)
       ]
       delegations                                   = {}
