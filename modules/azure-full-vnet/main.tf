@@ -32,10 +32,16 @@ resource "azurerm_subnet" "vnet_subnets" {
   resource_group_name                           = local.rg_name
   virtual_network_name                          = azurerm_virtual_network.vnet.name
   address_prefixes                              = each.value.address_prefixes
-  service_endpoints                             = each.value.service_endpoints
   private_link_service_network_policies_enabled = try(each.value.private_link_service_network_policies_enabled, true)
   private_endpoint_network_policies             = try(each.value.private_endpoint_network_policies, "Enabled")
   default_outbound_access_enabled               = false
+
+  dynamic "service_endpoint" {
+    for_each = each.value.service_endpoints
+    content {
+      service = service_endpoint.value
+    }
+  }
 
   dynamic "delegation" {
     for_each = each.value.delegations
