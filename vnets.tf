@@ -179,8 +179,6 @@ module "cert_ci_jenkins_io_vnet" {
   location           = var.location
   vnet_address_space = ["10.252.8.0/21"] # 10.252.8.1 - 10.252.15.254
 
-  set_default_nsg = true
-
   subnets = [
     {
       name                                          = "cert-ci-jenkins-io-vnet-controller"
@@ -211,6 +209,8 @@ module "cert_ci_jenkins_io_sponsored_vnet" {
   tags               = local.default_tags
   location           = "Sweden Central"
   vnet_address_space = ["10.205.0.0/22"] # 10.205.0.1 - 10.205.3.254
+
+  set_default_nsg = true
 
   subnets = [
     {
