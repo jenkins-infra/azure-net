@@ -179,6 +179,8 @@ module "cert_ci_jenkins_io_vnet" {
   location           = var.location
   vnet_address_space = ["10.252.8.0/21"] # 10.252.8.1 - 10.252.15.254
 
+  set_default_nsg = true
+
   subnets = [
     {
       name                                          = "cert-ci-jenkins-io-vnet-controller"
@@ -208,12 +210,22 @@ module "cert_ci_jenkins_io_sponsored_vnet" {
   outbound_ip_count  = 2
   tags               = local.default_tags
   location           = "Sweden Central"
-  vnet_address_space = ["10.205.0.0/23"] # 10.205.0.1 - 10.205.1.254
+  vnet_address_space = ["10.205.0.0/22"] # 10.205.0.1 - 10.205.3.254
 
   subnets = [
     {
       name             = "cert-ci-jenkins-io-sponsored-vnet-ephemeral-agents"
       address_prefixes = ["10.205.0.0/24"] # 10.205.0.1 - 10.205.0.254
+      service_endpoints = [
+        "Microsoft.Storage.Global", # Allow storage access from other regions (since this network is in Sweden)
+      ]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
+    },
+    {
+      name             = "cert-ci-jenkins-io-sponsored-vnet-commons"
+      address_prefixes = ["10.205.1.0/24"] # 10.205.0.1 - 10.205.0.254
       service_endpoints = [
         "Microsoft.Storage.Global", # Allow storage access from other regions (since this network is in Sweden)
       ]
