@@ -225,7 +225,17 @@ module "cert_ci_jenkins_io_sponsored_vnet" {
     },
     {
       name             = "cert-ci-jenkins-io-sponsored-vnet-commons"
-      address_prefixes = ["10.205.1.0/24"] # 10.205.0.1 - 10.205.0.254
+      address_prefixes = ["10.205.1.0/24"] # 10.205.1.1 - 10.205.1.254
+      service_endpoints = [
+        "Microsoft.Storage.Global", # Allow storage access from other regions (since this network is in Sweden)
+      ]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = true
+      private_endpoint_network_policies             = "Enabled"
+    },
+    {
+      name             = "cert-ci-jenkins-io-sponsored-vnet-controller"
+      address_prefixes = ["10.205.2.0/24"] # 10.205.2.1 - 10.205.2.254
       service_endpoints = [
         "Microsoft.Storage.Global", # Allow storage access from other regions (since this network is in Sweden)
       ]
