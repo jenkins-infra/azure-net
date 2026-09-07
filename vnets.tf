@@ -27,13 +27,13 @@
 #                                          │         │     │   │  ┌─────────────────────────────┐   │
 #                                          │         │     │   │  │                             │   │
 #                                          │       VNet Peerings──►  Privatek8s-sponsored Vnet  │   │
-#                                          │         │     │      │                             │◄──┘
-#                                          ▼         │     │      └─────────────────────────────┘
-#                     ┌────────────────────────┐     │  ┌──▼────────────────────┐
-#                     │                        │     │  │                       │
-#                     │ Trusted-sponsored VNet │     │  │  CertCi (CDF) Vnet    │
-#                     │                        │     │  │                       │
-#                     └────────────────────────┘     │  └───────────────────────┘
+#                                          │         │            │                             │◄──┘
+#                                          ▼         │            └─────────────────────────────┘
+#                     ┌────────────────────────┐     │
+#                     │                        │     │
+#                     │ Trusted-sponsored VNet │     │
+#                     │                        │     │
+#                     └────────────────────────┘     │
 #                                                    │
 #                                           ┌────────▼───────────────┐
 #                                           │                        │
@@ -109,7 +109,6 @@ module "private_vnet" {
   peered_vnets = {
     "${module.public_vnet.vnet_name}"                          = module.public_vnet.vnet_id,
     "${module.public_db_vnet.vnet_name}"                       = module.public_db_vnet.vnet_id,
-    "${module.cert_ci_jenkins_io_vnet.vnet_name}"              = module.cert_ci_jenkins_io_vnet.vnet_id,
     "${module.infra_ci_jenkins_io_sponsored_vnet.vnet_name}"   = module.infra_ci_jenkins_io_sponsored_vnet.vnet_id,
     "${module.cert_ci_jenkins_io_sponsored_vnet.vnet_name}"    = module.cert_ci_jenkins_io_sponsored_vnet.vnet_id,
     "${module.trusted_ci_jenkins_io_sponsored_vnet.vnet_name}" = module.trusted_ci_jenkins_io_sponsored_vnet.vnet_id,
@@ -170,32 +169,6 @@ module "trusted_ci_jenkins_io_sponsored_vnet" {
   }
 }
 
-module "cert_ci_jenkins_io_vnet" {
-  source = "./modules/azure-full-vnet"
-
-  base_name          = "cert-ci-jenkins-io"
-  gateway_name       = "cert-ci-jenkins-io-outbound"
-  tags               = local.default_tags
-  location           = var.location
-  vnet_address_space = ["10.252.8.0/21"] # 10.252.8.1 - 10.252.15.254
-
-  subnets = [
-    {
-      name                                          = "cert-ci-jenkins-io-vnet-controller"
-      address_prefixes                              = ["10.252.8.0/24"] # 10.252.8.1 - 10.252.8.254
-      service_endpoints                             = []
-      delegations                                   = {}
-      private_link_service_network_policies_enabled = true
-      private_endpoint_network_policies             = "Enabled"
-    },
-  ]
-
-  peered_vnets = {
-    "${module.private_vnet.vnet_name}"                      = module.private_vnet.vnet_id
-    "${module.cert_ci_jenkins_io_sponsored_vnet.vnet_name}" = module.cert_ci_jenkins_io_sponsored_vnet.vnet_id
-  }
-}
-
 module "cert_ci_jenkins_io_sponsored_vnet" {
   source = "./modules/azure-full-vnet"
 
@@ -246,8 +219,7 @@ module "cert_ci_jenkins_io_sponsored_vnet" {
   ]
 
   peered_vnets = {
-    "${module.private_vnet.vnet_name}"            = module.private_vnet.vnet_id,
-    "${module.cert_ci_jenkins_io_vnet.vnet_name}" = module.cert_ci_jenkins_io_vnet.vnet_id
+    "${module.private_vnet.vnet_name}" = module.private_vnet.vnet_id,
   }
 }
 

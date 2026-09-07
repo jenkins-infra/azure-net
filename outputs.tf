@@ -2,9 +2,6 @@ resource "local_file" "jenkins_infra_data_report" {
   content = jsonencode({
     "cert.ci.jenkins.io" = {
       "outbound_ips" = concat(
-        # Controller
-        split(",", module.cert_ci_jenkins_io_vnet.public_ip_list),
-        # Agents
         split(",", module.cert_ci_jenkins_io_sponsored_vnet.public_ip_list)
       ),
     },
@@ -46,7 +43,6 @@ resource "local_file" "jenkins_infra_data_report" {
     },
     "vnets" = {
       "cert-ci-jenkins-io-sponsored-vnet"    = module.cert_ci_jenkins_io_sponsored_vnet.vnet_address_space,
-      "cert-ci-jenkins-io-vnet"              = module.cert_ci_jenkins_io_vnet.vnet_address_space,
       "privatek8s-sponsored"                 = module.privatek8s_sponsored_vnet.vnet_address_space,
       "infra-ci-jenkins-io-sponsored-vnet"   = module.infra_ci_jenkins_io_sponsored_vnet.vnet_address_space,
       "private-vnet"                         = module.private_vnet.vnet_address_space,
