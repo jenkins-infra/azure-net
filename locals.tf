@@ -21,7 +21,7 @@ locals {
   }
 
   admin_public_ips = {
-    dduportal   = ["86.207.165.174"],
+    dduportal   = ["90.52.60.117"],
     mwaite      = ["162.142.59.220"],
     hlemeur     = ["82.67.38.76"],
     jay_jenkins = ["106.51.242.101"],
