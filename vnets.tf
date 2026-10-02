@@ -73,6 +73,40 @@ module "public_vnet" {
   }
 }
 
+module "public_sponsored_vnet" {
+  source = "./modules/azure-full-vnet"
+
+  providers = {
+    azurerm = azurerm.jenkins-sponsored
+  }
+
+  base_name = "public_sponsored"
+  tags      = local.default_tags
+  location  = var.location
+  # No NAT gateway as the AKS cluster requires an LB for its outbound method (due to IPv6 unsupported on NAT gateways)
+  vnet_address_space = ["10.7.0.0/21", "fd00:db8:7eca::/48"] # 10.7.0.0 - 10.7.7.255, fd00:0db8:7eca:0000:0000:0000:0000:0000 - fd00:0db8:7eca:ffff:ffff:ffff:ffff:ffff
+  subnets = [
+    {
+      # publick8s_sponsored AKS cluster with Azure CNI and dual-stack
+      name = "publick8s_sponsored"
+      address_prefixes = [
+        "10.7.0.0/24",           # 10.7.0.0 - 10.7.0.255
+        "fd00:db8:7eca:7eee::/64", # fd00:0db8:7eca:7eee:0000:0000:0000:0000 - fd00:0db8:7eca:7eee:ffff:ffff:ffff:ffff
+      ]
+      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
+      delegations                                   = {}
+      private_link_service_network_policies_enabled = false # Required to define Azure PLS
+      private_endpoint_network_policies             = "Enabled"
+    },
+  ]
+
+  peered_vnets = {
+    "${module.private_vnet.vnet_name}"                       = module.private_vnet.vnet_id,
+    "${module.public_db_vnet.vnet_name}"                     = module.public_db_vnet.vnet_id,
+    "${module.infra_ci_jenkins_io_sponsored_vnet.vnet_name}" = module.infra_ci_jenkins_io_sponsored_vnet.vnet_id,
+  }
+}
+
 module "private_vnet" {
   source = "./modules/azure-full-vnet"
 
