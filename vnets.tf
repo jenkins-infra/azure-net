@@ -142,6 +142,7 @@ module "private_vnet" {
 
   peered_vnets = {
     "${module.public_vnet.vnet_name}"                          = module.public_vnet.vnet_id,
+    "${module.public_sponsored_vnet.vnet_name}"                = module.public_sponsored_vnet.vnet_id,
     "${module.public_db_vnet.vnet_name}"                       = module.public_db_vnet.vnet_id,
     "${module.infra_ci_jenkins_io_sponsored_vnet.vnet_name}"   = module.infra_ci_jenkins_io_sponsored_vnet.vnet_id,
     "${module.cert_ci_jenkins_io_sponsored_vnet.vnet_name}"    = module.cert_ci_jenkins_io_sponsored_vnet.vnet_id,
@@ -319,6 +320,7 @@ module "infra_ci_jenkins_io_sponsored_vnet" {
     "${module.private_vnet.vnet_name}"              = module.private_vnet.vnet_id,
     "${module.public_db_vnet.vnet_name}"            = module.public_db_vnet.vnet_id,
     "${module.public_vnet.vnet_name}"               = module.public_vnet.vnet_id,
+    "${module.public_sponsored_vnet.vnet_name}"     = module.public_sponsored_vnet.vnet_id,
     "${module.privatek8s_sponsored_vnet.vnet_name}" = module.privatek8s_sponsored_vnet.vnet_id,
   }
 }
@@ -438,6 +440,7 @@ module "public_db_vnet" {
   peered_vnets = {
     "${module.infra_ci_jenkins_io_sponsored_vnet.vnet_name}" = module.infra_ci_jenkins_io_sponsored_vnet.vnet_id,
     "${module.public_vnet.vnet_name}"                        = module.public_vnet.vnet_id
+    "${module.public_sponsored_vnet.vnet_name}"              = module.public_sponsored_vnet.vnet_id,
     "${module.private_vnet.vnet_name}"                       = module.private_vnet.vnet_id
   }
 }
