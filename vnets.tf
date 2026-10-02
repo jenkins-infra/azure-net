@@ -59,7 +59,7 @@ module "public_vnet" {
         "10.245.2.0/24",           # 10.245.2.1 - 10.245.2.254
         "fd00:db8:deca:deee::/64", # fd00:db8:deca:deee:0:0:0:0 - fd00:db8:deca:deee:ffff:ffff:ffff:ffff
       ]
-      service_endpoints                             = ["Microsoft.Storage"]
+      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
       delegations                                   = {}
       private_link_service_network_policies_enabled = false # Required to define Azure PLS
       private_endpoint_network_policies             = "Enabled"
@@ -93,7 +93,7 @@ module "public_sponsored_vnet" {
         "10.7.0.0/24",           # 10.7.0.0 - 10.7.0.255
         "fd00:db8:7eca:7eee::/64", # fd00:0db8:7eca:7eee:0000:0000:0000:0000 - fd00:0db8:7eca:7eee:ffff:ffff:ffff:ffff
       ]
-      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
+      service_endpoints                             = ["Microsoft.Storage"]
       delegations                                   = {}
       private_link_service_network_policies_enabled = false # Required to define Azure PLS
       private_endpoint_network_policies             = "Enabled"
