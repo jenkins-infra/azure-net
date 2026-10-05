@@ -215,7 +215,7 @@ module "cert_ci_jenkins_io_sponsored_vnet" {
   gateway_name       = "cert-ci-jenkins-io-outbound-sponsored"
   outbound_ip_count  = 2
   tags               = local.default_tags
-  location           = "Germany West Central"
+  location           = "Sweden Central"
   vnet_address_space = ["10.205.0.0/22"] # 10.205.0.1 - 10.205.3.254
 
   set_default_nsg = true
