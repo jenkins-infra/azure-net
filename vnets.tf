@@ -82,7 +82,7 @@ module "public_sponsored_vnet" {
 
   base_name = "public_sponsored"
   tags      = local.default_tags
-  location  = "Sweden Central"
+  location  = "Germany West Central"
   # No NAT gateway as the AKS cluster requires an LB for its outbound method (due to IPv6 unsupported on NAT gateways)
   vnet_address_space = ["10.7.0.0/21", "fd00:db8:7eca::/48"] # 10.7.0.0 - 10.7.7.255, fd00:0db8:7eca:0000:0000:0000:0000:0000 - fd00:0db8:7eca:ffff:ffff:ffff:ffff:ffff
   subnets = [
@@ -215,7 +215,7 @@ module "cert_ci_jenkins_io_sponsored_vnet" {
   gateway_name       = "cert-ci-jenkins-io-outbound-sponsored"
   outbound_ip_count  = 2
   tags               = local.default_tags
-  location           = "Sweden Central"
+  location           = "Germany West Central"
   vnet_address_space = ["10.205.0.0/22"] # 10.205.0.1 - 10.205.3.254
 
   set_default_nsg = true
