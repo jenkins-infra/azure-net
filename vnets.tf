@@ -88,7 +88,7 @@ module "public_sponsored_vnet" {
   subnets = [
     {
       # publick8s_sponsored AKS cluster with Azure CNI and dual-stack
-      name = "publick8s_sponsored"
+      name = "publick8s-sponsored"
       address_prefixes = [
         "10.7.0.0/24",           # 10.7.0.0 - 10.7.0.255
         "fd00:db8:7eca:7eee::/64", # fd00:0db8:7eca:7eee:0000:0000:0000:0000 - fd00:0db8:7eca:7eee:ffff:ffff:ffff:ffff
