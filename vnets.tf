@@ -80,7 +80,7 @@ module "public_sponsored_vnet" {
     azurerm = azurerm.jenkins-sponsored
   }
 
-  base_name = "public_sponsored"
+  base_name = "public-sponsored"
   tags      = local.default_tags
   location  = "Germany West Central"
   # No NAT gateway as the AKS cluster requires an LB for its outbound method (due to IPv6 unsupported on NAT gateways)
