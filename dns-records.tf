@@ -310,14 +310,14 @@ resource "azurerm_dns_cname_record" "jenkinsio_customs" {
       "ttl" = 300,
     },
     "issues" = {
-      "target"      = "jenkinsci-jira-alb-368766416.us-west-2.elb.amazonaws.com",
+      "target"      = "public.publick8s.jenkins.io",
       "description" = "Jenkins public JIRA hosted by the Linux Foundation",
       # TODO: extend once migrated to new LF JIRA
       "ttl" = 300,
     },
     "_b1ff2d9eff9b1643970f47de4281ce22.issues" = {
       "target"      = "_d7eac0ec254ecc89fbb3d23a37f99fbd.zbkrxsrfvj.acm-validations.aws",
-      "description" = "TLS challenge for issues.jenbkins.io (managed by LF) - jenkins-infra/helpdesk-4757",
+      "description" = "TLS challenge for issues.jenkins.io (managed by LF) - jenkins-infra/helpdesk-4757",
       "ttl"         = 300,
     },
     "updates" = {
