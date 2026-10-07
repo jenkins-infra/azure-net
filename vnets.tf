@@ -82,7 +82,7 @@ module "public_sponsored_vnet" {
 
   base_name = "public-sponsored"
   tags      = local.default_tags
-  location  = "Germany West Central"
+  location  = var.location
   # No NAT gateway as the AKS cluster requires an LB for its outbound method (due to IPv6 unsupported on NAT gateways)
   vnet_address_space = ["10.7.0.0/21", "fd00:db8:7eca::/48"] # 10.7.0.0 - 10.7.7.255, fd00:0db8:7eca:0000:0000:0000:0000:0000 - fd00:0db8:7eca:ffff:ffff:ffff:ffff:ffff
   subnets = [
