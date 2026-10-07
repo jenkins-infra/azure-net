@@ -310,7 +310,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_customs" {
       "ttl" = 300,
     },
     "issues" = {
-      "target"      = "public.publick8s.jenkins.io",
+      "target"      = "jenkinsci-jira-alb-368766416.us-west-2.elb.amazonaws.com",
       "description" = "Jenkins public JIRA hosted by the Linux Foundation",
       # TODO: extend once migrated to new LF JIRA
       "ttl" = 300,
