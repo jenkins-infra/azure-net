@@ -6,7 +6,7 @@ resource "azurerm_dns_a_record" "jenkins_io" {
   name                = "@"
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-  ttl                 = 300
+  ttl                 = 60
   records             = [local.public_ips["publick8s_public_ipv4_address"]]
 
   tags = merge(local.default_tags, {
@@ -17,7 +17,7 @@ resource "azurerm_dns_aaaa_record" "jenkins_io" {
   name                = "@"
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-  ttl                 = 300
+  ttl                 = 60
   records             = [local.public_ips["publick8s_public_ipv6_address"]]
 
   tags = merge(local.default_tags, {
@@ -30,7 +30,7 @@ resource "azurerm_dns_a_record" "jenkinsciorg" {
   name                = "@"
   zone_name           = data.azurerm_dns_zone.jenkinsciorg.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsci.name
-  ttl                 = 300
+  ttl                 = 60
   records             = [local.public_ips["publick8s_public_ipv4_address"]]
 
   tags = merge(local.default_tags, {
@@ -41,7 +41,7 @@ resource "azurerm_dns_aaaa_record" "jenkinsciorg" {
   name                = "@"
   zone_name           = data.azurerm_dns_zone.jenkinsciorg.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsci.name
-  ttl                 = 300
+  ttl                 = 60
   records             = [local.public_ips["publick8s_public_ipv6_address"]]
 
   tags = merge(local.default_tags, {
@@ -93,7 +93,7 @@ resource "azurerm_dns_a_record" "ldap_jenkins_io" {
   name                = "ldap"
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-  ttl                 = 300
+  ttl                 = 60
   records             = [local.public_ips["ldap_jenkins_io_ipv4_address"]]
 
   tags = merge(local.default_tags, {
@@ -136,7 +136,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_public_new_publick8s" {
   name                = each.key
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-  ttl                 = 300
+  ttl                 = 60
   record              = "public.publick8s.jenkins.io" # A record defined in https://github.com/jenkins-infra/azure/blob/main/old_publick8s.tf
 
   tags = merge(local.default_tags, {
@@ -180,7 +180,7 @@ resource "azurerm_dns_cname_record" "jenkinsio_target_private_publick8s" {
   name                = each.key
   zone_name           = data.azurerm_dns_zone.jenkinsio.name
   resource_group_name = data.azurerm_resource_group.proddns_jenkinsio.name
-  ttl                 = 300
+  ttl                 = 60
   record              = "private.publick8s.jenkins.io" # A record defined in https://github.com/jenkins-infra/azure/blob/main/publick8s.tf
 
   tags = merge(local.default_tags, {
