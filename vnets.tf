@@ -355,11 +355,21 @@ module "privatek8s_sponsored_vnet" {
   }
 }
 
+# The DB are in this resource group due to legacy reasons. Moving RG would be risky. So we specify it here.
+resource "azurerm_resource_group" "public" {
+  name     = "public"
+  location = var.location
+  tags     = local.default_tags
+}
+moved {
+  from = module.public_vnet.azurerm_resource_group.vnet_rg[0]
+  to   = azurerm_resource_group.public
+}
 # separate vNET as Postgres/Mysql flexible server currently doesn't support a vNET with ipv4 and ipv6 address spaces
 module "public_db_vnet" {
   source = "./modules/azure-full-vnet"
 
-  base_name          = "public"
+  base_name          = azurerm_resource_group.public.name
   use_existing_rg    = true
   custom_vnet_name   = "public-db-vnet"
   tags               = local.default_tags
