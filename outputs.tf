@@ -28,15 +28,10 @@ resource "local_file" "jenkins_infra_data_report" {
         split(",", module.privatek8s_sponsored_vnet.public_ip_list),
       ),
     },
-    "privatek8s.jenkins.io" = {
-      "outbound_ips"      = split(",", module.private_vnet.public_ip_list),
-      "private_lb_subnet" = "privatek8s-tier",
-    },
     "privatek8s-sponsored.jenkins.io" = {
       "outbound_ips"      = split(",", module.privatek8s_sponsored_vnet.public_ip_list),
       "private_lb_subnet" = "privatek8s-sponsored-commons",
     },
-
     "private.vpn.jenkins.io" = {
       # VPN VM uses its public IP as outbound method (default Azure behavior) instead of the outbound NAT gateway
       "outbound_ips" = [azurerm_public_ip.vpn_public.ip_address],
@@ -47,7 +42,6 @@ resource "local_file" "jenkins_infra_data_report" {
       "infra-ci-jenkins-io-sponsored-vnet"   = module.infra_ci_jenkins_io_sponsored_vnet.vnet_address_space,
       "private-vnet"                         = module.private_vnet.vnet_address_space,
       "public-db-vnet"                       = module.public_db_vnet.vnet_address_space,
-      "public-vnet"                          = module.public_vnet.vnet_address_space,
       "trusted-ci-jenkins-io-sponsored-vnet" = module.trusted_ci_jenkins_io_sponsored_vnet.vnet_address_space,
     }
   })
