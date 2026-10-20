@@ -3,11 +3,11 @@
 #   <https://github.com/jenkins-infra/iep/tree/master/iep-002>
 #
 #                                                  ┌────────────────┐   Vnet peering
-#                                                  │                │◄───────────────────┐
-#                                                  │                │              ┌─────▼──────────────┐
-#                                                  │  Public VNet   │              │                    │
+#                                                  │     Public     │◄───────────────────┐
+#                                                  │    Sponsored   │              ┌─────▼──────────────┐
+#                                                  │     VNet       │              │                    │
 #                                                  │                │              │                    │
-#                                                  │   IPv4 + IPv6  │              │   Public DB        │
+#                                                  │   IPv4 + IPv6  │              │   Public DB VNet   │
 #                                                  └────────────────┘            ┌►│                    │
 #                                                    │          │                │ │                    │
 #                                                    │          │                │ └───────────▲────────┘
@@ -42,36 +42,6 @@
 #                                           └────────────────────────┘
 #
 # See also https://github.com/jenkins-infra/azure/blob/legacy-tf/plans/vnets.tf
-
-module "public_vnet" {
-  source = "./modules/azure-full-vnet"
-
-  base_name = "public"
-  tags      = local.default_tags
-  location  = var.location
-  # No NAT gateway as the AKS cluster requires an LB for its outbound method (due to IPv6 unsupported on NAT gateways)
-  vnet_address_space = ["10.244.0.0/14", "fd00:db8:deca::/48"] # from 10.244.0.1 - to 10.247.255.255
-  subnets = [
-    {
-      # publick8s AKS cluster with Azure CNI and dual-stack
-      name = "publick8s"
-      address_prefixes = [
-        "10.245.2.0/24",           # 10.245.2.1 - 10.245.2.254
-        "fd00:db8:deca:deee::/64", # fd00:db8:deca:deee:0:0:0:0 - fd00:db8:deca:deee:ffff:ffff:ffff:ffff
-      ]
-      service_endpoints                             = ["Microsoft.KeyVault", "Microsoft.Storage"]
-      delegations                                   = {}
-      private_link_service_network_policies_enabled = false # Required to define Azure PLS
-      private_endpoint_network_policies             = "Enabled"
-    },
-  ]
-
-  peered_vnets = {
-    "${module.private_vnet.vnet_name}"                       = module.private_vnet.vnet_id,
-    "${module.public_db_vnet.vnet_name}"                     = module.public_db_vnet.vnet_id,
-    "${module.infra_ci_jenkins_io_sponsored_vnet.vnet_name}" = module.infra_ci_jenkins_io_sponsored_vnet.vnet_id,
-  }
-}
 
 module "public_sponsored_vnet" {
   source = "./modules/azure-full-vnet"
@@ -141,7 +111,6 @@ module "private_vnet" {
   ]
 
   peered_vnets = {
-    "${module.public_vnet.vnet_name}"                          = module.public_vnet.vnet_id,
     "${module.public_sponsored_vnet.vnet_name}"                = module.public_sponsored_vnet.vnet_id,
     "${module.public_db_vnet.vnet_name}"                       = module.public_db_vnet.vnet_id,
     "${module.infra_ci_jenkins_io_sponsored_vnet.vnet_name}"   = module.infra_ci_jenkins_io_sponsored_vnet.vnet_id,
@@ -319,7 +288,6 @@ module "infra_ci_jenkins_io_sponsored_vnet" {
   peered_vnets = {
     "${module.private_vnet.vnet_name}"              = module.private_vnet.vnet_id,
     "${module.public_db_vnet.vnet_name}"            = module.public_db_vnet.vnet_id,
-    "${module.public_vnet.vnet_name}"               = module.public_vnet.vnet_id,
     "${module.public_sponsored_vnet.vnet_name}"     = module.public_sponsored_vnet.vnet_id,
     "${module.privatek8s_sponsored_vnet.vnet_name}" = module.privatek8s_sponsored_vnet.vnet_id,
   }
@@ -439,7 +407,6 @@ module "public_db_vnet" {
   ]
   peered_vnets = {
     "${module.infra_ci_jenkins_io_sponsored_vnet.vnet_name}" = module.infra_ci_jenkins_io_sponsored_vnet.vnet_id,
-    "${module.public_vnet.vnet_name}"                        = module.public_vnet.vnet_id
     "${module.public_sponsored_vnet.vnet_name}"              = module.public_sponsored_vnet.vnet_id,
     "${module.private_vnet.vnet_name}"                       = module.private_vnet.vnet_id
   }
