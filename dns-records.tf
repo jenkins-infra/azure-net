@@ -425,20 +425,7 @@ resource "azurerm_dns_txt_record" "apex_jenkinsciorg" {
     value = "v=spf1 mx ip4:199.193.196.24 ip4:140.211.15.0/24 ip4:140.211.8.0/23 ip4:173.203.60.151 ip4:140.211.166.128/25 include:sendgrid.net -all"
   }
   record {
-    # TODO: identify this value
-    value = "d9g3op5gq2093d1q9kqc4mteqr"
-  }
-
-  tags = local.default_tags
-}
-# Used for Godaddy certificate for artifactory (repo.jenkins-ci.org)
-resource "azurerm_dns_txt_record" "repo_jenkinsci_org" {
-  name                = "repo"
-  zone_name           = data.azurerm_dns_zone.jenkinsciorg.name
-  resource_group_name = data.azurerm_resource_group.proddns_jenkinsci.name
-  ttl                 = 300
-
-  record {
+    # Used for Godaddy ownership validation to author certificate for artifactory (repo.jenkins-ci.org)
     value = "mt9tj9gvhf6usdbdl0pg80r5ga"
   }
 
