@@ -428,9 +428,18 @@ resource "azurerm_dns_txt_record" "apex_jenkinsciorg" {
     # TODO: identify this value
     value = "d9g3op5gq2093d1q9kqc4mteqr"
   }
+
+  tags = local.default_tags
+}
+# Used for Godaddy certificate for artifactory (repo.jenkins-ci.org)
+resource "azurerm_dns_txt_record" "repo_jenkinsci_org" {
+  name                = "repo"
+  zone_name           = data.azurerm_dns_zone.jenkinsciorg.name
+  resource_group_name = data.azurerm_resource_group.proddns_jenkinsci.name
+  ttl                 = 300
+
   record {
-    # TXT record for Godaddy 2023 Dec. certificate renewal - https://groups.google.com/g/jenkins-infra/c/EgbRESb74oA/m/GogykGRFAwAJ
-    value = "37vdk1n5ihnd474hlm060uiek6"
+    value = "mt9tj9gvhf6usdbdl0pg80r5ga"
   }
 
   tags = local.default_tags
