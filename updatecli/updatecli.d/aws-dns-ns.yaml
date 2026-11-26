@@ -18,7 +18,8 @@ sources:
     kind: json
     spec:
       file: https://reports.jenkins.io/jenkins-infra-data-reports/aws-sponsorship.json
-      key: aws\.ci\.jenkins\.io.name_servers
+      engine: dasel/v3
+      key: $this["aws.ci.jenkins.io"].name_servers
     transformers:
       - replacers:
           - from: '['
